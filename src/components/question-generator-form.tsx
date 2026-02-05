@@ -89,11 +89,12 @@ export function QuestionGeneratorForm() {
         body: JSON.stringify(formData),
       })
 
+      const data = await response.json()
+
       if (!response.ok) {
-        throw new Error("Generation failed")
+        throw new Error(data.error || "Generation failed")
       }
 
-      const data = await response.json()
       setGeneratedQuestions(data.questions)
       setMetadata(data.metadata)
 
@@ -102,8 +103,9 @@ export function QuestionGeneratorForm() {
       })
     } catch (error) {
       console.error("Generation failed:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate questions. Please try again."
       toast.error("Generation failed", {
-        description: "Failed to generate questions. Please try again.",
+        description: errorMessage,
       })
     } finally {
       setIsGenerating(false)
