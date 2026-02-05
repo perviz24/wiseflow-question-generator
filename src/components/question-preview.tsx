@@ -3,7 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Circle, FileText, Save, Download } from "lucide-react"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2 } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
 interface Question {
@@ -27,9 +27,11 @@ interface QuestionPreviewProps {
   }
   onSave?: () => void
   onExport?: () => void
+  isSaving?: boolean
+  isExporting?: boolean
 }
 
-export function QuestionPreview({ questions, metadata, onSave, onExport }: QuestionPreviewProps) {
+export function QuestionPreview({ questions, metadata, onSave, onExport, isSaving, isExporting }: QuestionPreviewProps) {
   const getQuestionTypeLabel = (type: string) => {
     const labels = {
       mcq: "Multiple Choice",
@@ -62,13 +64,31 @@ export function QuestionPreview({ questions, metadata, onSave, onExport }: Quest
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={onSave} variant="default">
-                <Save className="mr-2 h-4 w-4" />
-                Save to Library
+              <Button onClick={onSave} variant="default" disabled={isSaving || isExporting}>
+                {isSaving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save to Library
+                  </>
+                )}
               </Button>
-              <Button onClick={onExport} variant="outline">
-                <Download className="mr-2 h-4 w-4" />
-                Export JSON
+              <Button onClick={onExport} variant="outline" disabled={isSaving || isExporting}>
+                {isExporting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export JSON
+                  </>
+                )}
               </Button>
             </div>
           </div>

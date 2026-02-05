@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { toast } from "sonner"
+import { useMutation } from "convex/react"
+import { api } from "../../convex/_generated/api"
 
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
@@ -61,6 +63,9 @@ export function QuestionGeneratorForm() {
     difficulty: string
     language: string
   } | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
 
   const toggleQuestionType = (type: QuestionType) => {
     setFormData((prev) => ({
@@ -103,11 +108,46 @@ export function QuestionGeneratorForm() {
     }
   }
 
-  const handleSave = () => {
-    // TODO: Save to Convex (Feature #8)
-    toast.info("Coming soon", {
-      description: "Save to library feature coming next!",
-    })
+  const handleSave = async () => {
+    if (!generatedQuestions || !metadata) return
+
+    setIsSaving(true)
+    try {
+      // Transform questions to match Convex schema
+      const questionsToSave = generatedQuestions.map((q) => ({
+        title: q.stimulus.substring(0, 100), // Use first 100 chars as title
+        subject: metadata.subject,
+        difficulty: metadata.difficulty as "easy" | "medium" | "hard",
+        language: metadata.language as "sv" | "en",
+        tags: [metadata.topic],
+        type: q.type,
+        stimulus: q.stimulus,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        shuffleOptions: q.type === "mcq",
+        maxLength: q.type === "longtextV2" ? 5000 : undefined,
+        formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
+        instructorStimulus: q.instructorStimulus,
+        submitOverLimit: false,
+        score: 1,
+        minScore: 0,
+        maxScore: 1,
+        generatedBy: "ai" as const,
+      }))
+
+      const result = await saveQuestionsMutation({ questions: questionsToSave })
+
+      toast.success("Questions saved!", {
+        description: `Successfully saved ${result.count} questions to your library.`,
+      })
+    } catch (error) {
+      console.error("Save failed:", error)
+      toast.error("Save failed", {
+        description: "Failed to save questions. Please try again.",
+      })
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleExport = () => {
@@ -131,6 +171,7 @@ export function QuestionGeneratorForm() {
           metadata={metadata}
           onSave={handleSave}
           onExport={handleExport}
+          isSaving={isSaving}
         />
         <div className="flex justify-center">
           <Button onClick={handleGenerateNew} variant="outline">
