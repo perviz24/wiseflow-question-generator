@@ -56,11 +56,22 @@ export function QuestionGeneratorForm() {
     setIsGenerating(true)
 
     try {
-      // TODO: Call AI generation API
-      console.log("Generating questions with:", formData)
-      await new Promise((resolve) => setTimeout(resolve, 2000)) // Simulate API call
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        throw new Error("Generation failed")
+      }
+
+      const data = await response.json()
+      console.log("Generated questions:", data.questions)
+      // TODO: Display the generated questions
     } catch (error) {
       console.error("Generation failed:", error)
+      // TODO: Show error toast
     } finally {
       setIsGenerating(false)
     }
