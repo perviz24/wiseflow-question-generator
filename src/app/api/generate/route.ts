@@ -112,7 +112,7 @@ Generate the questions now.`
 
     // Generate questions using Vercel AI SDK with Anthropic
     const { output } = await generateText({
-      model: anthropic("claude-3-5-sonnet-20241022"),
+      model: anthropic("claude-sonnet-4-5"),
       output: Output.object({
         schema: GeneratedQuestionsSchema,
       }),
