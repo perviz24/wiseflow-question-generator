@@ -219,6 +219,7 @@ export function QuestionGeneratorForm() {
               placeholder="e.g., Biology, Mathematics, History"
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+              autoComplete="off"
               required
             />
           </div>
@@ -231,6 +232,7 @@ export function QuestionGeneratorForm() {
               placeholder="e.g., Cell division, Algebra, World War II"
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+              autoComplete="off"
               required
             />
           </div>
@@ -268,33 +270,49 @@ export function QuestionGeneratorForm() {
                 setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
               }
             />
+            <p className="text-sm text-muted-foreground">Choose between 1 and 20 questions</p>
           </div>
 
           {/* Question Types */}
           <div className="space-y-2">
             <Label>Question Types *</Label>
-            <div className="flex flex-wrap gap-2">
-              <Badge
-                variant={formData.questionTypes.includes("mcq") ? "default" : "outline"}
-                className="cursor-pointer"
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+              <button
+                type="button"
                 onClick={() => toggleQuestionType("mcq")}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                  formData.questionTypes.includes("mcq")
+                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                }`}
+                aria-pressed={formData.questionTypes.includes("mcq")}
               >
                 Multiple Choice
-              </Badge>
-              <Badge
-                variant={formData.questionTypes.includes("true_false") ? "default" : "outline"}
-                className="cursor-pointer"
+              </button>
+              <button
+                type="button"
                 onClick={() => toggleQuestionType("true_false")}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                  formData.questionTypes.includes("true_false")
+                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                }`}
+                aria-pressed={formData.questionTypes.includes("true_false")}
               >
                 True/False
-              </Badge>
-              <Badge
-                variant={formData.questionTypes.includes("longtextV2") ? "default" : "outline"}
-                className="cursor-pointer"
+              </button>
+              <button
+                type="button"
                 onClick={() => toggleQuestionType("longtextV2")}
+                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                  formData.questionTypes.includes("longtextV2")
+                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                }`}
+                aria-pressed={formData.questionTypes.includes("longtextV2")}
               >
                 Essay
-              </Badge>
+              </button>
             </div>
             {formData.questionTypes.length === 0 && (
               <p className="text-sm text-muted-foreground">
@@ -330,8 +348,12 @@ export function QuestionGeneratorForm() {
               placeholder="Add any specific instructions, learning outcomes, or context for the questions..."
               value={formData.context}
               onChange={(e) => setFormData({ ...formData, context: e.target.value })}
+              maxLength={2000}
               rows={4}
             />
+            <p className="text-sm text-muted-foreground">
+              {formData.context?.length || 0} / 2000 characters
+            </p>
           </div>
 
           {/* Submit Button */}

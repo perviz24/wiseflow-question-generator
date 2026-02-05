@@ -3,12 +3,6 @@ import { generateText, Output } from "ai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { auth } from "@clerk/nextjs/server"
 import { z } from "zod"
-import { ANTHROPIC_API_KEY } from "@/lib/env"
-
-// Create Anthropic provider instance with custom API key
-const anthropic = createAnthropic({
-  apiKey: ANTHROPIC_API_KEY,
-})
 
 // Define the schema for a single question
 const QuestionSchema = z.object({
@@ -101,6 +95,17 @@ Requirements:
 - Ensure questions are pedagogically sound and aligned with learning outcomes.
 
 Generate the questions now.`
+
+    // Create Anthropic provider instance at runtime
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      return Response.json(
+        { error: "ANTHROPIC_API_KEY not configured" },
+        { status: 500 }
+      )
+    }
+
+    const anthropic = createAnthropic({ apiKey })
 
     // Generate questions using Vercel AI SDK with Anthropic
     const { output } = await generateText({
