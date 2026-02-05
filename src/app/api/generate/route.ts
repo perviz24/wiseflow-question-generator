@@ -4,6 +4,9 @@ import { createAnthropic } from "@ai-sdk/anthropic"
 import { auth } from "@clerk/nextjs/server"
 import { z } from "zod"
 
+// Set function timeout to 60 seconds
+export const maxDuration = 60
+
 // Define the schema for a single question
 const QuestionSchema = z.object({
   type: z.enum(["mcq", "true_false", "longtextV2"]),
@@ -115,6 +118,7 @@ Generate the questions now.`
       }),
       prompt,
       temperature: 0.7,
+      maxTokens: 4096,
     })
 
     // Return the generated questions
@@ -131,8 +135,9 @@ Generate the questions now.`
     })
   } catch (error) {
     console.error("Generation error:", error)
+    const errorMessage = error instanceof Error ? error.message : "Unknown error"
     return Response.json(
-      { error: "Failed to generate questions" },
+      { error: `Failed to generate questions: ${errorMessage}` },
       { status: 500 }
     )
   }
