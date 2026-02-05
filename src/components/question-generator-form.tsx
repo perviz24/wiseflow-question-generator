@@ -15,6 +15,8 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles } from "lucide-react"
+import { QuestionPreview } from "./question-preview"
+import { toast } from "sonner"
 
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
@@ -30,6 +32,17 @@ interface FormData {
   context?: string
 }
 
+interface Question {
+  type: "mcq" | "true_false" | "longtextV2"
+  stimulus: string
+  options?: Array<{
+    label: string
+    value: string
+  }>
+  correctAnswer?: string[]
+  instructorStimulus?: string
+}
+
 export function QuestionGeneratorForm() {
   const [formData, setFormData] = useState<FormData>({
     subject: "",
@@ -41,6 +54,13 @@ export function QuestionGeneratorForm() {
     context: "",
   })
   const [isGenerating, setIsGenerating] = useState(false)
+  const [generatedQuestions, setGeneratedQuestions] = useState<Question[] | null>(null)
+  const [metadata, setMetadata] = useState<{
+    subject: string
+    topic: string
+    difficulty: string
+    language: string
+  } | null>(null)
 
   const toggleQuestionType = (type: QuestionType) => {
     setFormData((prev) => ({
@@ -67,14 +87,59 @@ export function QuestionGeneratorForm() {
       }
 
       const data = await response.json()
-      console.log("Generated questions:", data.questions)
-      // TODO: Display the generated questions
+      setGeneratedQuestions(data.questions)
+      setMetadata(data.metadata)
+
+      toast.success("Questions generated!", {
+        description: `Successfully generated ${data.questions.length} questions.`,
+      })
     } catch (error) {
       console.error("Generation failed:", error)
-      // TODO: Show error toast
+      toast.error("Generation failed", {
+        description: "Failed to generate questions. Please try again.",
+      })
     } finally {
       setIsGenerating(false)
     }
+  }
+
+  const handleSave = () => {
+    // TODO: Save to Convex (Feature #8)
+    toast.info("Coming soon", {
+      description: "Save to library feature coming next!",
+    })
+  }
+
+  const handleExport = () => {
+    // TODO: Export to Wiseflow JSON (Feature #9)
+    toast.info("Coming soon", {
+      description: "Export to Wiseflow JSON feature coming next!",
+    })
+  }
+
+  const handleGenerateNew = () => {
+    setGeneratedQuestions(null)
+    setMetadata(null)
+  }
+
+  // Show preview if questions have been generated
+  if (generatedQuestions && metadata) {
+    return (
+      <div className="space-y-4">
+        <QuestionPreview
+          questions={generatedQuestions}
+          metadata={metadata}
+          onSave={handleSave}
+          onExport={handleExport}
+        />
+        <div className="flex justify-center">
+          <Button onClick={handleGenerateNew} variant="outline">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate New Questions
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
