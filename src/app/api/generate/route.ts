@@ -118,7 +118,6 @@ Generate the questions now.`
       }),
       prompt,
       temperature: 0.7,
-      maxTokens: 4096,
     })
 
     // Return the generated questions
