@@ -19,6 +19,7 @@ import { QuestionPreview } from "./question-preview"
 import { toast } from "sonner"
 import { useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
+import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
@@ -64,6 +65,7 @@ export function QuestionGeneratorForm() {
     language: string
   } | null>(null)
   const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
 
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
 
@@ -151,10 +153,22 @@ export function QuestionGeneratorForm() {
   }
 
   const handleExport = () => {
-    // TODO: Export to Wiseflow JSON (Feature #9)
-    toast.info("Coming soon", {
-      description: "Export to Wiseflow JSON feature coming next!",
-    })
+    if (!generatedQuestions || !metadata) return
+
+    setIsExporting(true)
+    try {
+      downloadWiseflowJSON(generatedQuestions, metadata)
+      toast.success("Export successful!", {
+        description: "Questions exported to Wiseflow JSON format.",
+      })
+    } catch (error) {
+      console.error("Export failed:", error)
+      toast.error("Export failed", {
+        description: "Failed to export questions. Please try again.",
+      })
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const handleGenerateNew = () => {
@@ -172,6 +186,7 @@ export function QuestionGeneratorForm() {
           onSave={handleSave}
           onExport={handleExport}
           isSaving={isSaving}
+          isExporting={isExporting}
         />
         <div className="flex justify-center">
           <Button onClick={handleGenerateNew} variant="outline">
