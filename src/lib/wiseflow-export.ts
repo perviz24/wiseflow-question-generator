@@ -59,6 +59,7 @@ interface ExportMetadata {
   examType?: string
   courseCode?: string
   additionalTags?: string
+  tutorInitials?: string
 }
 
 function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>): string[] {
@@ -87,6 +88,11 @@ function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>):
 
   // Add AI-generated marker
   autoTags.push("AI-generated")
+
+  // Add tutor initials if provided
+  if (metadata.tutorInitials && metadata.tutorInitials.trim()) {
+    autoTags.push(metadata.tutorInitials.trim())
+  }
 
   return autoTags
 }

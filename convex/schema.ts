@@ -45,4 +45,13 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_subject", ["subject"])
     .index("by_created_at", ["createdAt"]),
+
+  userProfiles: defineTable({
+    userId: v.string(), // Clerk user ID
+    tutorInitials: v.string(), // e.g., "JD", "AB", "id:pma"
+    uiLanguage: v.union(v.literal("sv"), v.literal("en")), // UI language preference
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"]),
 })

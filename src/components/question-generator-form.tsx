@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { toast } from "sonner"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 
@@ -82,6 +82,7 @@ export function QuestionGeneratorForm() {
   const [isExporting, setIsExporting] = useState(false)
 
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
+  const userProfile = useQuery(api.profiles.getUserProfile)
 
   const toggleQuestionType = (type: QuestionType) => {
     setFormData((prev) => ({
@@ -173,7 +174,7 @@ export function QuestionGeneratorForm() {
 
     setIsExporting(true)
     try {
-      // Pass complete metadata including tagging fields
+      // Pass complete metadata including tagging fields and tutor initials
       const exportMetadata = {
         ...metadata,
         exportFormat: formData.exportFormat,
@@ -182,6 +183,7 @@ export function QuestionGeneratorForm() {
         examType: formData.examType,
         courseCode: formData.courseCode,
         additionalTags: formData.additionalTags,
+        tutorInitials: userProfile?.tutorInitials || "",
       }
 
       downloadWiseflowJSON(generatedQuestions, exportMetadata)

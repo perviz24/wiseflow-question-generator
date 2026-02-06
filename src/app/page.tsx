@@ -1,5 +1,8 @@
 import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
+import Link from "next/link"
+import { Settings } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
@@ -10,8 +13,14 @@ export default function Home() {
           <h1 className="text-xl font-semibold tracking-tight">
             Wiseflow Question Generator
           </h1>
-          <div>
+          <div className="flex items-center gap-3">
             <SignedIn>
+              <Link href="/settings">
+                <Button variant="ghost" size="icon">
+                  <Settings className="h-5 w-5" />
+                  <span className="sr-only">Settings</span>
+                </Button>
+              </Link>
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
             <SignedOut>
