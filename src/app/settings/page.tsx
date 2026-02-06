@@ -17,8 +17,10 @@ import {
 import { toast } from "sonner"
 import { Settings, Loader2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { useTranslation } from "@/lib/language-context"
 
 export default function SettingsPage() {
+  const { t } = useTranslation()
   // Settings page for tutor profile configuration
   const profile = useQuery(api.profiles.getUserProfile)
   const upsertProfile = useMutation(api.profiles.upsertProfile)
@@ -45,15 +47,15 @@ export default function SettingsPage() {
         uiLanguage,
       })
 
-      toast.success("Inställningar sparade!", {
+      toast.success(t("settingsSaved"), {
         description: result.action === "created"
-          ? "Din profil har skapats."
-          : "Dina inställningar har uppdaterats.",
+          ? t("settingsSavedDescCreated")
+          : t("settingsSavedDescUpdated"),
       })
     } catch (error) {
       console.error("Failed to save settings:", error)
-      toast.error("Misslyckades att spara", {
-        description: "Kunde inte spara inställningar. Försök igen.",
+      toast.error(t("settingsSaveFailed"), {
+        description: t("settingsSaveFailedDesc"),
       })
     } finally {
       setIsSaving(false)
@@ -74,7 +76,7 @@ export default function SettingsPage() {
         <Link href="/">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Tillbaka
+            {t("back")}
           </Button>
         </Link>
       </div>
@@ -82,10 +84,10 @@ export default function SettingsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Profilinställningar
+            {t("profileSettings")}
           </CardTitle>
           <CardDescription>
-            Ställ in dina personliga inställningar för frågegenereringen
+            {t("profileSettingsDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -93,11 +95,11 @@ export default function SettingsPage() {
             {/* Tutor Initials */}
             <div className="space-y-2">
               <Label htmlFor="tutorInitials">
-                Lärarinitialer *
+                {t("tutorInitials")} *
               </Label>
               <Input
                 id="tutorInitials"
-                placeholder="t.ex. AB, JD, eller id:pma"
+                placeholder={t("tutorInitialsPlaceholder")}
                 value={tutorInitials}
                 onChange={(e) => setTutorInitials(e.target.value)}
                 maxLength={20}
@@ -105,14 +107,13 @@ export default function SettingsPage() {
                 required
               />
               <p className="text-sm text-muted-foreground">
-                Dessa initialer läggs automatiskt till som tagg på alla dina genererade frågor.
-                Detta hjälper dig att hitta dina frågor i Wiseflow.
+                {t("tutorInitialsHelp")}
               </p>
             </div>
 
             {/* UI Language */}
             <div className="space-y-2">
-              <Label htmlFor="uiLanguage">Gränssnittsspråk</Label>
+              <Label htmlFor="uiLanguage">{t("uiLanguage")}</Label>
               <Select
                 value={uiLanguage}
                 onValueChange={(value: "sv" | "en") => setUiLanguage(value)}
@@ -121,12 +122,12 @@ export default function SettingsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sv">Svenska</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="sv">{t("swedish")}</SelectItem>
+                  <SelectItem value="en">{t("english")}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-sm text-muted-foreground">
-                Välj vilket språk du vill använda i gränssnittet
+                {t("uiLanguageHelp")}
               </p>
             </div>
 
@@ -139,10 +140,10 @@ export default function SettingsPage() {
               {isSaving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Sparar...
+                  {t("saving")}
                 </>
               ) : (
-                <>Spara inställningar</>
+                <>{t("saveSettings")}</>
               )}
             </Button>
           </form>

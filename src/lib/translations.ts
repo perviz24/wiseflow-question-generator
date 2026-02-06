@@ -8,6 +8,7 @@ export interface Translations {
   signIn: string
   signOut: string
   settings: string
+  back: string
 
   // Home Page
   welcomeTitle: string
@@ -105,6 +106,7 @@ export const translations: Record<Language, Translations> = {
     signIn: "Logga in",
     signOut: "Logga ut",
     settings: "Inställningar",
+    back: "Tillbaka",
 
     // Home Page
     welcomeTitle: "Välkommen till Wiseflow Frågegenerator",
@@ -200,6 +202,7 @@ export const translations: Record<Language, Translations> = {
     signIn: "Sign In",
     signOut: "Sign Out",
     settings: "Settings",
+    back: "Back",
 
     // Home Page
     welcomeTitle: "Welcome to Wiseflow Question Generator",
