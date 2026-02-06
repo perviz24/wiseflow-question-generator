@@ -128,9 +128,7 @@ export const translations: Record<Language, Translations> = {
     numQuestionsHelp: "Välj mellan 1 och 20 frågor",
     questionTypes: "Frågetyper",
     questionTypesHelp: "Välj minst en frågetyp",
-    multipleChoice: "Flervalsf
-
-råga",
+    multipleChoice: "Flervalsfråga",
     trueFalse: "Sant/Falskt",
     essay: "Essä",
     language: "Språk",
