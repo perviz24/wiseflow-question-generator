@@ -15,7 +15,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Settings, Loader2 } from "lucide-react"
+import { Settings, Loader2, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 
 export default function SettingsPage() {
   // Settings page for tutor profile configuration
@@ -69,6 +70,14 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto max-w-2xl py-8">
+      <div className="mb-4">
+        <Link href="/">
+          <Button variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Tillbaka
+          </Button>
+        </Link>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
