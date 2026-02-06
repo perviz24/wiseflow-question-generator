@@ -16,6 +16,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
+import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
@@ -80,9 +81,21 @@ export function QuestionGeneratorForm() {
   } | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [uploadedContentSource, setUploadedContentSource] = useState<string>("")
 
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
   const userProfile = useQuery(api.profiles.getUserProfile)
+
+  const handleContentExtracted = (content: string, source: string) => {
+    // Append uploaded content to the context field
+    setFormData((prev) => ({
+      ...prev,
+      context: prev.context
+        ? `${prev.context}\n\n---\nContent from ${source}:\n${content}`
+        : `Content from ${source}:\n${content}`,
+    }))
+    setUploadedContentSource(source)
+  }
 
   const toggleQuestionType = (type: QuestionType) => {
     setFormData((prev) => ({
@@ -368,6 +381,9 @@ export function QuestionGeneratorForm() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Content Upload */}
+          <ContentUpload onContentExtracted={handleContentExtracted} />
 
           {/* Context (Optional) */}
           <div className="space-y-2">
