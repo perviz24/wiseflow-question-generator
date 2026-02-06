@@ -1,9 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Circle, FileText, Save, Download, Loader2 } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 
 interface Question {
@@ -27,11 +30,15 @@ interface QuestionPreviewProps {
   }
   onSave?: () => void
   onExport?: () => void
+  onUpdateQuestions?: (updatedQuestions: Question[]) => void
   isSaving?: boolean
   isExporting?: boolean
 }
 
-export function QuestionPreview({ questions, metadata, onSave, onExport, isSaving, isExporting }: QuestionPreviewProps) {
+export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdateQuestions, isSaving, isExporting }: QuestionPreviewProps) {
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
+
   const getQuestionTypeLabel = (type: string) => {
     const labels = {
       mcq: "Multiple Choice",
@@ -48,6 +55,56 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, isSavin
       hard: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200",
     }
     return colors[difficulty as keyof typeof colors] || "bg-gray-100 text-gray-800"
+  }
+
+  const handleEditClick = (index: number) => {
+    setEditingIndex(index)
+    setEditedQuestion({ ...questions[index] })
+  }
+
+  const handleCancelEdit = () => {
+    setEditingIndex(null)
+    setEditedQuestion(null)
+  }
+
+  const handleSaveEdit = () => {
+    if (editingIndex === null || !editedQuestion || !onUpdateQuestions) return
+
+    const updatedQuestions = [...questions]
+    updatedQuestions[editingIndex] = editedQuestion
+    onUpdateQuestions(updatedQuestions)
+
+    setEditingIndex(null)
+    setEditedQuestion(null)
+  }
+
+  const updateEditedOption = (optionIndex: number, field: 'label' | 'value', newValue: string) => {
+    if (!editedQuestion || !editedQuestion.options) return
+
+    const updatedOptions = [...editedQuestion.options]
+    updatedOptions[optionIndex] = {
+      ...updatedOptions[optionIndex],
+      [field]: newValue
+    }
+
+    setEditedQuestion({
+      ...editedQuestion,
+      options: updatedOptions
+    })
+  }
+
+  const toggleCorrectAnswer = (label: string) => {
+    if (!editedQuestion) return
+
+    const currentAnswers = editedQuestion.correctAnswer || []
+    const isCurrentlyCorrect = currentAnswers.includes(label)
+
+    setEditedQuestion({
+      ...editedQuestion,
+      correctAnswer: isCurrentlyCorrect
+        ? currentAnswers.filter(a => a !== label)
+        : [...currentAnswers, label]
+    })
   }
 
   return (
@@ -110,66 +167,125 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, isSavin
       </Card>
 
       {/* Question cards */}
-      {questions.map((question, index) => (
-        <Card key={index}>
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
-                  <span className="text-sm text-muted-foreground">Question {index + 1}</span>
-                </div>
-                <CardTitle className="text-lg leading-relaxed">{question.stimulus}</CardTitle>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* MCQ and True/False options */}
-            {(question.type === "mcq" || question.type === "true_false") && question.options && (
-              <div className="space-y-2">
-                {question.options.map((option, optionIndex) => {
-                  const isCorrect = question.correctAnswer?.includes(option.label)
-                  return (
-                    <div
-                      key={optionIndex}
-                      className={`flex items-start gap-3 rounded-lg border p-3 ${
-                        isCorrect
-                          ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
-                          : "border-border"
-                      }`}
-                    >
-                      {isCorrect ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                      ) : (
-                        <Circle className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                      )}
-                      <div className="flex-1">
-                        <span className="font-medium">{option.label}.</span>{" "}
-                        <span>{option.value}</span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+      {questions.map((question, index) => {
+        const isEditing = editingIndex === index
+        const displayQuestion = isEditing && editedQuestion ? editedQuestion : question
 
-            {/* Essay guidance */}
-            {question.type === "longtextV2" && question.instructorStimulus && (
-              <>
-                <Separator />
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
-                  <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
-                    Instructor Guidance
+        return (
+          <Card key={index}>
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
+                    <span className="text-sm text-muted-foreground">Question {index + 1}</span>
                   </div>
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    {question.instructorStimulus}
-                  </p>
+                  {isEditing ? (
+                    <Textarea
+                      value={editedQuestion?.stimulus || ""}
+                      onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, stimulus: e.target.value } : null)}
+                      className="text-lg leading-relaxed min-h-[80px]"
+                    />
+                  ) : (
+                    <CardTitle className="text-lg leading-relaxed">{question.stimulus}</CardTitle>
+                  )}
                 </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      ))}
+                <div className="ml-4">
+                  {isEditing ? (
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="default" onClick={handleSaveEdit}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={handleCancelEdit}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="ghost" onClick={() => handleEditClick(index)}>
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* MCQ and True/False options */}
+              {(displayQuestion.type === "mcq" || displayQuestion.type === "true_false") && displayQuestion.options && (
+                <div className="space-y-2">
+                  {displayQuestion.options.map((option, optionIndex) => {
+                    const isCorrect = displayQuestion.correctAnswer?.includes(option.label)
+                    return (
+                      <div
+                        key={optionIndex}
+                        className={`flex items-start gap-3 rounded-lg border p-3 ${
+                          isCorrect
+                            ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
+                            : "border-border"
+                        }`}
+                      >
+                        {isEditing ? (
+                          <button
+                            type="button"
+                            onClick={() => toggleCorrectAnswer(option.label)}
+                            className="mt-0.5 flex-shrink-0"
+                          >
+                            {isCorrect ? (
+                              <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                            ) : (
+                              <Circle className="h-5 w-5 text-muted-foreground" />
+                            )}
+                          </button>
+                        ) : (
+                          isCorrect ? (
+                            <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                          ) : (
+                            <Circle className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                          )
+                        )}
+                        <div className="flex-1 flex items-center gap-2">
+                          <span className="font-medium flex-shrink-0">{option.label}.</span>
+                          {isEditing ? (
+                            <Input
+                              value={option.value}
+                              onChange={(e) => updateEditedOption(optionIndex, 'value', e.target.value)}
+                              className="flex-1"
+                            />
+                          ) : (
+                            <span>{option.value}</span>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Essay guidance */}
+              {displayQuestion.type === "longtextV2" && displayQuestion.instructorStimulus && (
+                <>
+                  <Separator />
+                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
+                    <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                      Instructor Guidance
+                    </div>
+                    {isEditing ? (
+                      <Textarea
+                        value={editedQuestion?.instructorStimulus || ""}
+                        onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, instructorStimulus: e.target.value } : null)}
+                        className="text-sm bg-white dark:bg-blue-950"
+                      />
+                    ) : (
+                      <p className="text-sm text-blue-800 dark:text-blue-200">
+                        {question.instructorStimulus}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        )
+      })}
     </div>
   )
 }

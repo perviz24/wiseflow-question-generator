@@ -218,6 +218,10 @@ export function QuestionGeneratorForm() {
     setMetadata(null)
   }
 
+  const handleUpdateQuestions = (updatedQuestions: Question[]) => {
+    setGeneratedQuestions(updatedQuestions)
+  }
+
   // Show preview if questions have been generated
   if (generatedQuestions && metadata) {
     return (
@@ -227,6 +231,7 @@ export function QuestionGeneratorForm() {
           metadata={metadata}
           onSave={handleSave}
           onExport={handleExport}
+          onUpdateQuestions={handleUpdateQuestions}
           isSaving={isSaving}
           isExporting={isExporting}
         />
