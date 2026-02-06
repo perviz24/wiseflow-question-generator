@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import * as pdfjsLib from "pdfjs-dist"
+// @ts-ignore - pdf-parse has incomplete types
+import pdfParse from "pdf-parse"
 import mammoth from "mammoth"
-
-// Set PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -60,20 +58,8 @@ export async function POST(req: NextRequest) {
 
 async function extractPDF(buffer: Buffer): Promise<string> {
   try {
-    const pdfData = new Uint8Array(buffer)
-    const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise
-    let text = ""
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i)
-      const content = await page.getTextContent()
-      const pageText = content.items
-        .map((item: any) => item.str)
-        .join(" ")
-      text += pageText + "\n\n"
-    }
-
-    return text.trim()
+    const data = await pdfParse(buffer)
+    return data.text
   } catch (error) {
     console.error("PDF extraction error:", error)
     throw new Error("Failed to extract text from PDF")
