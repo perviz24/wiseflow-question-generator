@@ -4,12 +4,6 @@ import mammoth from "mammoth"
 export const runtime = "nodejs"
 export const maxDuration = 60
 
-// Dynamic import for pdf-parse (CommonJS module)
-const getPdfParse = async () => {
-  const pdfParse = (await import("pdf-parse")).default
-  return pdfParse
-}
-
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -27,11 +21,14 @@ export async function POST(req: NextRequest) {
 
     // Extract based on file type
     if (fileType === "application/pdf") {
-      extractedText = await extractPDF(buffer)
+      // PDF support coming soon - for now use URL scraping instead
+      return NextResponse.json(
+        { error: "PDF extraction coming soon. Please use URL scraping for PDFs hosted online." },
+        { status: 400 }
+      )
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
       extractedText = await extractWord(buffer)
     } else if (fileType === "application/vnd.openxmlformats-officedocument.presentationml.presentation") {
-      // For PPTX, we'll return an error for now (complex to parse)
       return NextResponse.json(
         { error: "PowerPoint extraction is not yet supported" },
         { status: 400 }
@@ -57,17 +54,6 @@ export async function POST(req: NextRequest) {
       { error: "Failed to extract content from file" },
       { status: 500 }
     )
-  }
-}
-
-async function extractPDF(buffer: Buffer): Promise<string> {
-  try {
-    const pdfParse = await getPdfParse()
-    const data = await pdfParse(buffer)
-    return data.text
-  } catch (error) {
-    console.error("PDF extraction error:", error)
-    throw new Error("Failed to extract text from PDF")
   }
 }
 
