@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
-// @ts-ignore - pdf-parse has incomplete types
-import pdfParse from "pdf-parse"
 import mammoth from "mammoth"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
+
+// Dynamic import for pdf-parse (CommonJS module)
+const getPdfParse = async () => {
+  const pdfParse = (await import("pdf-parse")).default
+  return pdfParse
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -58,6 +62,7 @@ export async function POST(req: NextRequest) {
 
 async function extractPDF(buffer: Buffer): Promise<string> {
   try {
+    const pdfParse = await getPdfParse()
     const data = await pdfParse(buffer)
     return data.text
   } catch (error) {
