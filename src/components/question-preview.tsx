@@ -6,8 +6,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X } from "lucide-react"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2"
@@ -38,6 +39,7 @@ interface QuestionPreviewProps {
 export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdateQuestions, isSaving, isExporting }: QuestionPreviewProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
 
   const getQuestionTypeLabel = (type: string) => {
     const labels = {
@@ -105,6 +107,65 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
         ? currentAnswers.filter(a => a !== label)
         : [...currentAnswers, label]
     })
+  }
+
+  const handleRegenerateAlternatives = async (index: number) => {
+    const question = questions[index]
+
+    // Only regenerate for MCQ and True/False questions
+    if (question.type === "longtextV2") {
+      toast.error("Cannot regenerate", {
+        description: "Essay questions don't have answer options to regenerate."
+      })
+      return
+    }
+
+    setRegeneratingIndex(index)
+
+    try {
+      const response = await fetch("/api/regenerate-alternatives", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questionType: question.type,
+          questionText: question.stimulus,
+          currentOptions: question.options,
+          subject: metadata.subject,
+          topic: metadata.topic,
+          difficulty: metadata.difficulty,
+          language: metadata.language,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Regeneration failed")
+      }
+
+      // Update the question with new options
+      if (onUpdateQuestions) {
+        const updatedQuestions = [...questions]
+        updatedQuestions[index] = {
+          ...question,
+          options: data.options,
+          correctAnswer: data.correctAnswer,
+        }
+        onUpdateQuestions(updatedQuestions)
+      }
+
+      toast.success("Alternatives regenerated!", {
+        description: "New answer options have been generated for this question."
+      })
+    } catch (error) {
+      console.error("Regeneration failed:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to regenerate alternatives"
+      toast.error("Regeneration failed", {
+        description: errorMessage
+      })
+    } finally {
+      setRegeneratingIndex(null)
+    }
   }
 
   return (
@@ -201,9 +262,25 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       </Button>
                     </div>
                   ) : (
-                    <Button size="sm" variant="ghost" onClick={() => handleEditClick(index)}>
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="ghost" onClick={() => handleEditClick(index)}>
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      {(question.type === "mcq" || question.type === "true_false") && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleRegenerateAlternatives(index)}
+                          disabled={regeneratingIndex === index}
+                        >
+                          {regeneratingIndex === index ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
