@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { Settings, Loader2 } from "lucide-react"
 
 export default function SettingsPage() {
+  // Settings page for tutor profile configuration
   const profile = useQuery(api.profiles.getUserProfile)
   const upsertProfile = useMutation(api.profiles.upsertProfile)
 
