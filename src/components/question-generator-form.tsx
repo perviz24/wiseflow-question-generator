@@ -24,6 +24,7 @@ import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
 type Language = "sv" | "en"
+type ExportFormat = "legacy" | "utgaende"
 
 interface FormData {
   subject: string
@@ -33,6 +34,13 @@ interface FormData {
   questionTypes: QuestionType[]
   language: Language
   context?: string
+  // Tagging fields
+  exportFormat: ExportFormat
+  term?: string // T1, T2, T3, T4
+  semester?: string // HT25, VT26
+  examType?: string // Ordinarie, Omtentamen, Quiz
+  courseCode?: string // BIO101, MATH202
+  additionalTags?: string // Comma-separated custom tags
 }
 
 interface Question {
@@ -55,6 +63,12 @@ export function QuestionGeneratorForm() {
     questionTypes: ["mcq"],
     language: "sv",
     context: "",
+    exportFormat: "legacy",
+    term: "",
+    semester: "",
+    examType: "",
+    courseCode: "",
+    additionalTags: "",
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedQuestions, setGeneratedQuestions] = useState<Question[] | null>(null)
@@ -159,9 +173,20 @@ export function QuestionGeneratorForm() {
 
     setIsExporting(true)
     try {
-      downloadWiseflowJSON(generatedQuestions, metadata)
+      // Pass complete metadata including tagging fields
+      const exportMetadata = {
+        ...metadata,
+        exportFormat: formData.exportFormat,
+        term: formData.term,
+        semester: formData.semester,
+        examType: formData.examType,
+        courseCode: formData.courseCode,
+        additionalTags: formData.additionalTags,
+      }
+
+      downloadWiseflowJSON(generatedQuestions, exportMetadata)
       toast.success("Export successful!", {
-        description: "Questions exported to Wiseflow JSON format.",
+        description: `Questions exported to Wiseflow JSON (${formData.exportFormat === "legacy" ? "Legacy" : "Utgående"} format).`,
       })
     } catch (error) {
       console.error("Export failed:", error)
@@ -356,6 +381,97 @@ export function QuestionGeneratorForm() {
             <p className="text-sm text-muted-foreground">
               {formData.context?.length || 0} / 2000 characters
             </p>
+          </div>
+
+          {/* Export Format */}
+          <div className="space-y-2">
+            <Label htmlFor="exportFormat">Export Format</Label>
+            <Select
+              value={formData.exportFormat}
+              onValueChange={(value: ExportFormat) =>
+                setFormData({ ...formData, exportFormat: value })
+              }
+            >
+              <SelectTrigger id="exportFormat">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="legacy">Legacy (tags array)</SelectItem>
+                <SelectItem value="utgaende">Utgående (labels with IDs)</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-sm text-muted-foreground">
+              Choose the Wiseflow JSON format for your exam center
+            </p>
+          </div>
+
+          {/* Tagging Section */}
+          <div className="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+            <div>
+              <h3 className="text-sm font-medium">Tags & Organization</h3>
+              <p className="text-xs text-muted-foreground">
+                Auto-tags: Subject, Topic, Question Type, Difficulty, Language, Timestamp
+              </p>
+            </div>
+
+            {/* Exam Center Tags */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="term">Term/Period</Label>
+                <Input
+                  id="term"
+                  placeholder="e.g., T3"
+                  value={formData.term}
+                  onChange={(e) => setFormData({ ...formData, term: e.target.value })}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="semester">Semester</Label>
+                <Input
+                  id="semester"
+                  placeholder="e.g., HT25"
+                  value={formData.semester}
+                  onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="examType">Exam Type</Label>
+                <Input
+                  id="examType"
+                  placeholder="e.g., Ordinarie"
+                  value={formData.examType}
+                  onChange={(e) => setFormData({ ...formData, examType: e.target.value })}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="courseCode">Course Code</Label>
+                <Input
+                  id="courseCode"
+                  placeholder="e.g., BIO101"
+                  value={formData.courseCode}
+                  onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+
+            {/* Additional Tags */}
+            <div className="space-y-2">
+              <Label htmlFor="additionalTags">Additional Tags (Optional)</Label>
+              <Input
+                id="additionalTags"
+                placeholder="e.g., Ögon, Makula, LO1 (comma-separated)"
+                value={formData.additionalTags}
+                onChange={(e) => setFormData({ ...formData, additionalTags: e.target.value })}
+                autoComplete="off"
+              />
+              <p className="text-xs text-muted-foreground">
+                Separate multiple tags with commas
+              </p>
+            </div>
           </div>
 
           {/* Submit Button */}

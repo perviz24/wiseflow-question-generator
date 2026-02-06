@@ -28,20 +28,120 @@ interface WiseflowQuestion {
   }
 }
 
-interface WiseflowItem {
-  title: string
-  questions: WiseflowQuestion[]
+interface WiseflowLabel {
+  id: number
+  name: string
+  type: "personal"
 }
 
-export function exportToWiseflowJSON(
-  questions: Question[],
-  metadata: {
-    subject: string
-    topic: string
-    difficulty: string
-    language: string
+interface WiseflowItemLegacy {
+  title: string
+  questions: WiseflowQuestion[]
+  tags?: string[]
+}
+
+interface WiseflowItemUtgaende {
+  title: string
+  questions: WiseflowQuestion[]
+  labels?: WiseflowLabel[]
+}
+
+type WiseflowItem = WiseflowItemLegacy | WiseflowItemUtgaende
+
+interface ExportMetadata {
+  subject: string
+  topic: string
+  difficulty: string
+  language: string
+  exportFormat: "legacy" | "utgaende"
+  term?: string
+  semester?: string
+  examType?: string
+  courseCode?: string
+  additionalTags?: string
+}
+
+function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>): string[] {
+  const autoTags: string[] = []
+
+  // Add subject and topic
+  autoTags.push(metadata.subject)
+  autoTags.push(metadata.topic)
+
+  // Add all unique question types from the set
+  questionTypes.forEach((type) => {
+    if (type === "mcq") autoTags.push("MCQ")
+    else if (type === "true_false") autoTags.push("True/False")
+    else if (type === "longtextV2") autoTags.push("Essay")
+  })
+
+  // Add difficulty
+  autoTags.push(metadata.difficulty)
+
+  // Add language
+  autoTags.push(metadata.language === "sv" ? "Swedish" : "English")
+
+  // Add timestamp
+  const timestamp = new Date().toLocaleString("sv-SE")
+  autoTags.push(timestamp)
+
+  // Add AI-generated marker
+  autoTags.push("AI-generated")
+
+  return autoTags
+}
+
+function generateManualTags(metadata: ExportMetadata): string[] {
+  const manualTags: string[] = []
+
+  // Add exam center tags
+  if (metadata.term) manualTags.push(metadata.term)
+  if (metadata.semester) manualTags.push(metadata.semester)
+  if (metadata.examType) manualTags.push(metadata.examType)
+  if (metadata.courseCode) manualTags.push(metadata.courseCode)
+
+  // Add custom additional tags (comma-separated)
+  if (metadata.additionalTags) {
+    const customTags = metadata.additionalTags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0)
+    manualTags.push(...customTags)
   }
-): string {
+
+  return manualTags
+}
+
+function generateLabelsFromTags(tags: string[]): WiseflowLabel[] {
+  // Generate unique IDs for labels (simple hash-based approach)
+  return tags.map((tag, index) => ({
+    id: 900000 + Math.abs(hashString(tag)) % 100000, // Generate ID between 900000-999999
+    name: tag,
+    type: "personal" as const,
+  }))
+}
+
+// Simple string hash function for consistent label IDs
+function hashString(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return hash
+}
+
+export function exportToWiseflowJSON(questions: Question[], metadata: ExportMetadata): string {
+  // Collect all unique question types from questions
+  const questionTypes = new Set<string>()
+  questions.forEach((q) => questionTypes.add(q.type))
+
+  // Generate tags
+  const autoTags = generateAutoTags(metadata, questionTypes)
+  const manualTags = generateManualTags(metadata)
+  const allTags = [...autoTags, ...manualTags]
+
   const wiseflowItems: WiseflowItem[] = questions.map((question, index) => {
     const wiseflowQuestion: WiseflowQuestion = {
       data: {
@@ -89,9 +189,23 @@ export function exportToWiseflowJSON(
         ? question.stimulus.substring(0, 97) + "..."
         : question.stimulus
 
-    return {
+    const baseItem = {
       title: title || `${metadata.subject} - ${metadata.topic} - Question ${index + 1}`,
       questions: [wiseflowQuestion],
+    }
+
+    // Add tags or labels based on export format
+    if (metadata.exportFormat === "legacy") {
+      return {
+        ...baseItem,
+        tags: allTags,
+      } as WiseflowItemLegacy
+    } else {
+      // utgaende format
+      return {
+        ...baseItem,
+        labels: generateLabelsFromTags(allTags),
+      } as WiseflowItemUtgaende
     }
   })
 
@@ -99,24 +213,17 @@ export function exportToWiseflowJSON(
   return JSON.stringify(wiseflowItems, null, 2)
 }
 
-export function downloadWiseflowJSON(
-  questions: Question[],
-  metadata: {
-    subject: string
-    topic: string
-    difficulty: string
-    language: string
-  }
-) {
+export function downloadWiseflowJSON(questions: Question[], metadata: ExportMetadata) {
   const jsonString = exportToWiseflowJSON(questions, metadata)
 
   // Create blob and download
   const blob = new Blob([jsonString], { type: "application/json" })
   const url = URL.createObjectURL(blob)
 
-  // Generate filename with timestamp
+  // Generate filename with timestamp and format
   const timestamp = new Date().toISOString().split("T")[0] // YYYY-MM-DD
-  const filename = `wiseflow_${metadata.subject.toLowerCase().replace(/\s+/g, "_")}_${timestamp}.json`
+  const format = metadata.exportFormat === "legacy" ? "legacy" : "utgaende"
+  const filename = `wiseflow_${metadata.subject.toLowerCase().replace(/\s+/g, "_")}_${format}_${timestamp}.json`
 
   // Trigger download
   const link = document.createElement("a")
