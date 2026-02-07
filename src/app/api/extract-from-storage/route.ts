@@ -4,6 +4,7 @@ import { ConvexHttpClient } from "convex/browser"
 import { api } from "../../../../convex/_generated/api"
 import { Id } from "../../../../convex/_generated/dataModel"
 import mammoth from "mammoth"
+import { parseOffice } from "officeparser"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
@@ -46,25 +47,27 @@ export async function POST(request: NextRequest) {
 
     // Extract based on file type
     if (fileType === "application/pdf") {
-      // PDF support coming soon
-      return NextResponse.json(
-        { error: "PDF extraction coming soon. Please use URL scraping for PDFs hosted online." },
-        { status: 400 }
-      )
+      // Use officeparser for PDF extraction
+      const ast = await parseOffice(buffer, {
+        outputErrorToConsole: false,
+      })
+      extractedText = ast.toText()
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
+      // Keep using mammoth for Word (works well)
       const result = await mammoth.extractRawText({ buffer })
       extractedText = result.value
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.presentationml.presentation"
     ) {
-      return NextResponse.json(
-        { error: "PowerPoint extraction is not yet supported" },
-        { status: 400 }
-      )
+      // Use officeparser for PowerPoint extraction
+      const ast = await parseOffice(buffer, {
+        outputErrorToConsole: false,
+      })
+      extractedText = ast.toText()
     } else {
       return NextResponse.json(
         { error: "Unsupported file type" },
