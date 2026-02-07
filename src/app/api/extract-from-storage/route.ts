@@ -1,3 +1,8 @@
+// CRITICAL: Import polyfill FIRST for pdfjs-dist serverless compatibility
+import "@ungap/with-resolvers"
+// Force pdfjs-dist to be bundled by Vercel (officeparser uses it dynamically)
+import "pdfjs-dist"
+
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { ConvexHttpClient } from "convex/browser"
