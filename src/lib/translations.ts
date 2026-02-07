@@ -48,6 +48,7 @@ export interface Translations {
   priorityContextOnlyDesc: string
   priorityHybrid: string
   priorityHybridDesc: string
+  subjectTopicCleared: string
   exportFormat: string
   exportFormatHelp: string
   legacyFormat: string
@@ -153,6 +154,7 @@ export const translations: Record<Language, Translations> = {
     priorityContextOnlyDesc: "AI genererar frågor strikt baserat på uppladdad kontext. Ämne/ämnesområde används endast för kategorisering.",
     priorityHybrid: "Hybrid (Rekommenderas)",
     priorityHybridDesc: "AI prioriterar uppladdad kontext men behåller ämne/ämnesområde som referens för sammanhang.",
+    subjectTopicCleared: "Ämne och ämnesområde rensade - de kommer inte påverka frågegenerering",
     exportFormat: "Exportformat",
     exportFormatHelp: "Välj Wiseflow JSON-format för ditt tentacenter",
     legacyFormat: "Legacy (tags-array)",
@@ -256,6 +258,7 @@ export const translations: Record<Language, Translations> = {
     priorityContextOnlyDesc: "AI generates questions strictly based on uploaded context. Subject/topic used only for categorization.",
     priorityHybrid: "Hybrid (Recommended)",
     priorityHybridDesc: "AI prioritizes uploaded context but keeps subject/topic as reference for context.",
+    subjectTopicCleared: "Subject and topic cleared - they won't influence question generation",
     exportFormat: "Export Format",
     exportFormatHelp: "Choose the Wiseflow JSON format for your exam center",
     legacyFormat: "Legacy (tags array)",

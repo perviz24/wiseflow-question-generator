@@ -420,9 +420,15 @@ export function QuestionGeneratorForm() {
               <Label className="text-sm font-semibold">{t("contextPriorityLabel")}</Label>
               <RadioGroup
                 value={formData.contextPriority}
-                onValueChange={(value: ContextPriority) =>
-                  setFormData({ ...formData, contextPriority: value })
-                }
+                onValueChange={(value: ContextPriority) => {
+                  // Auto-clear subject/topic when selecting "context_only"
+                  if (value === "context_only" && (formData.subject || formData.topic)) {
+                    setFormData({ ...formData, contextPriority: value, subject: "", topic: "" })
+                    toast.info(t("subjectTopicCleared") || "Subject and topic cleared - they won't influence question generation")
+                  } else {
+                    setFormData({ ...formData, contextPriority: value })
+                  }
+                }}
               >
                 <div className="flex items-start space-x-2">
                   <RadioGroupItem value="subject_topic" id="subject_topic" />
@@ -475,6 +481,11 @@ export function QuestionGeneratorForm() {
             <p className="text-sm text-muted-foreground">
               {formData.context?.length || 0} / 2000 {t("charactersCount")}
             </p>
+            {formData.uploadedContext && (
+              <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-900">
+                💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"
+              </p>
+            )}
           </div>
 
           {/* Export Format */}

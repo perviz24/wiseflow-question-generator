@@ -1,0 +1,15 @@
+Photosynthesis Test Content
+
+Photosynthesis is the process by which plants convert light energy into chemical energy. It occurs in the chloroplasts of plant cells.
+
+The light-dependent reactions take place in the thylakoid membranes. Water molecules are split, releasing oxygen as a byproduct. This process creates ATP and NADPH.
+
+The Calvin cycle (light-independent reactions) occurs in the stroma. Carbon dioxide is fixed into organic molecules using the ATP and NADPH produced in the light-dependent reactions.
+
+The overall equation for photosynthesis is:
+6CO2 + 6H2O + light energy → C6H12O6 + 6O2
+
+Key terms:
+- Chlorophyll: The green pigment that captures light energy
+- Stomata: Pores that allow gas exchange
+- Glucose: The sugar molecule produced as the end product

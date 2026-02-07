@@ -134,13 +134,13 @@ export async function POST(req: NextRequest) {
     let prompt = ""
 
     if (context && priority === "context_only") {
-      // Prioritize uploaded context only
+      // Prioritize uploaded context only - completely omit subject/topic to avoid AI bias
       prompt = `You are a pedagogical expert creating exam questions.
 
-PRIORITY: Generate questions strictly based on the following provided content:
+PRIORITY: Generate questions strictly and exclusively based on the following provided content:
 ${context}
 
-The subject (${subject || "General"}) and topic (${topic || "General"}) are for categorization purposes only. Focus exclusively on the content provided above.
+Do not infer, assume, or create questions about any subject or topic not present in the content above. Use ONLY what is provided.
 
 Generate ${numQuestions} ${difficultyMap[difficulty as keyof typeof difficultyMap]} questions ${languageInstruction}.
 
