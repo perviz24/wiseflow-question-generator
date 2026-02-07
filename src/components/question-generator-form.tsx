@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Loader2, Sparkles } from "lucide-react"
@@ -28,6 +29,8 @@ type Difficulty = "easy" | "medium" | "hard"
 type Language = "sv" | "en"
 type ExportFormat = "legacy" | "utgaende"
 
+type ContextPriority = "subject_topic" | "context_only" | "hybrid"
+
 interface FormData {
   subject: string
   topic: string
@@ -36,6 +39,7 @@ interface FormData {
   questionTypes: QuestionType[]
   language: Language
   context?: string
+  contextPriority: ContextPriority // How AI handles subject/topic vs context
   // Tagging fields
   exportFormat: ExportFormat
   term?: string // T1, T2, T3, T4
@@ -66,6 +70,7 @@ export function QuestionGeneratorForm() {
     questionTypes: ["mcq"],
     language: "sv",
     context: "",
+    contextPriority: "subject_topic",
     exportFormat: "legacy",
     term: "",
     semester: "",
@@ -265,27 +270,31 @@ export function QuestionGeneratorForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Subject */}
           <div className="space-y-2">
-            <Label htmlFor="subject">{t("subject")} *</Label>
+            <Label htmlFor="subject">
+              {t("subject")} {formData.contextPriority !== "context_only" || !formData.context ? "*" : "(Optional)"}
+            </Label>
             <Input
               id="subject"
               placeholder={t("subjectPlaceholder")}
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               autoComplete="off"
-              required
+              required={formData.contextPriority !== "context_only" || !formData.context}
             />
           </div>
 
           {/* Topic */}
           <div className="space-y-2">
-            <Label htmlFor="topic">{t("topic")} *</Label>
+            <Label htmlFor="topic">
+              {t("topic")} {formData.contextPriority !== "context_only" || !formData.context ? "*" : "(Optional)"}
+            </Label>
             <Input
               id="topic"
               placeholder={t("topicPlaceholder")}
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
               autoComplete="off"
-              required
+              required={formData.contextPriority !== "context_only" || !formData.context}
             />
           </div>
 
@@ -394,6 +403,53 @@ export function QuestionGeneratorForm() {
 
           {/* Content Upload */}
           <ContentUpload onContentExtracted={handleContentExtracted} />
+
+          {/* Context Priority */}
+          {formData.context && (
+            <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
+              <Label className="text-sm font-semibold">{t("contextPriorityLabel")}</Label>
+              <RadioGroup
+                value={formData.contextPriority}
+                onValueChange={(value: ContextPriority) =>
+                  setFormData({ ...formData, contextPriority: value })
+                }
+              >
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="subject_topic" id="subject_topic" />
+                  <div className="flex-1">
+                    <Label htmlFor="subject_topic" className="cursor-pointer font-medium">
+                      {t("prioritySubjectTopic")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("prioritySubjectTopicDesc")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="context_only" id="context_only" />
+                  <div className="flex-1">
+                    <Label htmlFor="context_only" className="cursor-pointer font-medium">
+                      {t("priorityContextOnly")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("priorityContextOnlyDesc")}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <RadioGroupItem value="hybrid" id="hybrid" />
+                  <div className="flex-1">
+                    <Label htmlFor="hybrid" className="cursor-pointer font-medium">
+                      {t("priorityHybrid")}
+                    </Label>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("priorityHybridDesc")}
+                    </p>
+                  </div>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
 
           {/* Context (Optional) */}
           <div className="space-y-2">

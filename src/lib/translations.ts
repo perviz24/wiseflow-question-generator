@@ -41,6 +41,13 @@ export interface Translations {
   additionalContext: string
   additionalContextPlaceholder: string
   charactersCount: string
+  contextPriorityLabel: string
+  prioritySubjectTopic: string
+  prioritySubjectTopicDesc: string
+  priorityContextOnly: string
+  priorityContextOnlyDesc: string
+  priorityHybrid: string
+  priorityHybridDesc: string
   exportFormat: string
   exportFormatHelp: string
   legacyFormat: string
@@ -139,6 +146,13 @@ export const translations: Record<Language, Translations> = {
     additionalContext: "Ytterligare kontext (valfritt)",
     additionalContextPlaceholder: "Lägg till specifika instruktioner, lärandemål eller kontext för frågorna...",
     charactersCount: "tecken",
+    contextPriorityLabel: "Hur ska AI hantera uppladdad kontext?",
+    prioritySubjectTopic: "Respektera Ämne & Ämnesområde",
+    prioritySubjectTopicDesc: "AI använder både ämne/ämnesområde OCH uppladdad kontext. Kan ge blandade frågor om de inte matchar.",
+    priorityContextOnly: "Prioritera Uppladdad Kontext",
+    priorityContextOnlyDesc: "AI genererar frågor strikt baserat på uppladdad kontext. Ämne/ämnesområde används endast för kategorisering.",
+    priorityHybrid: "Hybrid (Rekommenderas)",
+    priorityHybridDesc: "AI prioriterar uppladdad kontext men behåller ämne/ämnesområde som referens för sammanhang.",
     exportFormat: "Exportformat",
     exportFormatHelp: "Välj Wiseflow JSON-format för ditt tentacenter",
     legacyFormat: "Legacy (tags-array)",
@@ -235,6 +249,13 @@ export const translations: Record<Language, Translations> = {
     additionalContext: "Additional Context (Optional)",
     additionalContextPlaceholder: "Add any specific instructions, learning outcomes, or context for the questions...",
     charactersCount: "characters",
+    contextPriorityLabel: "How should AI handle uploaded context?",
+    prioritySubjectTopic: "Respect Subject & Topic",
+    prioritySubjectTopicDesc: "AI uses both subject/topic AND uploaded context. May generate mixed questions if they don't match.",
+    priorityContextOnly: "Prioritize Uploaded Context",
+    priorityContextOnlyDesc: "AI generates questions strictly based on uploaded context. Subject/topic used only for categorization.",
+    priorityHybrid: "Hybrid (Recommended)",
+    priorityHybridDesc: "AI prioritizes uploaded context but keeps subject/topic as reference for context.",
     exportFormat: "Export Format",
     exportFormatHelp: "Choose the Wiseflow JSON format for your exam center",
     legacyFormat: "Legacy (tags array)",

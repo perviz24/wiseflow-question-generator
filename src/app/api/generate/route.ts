@@ -53,12 +53,23 @@ export async function POST(req: NextRequest) {
       questionTypes,
       language,
       context,
+      contextPriority,
     } = body
 
-    // Validate required fields
-    if (!subject || !topic || !questionTypes || questionTypes.length === 0) {
+    // Validate required fields based on context priority
+    const priority = contextPriority || "subject_topic"
+    const requiresSubjectTopic = priority === "subject_topic" || !context
+
+    if (requiresSubjectTopic && (!subject || !topic)) {
       return Response.json(
-        { error: "Missing required fields" },
+        { error: "Subject and topic are required when no context is provided or when using subject/topic priority" },
+        { status: 400 }
+      )
+    }
+
+    if (!questionTypes || questionTypes.length === 0) {
+      return Response.json(
+        { error: "At least one question type is required" },
         { status: 400 }
       )
     }
@@ -81,13 +92,50 @@ export async function POST(req: NextRequest) {
       .map((t: string) => questionTypeInstructions[t as keyof typeof questionTypeInstructions])
       .join(", ")
 
-    const prompt = `You are a pedagogical expert creating exam questions for ${subject}, specifically about ${topic}.
+    // Build prompt based on context priority
+    let prompt = ""
+
+    if (context && priority === "context_only") {
+      // Prioritize uploaded context only
+      prompt = `You are a pedagogical expert creating exam questions.
+
+PRIORITY: Generate questions strictly based on the following provided content:
+${context}
+
+The subject (${subject || "General"}) and topic (${topic || "General"}) are for categorization purposes only. Focus exclusively on the content provided above.
+
+Generate ${numQuestions} ${difficultyMap[difficulty as keyof typeof difficultyMap]} questions ${languageInstruction}.
+
+Question types to generate: ${typesList}`
+
+    } else if (context && priority === "hybrid") {
+      // Hybrid: prioritize context but keep subject/topic as reference
+      prompt = `You are a pedagogical expert creating exam questions.
+
+Generate questions primarily based on this provided content:
+${context}
+
+Reference subject: ${subject}
+Reference topic: ${topic}
+
+Use the provided content as the primary source for questions, but keep the subject and topic in mind for pedagogical context and alignment.
+
+Generate ${numQuestions} ${difficultyMap[difficulty as keyof typeof difficultyMap]} questions ${languageInstruction}.
+
+Question types to generate: ${typesList}`
+
+    } else {
+      // Default: respect subject/topic (with or without context)
+      prompt = `You are a pedagogical expert creating exam questions for ${subject}, specifically about ${topic}.
 
 Generate ${numQuestions} ${difficultyMap[difficulty as keyof typeof difficultyMap]} questions ${languageInstruction}.
 
 Question types to generate: ${typesList}
 
-${context ? `Additional context: ${context}` : ""}
+${context ? `Additional context: ${context}` : ""}`
+    }
+
+    prompt += `
 
 Requirements:
 - For MCQ: Provide exactly 4 options (A, B, C, D). Mark the correct answer(s) in correctAnswer array.
