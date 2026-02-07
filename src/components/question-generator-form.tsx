@@ -574,9 +574,10 @@ export function QuestionGeneratorForm() {
             className="w-full"
             disabled={
               isGenerating ||
-              !formData.subject ||
-              !formData.topic ||
-              formData.questionTypes.length === 0
+              formData.questionTypes.length === 0 ||
+              // Subject/topic required UNLESS prioritizing uploaded context with content
+              (formData.contextPriority !== "context_only" && (!formData.subject || !formData.topic)) ||
+              (formData.contextPriority === "context_only" && !formData.uploadedContext)
             }
           >
             {isGenerating ? (
