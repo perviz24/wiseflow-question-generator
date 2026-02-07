@@ -76,6 +76,8 @@ export interface Translations {
   exportJSON: string
   exporting: string
   generateNew: string
+  generateMoreTitle: string
+  generateMoreDesc: string
 
   // Settings Page
   profileSettings: string
@@ -182,6 +184,8 @@ export const translations: Record<Language, Translations> = {
     exportJSON: "Exportera JSON",
     exporting: "Exporterar...",
     generateNew: "Generera nya frågor",
+    generateMoreTitle: "Generera fler frågor",
+    generateMoreDesc: "Lägg till fler frågor till ditt befintliga set utan att lämna denna sida",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -286,6 +290,8 @@ export const translations: Record<Language, Translations> = {
     exportJSON: "Export JSON",
     exporting: "Exporting...",
     generateNew: "Generate New Questions",
+    generateMoreTitle: "Generate More Questions",
+    generateMoreDesc: "Add additional questions to your existing set without leaving this page",
 
     // Settings Page
     profileSettings: "Profile Settings",

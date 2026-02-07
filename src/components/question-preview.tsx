@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
+import { useTranslation } from "@/lib/language-context"
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2"
@@ -37,6 +38,7 @@ interface QuestionPreviewProps {
 }
 
 export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdateQuestions, isSaving, isExporting }: QuestionPreviewProps) {
+  const { t } = useTranslation()
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
@@ -432,9 +434,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       {/* Generate More Questions Section */}
       <Card className="border-dashed">
         <CardHeader>
-          <CardTitle className="text-lg">Generate More Questions</CardTitle>
+          <CardTitle className="text-lg">{t("generateMoreTitle")}</CardTitle>
           <CardDescription>
-            Add additional questions to your existing set without leaving this page
+            {t("generateMoreDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

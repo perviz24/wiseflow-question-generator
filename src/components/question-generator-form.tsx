@@ -106,6 +106,16 @@ export function QuestionGeneratorForm() {
     setUploadedContentSource(source)
   }
 
+  const handleContentRemoved = () => {
+    // Clear uploaded context and reset to default when all files/URLs removed
+    setFormData((prev) => ({
+      ...prev,
+      uploadedContext: "",
+      contextPriority: "subject_topic",
+    }))
+    setUploadedContentSource("")
+  }
+
   const toggleQuestionType = (type: QuestionType) => {
     setFormData((prev) => ({
       ...prev,
@@ -412,7 +422,10 @@ export function QuestionGeneratorForm() {
           </div>
 
           {/* Content Upload */}
-          <ContentUpload onContentExtracted={handleContentExtracted} />
+          <ContentUpload
+            onContentExtracted={handleContentExtracted}
+            onContentRemoved={handleContentRemoved}
+          />
 
           {/* Context Priority */}
           {formData.uploadedContext && (

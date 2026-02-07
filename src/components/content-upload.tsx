@@ -14,6 +14,7 @@ import { Id } from "../../convex/_generated/dataModel"
 interface ContentUploadProps {
   onContentExtracted: (content: string, source: string) => void
   onFileUploaded?: (storageId: string, fileName: string, fileType: string) => void
+  onContentRemoved?: () => void
 }
 
 interface UploadedItem {
@@ -22,7 +23,7 @@ interface UploadedItem {
   type: "file" | "url"
 }
 
-export function ContentUpload({ onContentExtracted, onFileUploaded }: ContentUploadProps) {
+export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRemoved }: ContentUploadProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
@@ -172,6 +173,12 @@ export function ContentUpload({ onContentExtracted, onFileUploaded }: ContentUpl
 
   const removeItem = (id: string) => {
     setUploadedItems(prev => prev.filter(item => item.id !== id))
+
+    // Notify parent to clear uploaded context if all items removed
+    if (uploadedItems.length === 1 && onContentRemoved) {
+      onContentRemoved()
+    }
+
     toast.info("Borttagen", {
       description: "Innehåll borttaget. Generera nya frågor för att uppdatera.",
     })
