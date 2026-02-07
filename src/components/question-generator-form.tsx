@@ -22,12 +22,13 @@ import { toast } from "sonner"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
+import { downloadQti21 } from "@/lib/qti-export"
 import { useTranslation } from "@/lib/language-context"
 
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
 type Language = "sv" | "en"
-type ExportFormat = "legacy" | "utgaende"
+type ExportFormat = "legacy" | "utgaende" | "qti21"
 
 type ContextPriority = "subject_topic" | "context_only" | "hybrid"
 
@@ -209,7 +210,7 @@ export function QuestionGeneratorForm() {
     }
   }
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (!generatedQuestions || !metadata) return
 
     setIsExporting(true)
@@ -226,9 +227,16 @@ export function QuestionGeneratorForm() {
         tutorInitials: userProfile?.tutorInitials || "",
       }
 
-      downloadWiseflowJSON(generatedQuestions, exportMetadata)
+      // Choose export format based on user selection
+      if (formData.exportFormat === "qti21") {
+        await downloadQti21(generatedQuestions, exportMetadata)
+      } else {
+        downloadWiseflowJSON(generatedQuestions, exportMetadata)
+      }
+
+      const formatLabel = formData.exportFormat === "legacy" ? "Legacy" : formData.exportFormat === "utgaende" ? "Utgående" : "QTI 2.1"
       toast.success(t("exportSuccessful"), {
-        description: t("exportSuccessfulDesc", { format: formData.exportFormat === "legacy" ? "Legacy" : "Utgående" }),
+        description: t("exportSuccessfulDesc", { format: formatLabel }),
       })
     } catch (error) {
       console.error("Export failed:", error)
@@ -516,6 +524,7 @@ export function QuestionGeneratorForm() {
               <SelectContent>
                 <SelectItem value="legacy">{t("legacyFormat")}</SelectItem>
                 <SelectItem value="utgaende">{t("utgaendeFormat")}</SelectItem>
+                <SelectItem value="qti21">{t("qti21Format")}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">

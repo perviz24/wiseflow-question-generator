@@ -53,7 +53,7 @@ interface ExportMetadata {
   topic: string
   difficulty: string
   language: string
-  exportFormat: "legacy" | "utgaende"
+  exportFormat: "legacy" | "utgaende" | "qti21"
   term?: string
   semester?: string
   examType?: string

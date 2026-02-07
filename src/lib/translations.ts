@@ -53,6 +53,7 @@ export interface Translations {
   exportFormatHelp: string
   legacyFormat: string
   utgaendeFormat: string
+  qti21Format: string
 
   // Tagging Section
   tagsOrganization: string
@@ -161,6 +162,7 @@ export const translations: Record<Language, Translations> = {
     exportFormatHelp: "Välj Wiseflow JSON-format för ditt tentacenter",
     legacyFormat: "Legacy (tags-array)",
     utgaendeFormat: "Utgående (labels med ID)",
+    qti21Format: "QTI 2.1 (Universal LMS)",
 
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
@@ -267,6 +269,7 @@ export const translations: Record<Language, Translations> = {
     exportFormatHelp: "Choose the Wiseflow JSON format for your exam center",
     legacyFormat: "Legacy (tags array)",
     utgaendeFormat: "Utgående (labels with IDs)",
+    qti21Format: "QTI 2.1 (Universal LMS)",
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",
