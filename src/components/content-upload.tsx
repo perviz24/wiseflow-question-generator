@@ -4,81 +4,98 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
-import { Upload, FileText, Loader2, X, Link2 } from "lucide-react"
+import { Upload, FileText, Loader2, X, Link2, Plus } from "lucide-react"
 import { toast } from "sonner"
 
 interface ContentUploadProps {
   onContentExtracted: (content: string, source: string) => void
 }
 
+interface UploadedItem {
+  id: string
+  name: string
+  type: "file" | "url"
+}
+
 export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
   const [isProcessing, setIsProcessing] = useState(false)
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
-  const [url, setUrl] = useState("")
+  const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
+  const [urlInputs, setUrlInputs] = useState<string[]>([""])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
 
-    // Check file type
+    // Check file types
     const validTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ]
 
-    if (!validTypes.includes(file.type)) {
-      toast.error("Ogiltigt filformat", {
-        description: "Endast PDF, Word (.docx) och PowerPoint (.pptx) stöds.",
-      })
-      return
-    }
-
-    // Check file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error("Filen är för stor", {
-        description: "Maximal filstorlek är 10MB.",
-      })
-      return
-    }
-
-    setUploadedFile(file)
-    setIsProcessing(true)
-
-    try {
-      const formData = new FormData()
-      formData.append("file", file)
-
-      const response = await fetch("/api/extract-content", {
-        method: "POST",
-        body: formData,
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to extract content")
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        toast.error("Ogiltigt filformat", {
+          description: `${file.name}: Endast PDF, Word (.docx) och PowerPoint (.pptx) stöds.`,
+        })
+        continue
       }
 
-      onContentExtracted(data.content, `Fil: ${file.name}`)
-      toast.success("Innehåll extraherat!", {
-        description: `Extraherade ${data.content.length} tecken från ${file.name}`,
-      })
-    } catch (error) {
-      console.error("File extraction failed:", error)
-      toast.error("Extraktion misslyckades", {
-        description: error instanceof Error ? error.message : "Kunde inte läsa filen.",
-      })
-      setUploadedFile(null)
-    } finally {
-      setIsProcessing(false)
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Filen är för stor", {
+          description: `${file.name}: Maximal filstorlek är 10MB.`,
+        })
+        continue
+      }
+
+      setIsProcessing(true)
+
+      try {
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const response = await fetch("/api/extract-content", {
+          method: "POST",
+          body: formData,
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to extract content")
+        }
+
+        onContentExtracted(data.content, `Fil: ${file.name}`)
+
+        // Add to uploaded items list
+        setUploadedItems(prev => [
+          ...prev,
+          { id: Date.now().toString() + Math.random(), name: file.name, type: "file" },
+        ])
+
+        toast.success("Innehåll extraherat!", {
+          description: `Extraherade ${data.content.length} tecken från ${file.name}`,
+        })
+      } catch (error) {
+        console.error("File extraction failed:", error)
+        toast.error("Extraktion misslyckades", {
+          description: error instanceof Error ? error.message : `Kunde inte läsa ${file.name}.`,
+        })
+      }
     }
+
+    setIsProcessing(false)
+
+    // Reset file input
+    const fileInput = document.getElementById("file-upload") as HTMLInputElement
+    if (fileInput) fileInput.value = ""
   }
 
-  const handleUrlSubmit = async () => {
-    if (!url.trim()) return
+  const handleUrlSubmit = async (index: number) => {
+    const url = urlInputs[index]?.trim()
+    if (!url) return
 
     // Basic URL validation
     try {
@@ -106,10 +123,21 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
       }
 
       onContentExtracted(data.content, `URL: ${url}`)
+
+      // Add to uploaded items list
+      setUploadedItems(prev => [
+        ...prev,
+        { id: Date.now().toString() + Math.random(), name: url, type: "url" },
+      ])
+
       toast.success("Innehåll extraherat!", {
         description: `Extraherade ${data.content.length} tecken från URL`,
       })
-      setUrl("")
+
+      // Clear this URL input
+      const newUrls = [...urlInputs]
+      newUrls[index] = ""
+      setUrlInputs(newUrls)
     } catch (error) {
       console.error("URL extraction failed:", error)
       toast.error("Extraktion misslyckades", {
@@ -120,11 +148,25 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
     }
   }
 
-  const clearFile = () => {
-    setUploadedFile(null)
-    // Reset file input
-    const fileInput = document.getElementById("file-upload") as HTMLInputElement
-    if (fileInput) fileInput.value = ""
+  const removeItem = (id: string) => {
+    setUploadedItems(prev => prev.filter(item => item.id !== id))
+    toast.info("Borttagen", {
+      description: "Innehåll borttaget. Generera nya frågor för att uppdatera.",
+    })
+  }
+
+  const addUrlInput = () => {
+    setUrlInputs(prev => [...prev, ""])
+  }
+
+  const removeUrlInput = (index: number) => {
+    setUrlInputs(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const updateUrlInput = (index: number, value: string) => {
+    const newUrls = [...urlInputs]
+    newUrls[index] = value
+    setUrlInputs(newUrls)
   }
 
   return (
@@ -136,36 +178,48 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
             <Label htmlFor="file-upload">
               Ladda upp dokument (valfritt)
             </Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="file-upload"
-                type="file"
-                accept=".pdf,.docx,.pptx"
-                onChange={handleFileUpload}
-                disabled={isProcessing || !!uploadedFile}
-                className="cursor-pointer"
-              />
-              {uploadedFile && !isProcessing && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  onClick={clearFile}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            <Input
+              id="file-upload"
+              type="file"
+              accept=".pdf,.docx,.pptx"
+              onChange={handleFileUpload}
+              disabled={isProcessing}
+              multiple
+              className="cursor-pointer"
+            />
             <p className="text-sm text-muted-foreground">
-              PDF, Word (.docx) eller PowerPoint (.pptx), max 10MB
+              PDF, Word (.docx) eller PowerPoint (.pptx), max 10MB per fil. Välj flera filer samtidigt.
             </p>
           </div>
 
-          {uploadedFile && (
-            <div className="flex items-center gap-2 rounded-md bg-muted p-3">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{uploadedFile.name}</span>
-              {isProcessing && <Loader2 className="ml-auto h-4 w-4 animate-spin" />}
+          {/* Uploaded Items List */}
+          {uploadedItems.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Uppladdade filer och URL:er:</Label>
+              {uploadedItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 rounded-md bg-muted p-3"
+                >
+                  {item.type === "file" ? (
+                    <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  ) : (
+                    <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  )}
+                  <span className="text-sm flex-1 truncate" title={item.name}>
+                    {item.name}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 flex-shrink-0"
+                    onClick={() => removeItem(item.id)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
             </div>
           )}
 
@@ -180,40 +234,62 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
             </div>
           </div>
 
-          {/* URL Input */}
-          <div className="space-y-2">
-            <Label htmlFor="url-input">
-              Hämta från webbadress (valfritt)
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="url-input"
-                type="url"
-                placeholder="https://exempel.se/artikel"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                disabled={isProcessing}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && url.trim()) {
-                    e.preventDefault()
-                    handleUrlSubmit()
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                onClick={handleUrlSubmit}
-                disabled={isProcessing || !url.trim()}
-              >
-                {isProcessing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Link2 className="h-4 w-4" />
+          {/* URL Inputs */}
+          <div className="space-y-3">
+            <Label>Hämta från webbadresser (valfritt)</Label>
+            {urlInputs.map((url, index) => (
+              <div key={index} className="flex gap-2">
+                <Input
+                  type="url"
+                  placeholder="https://exempel.se/artikel"
+                  value={url}
+                  onChange={(e) => updateUrlInput(index, e.target.value)}
+                  disabled={isProcessing}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && url.trim()) {
+                      e.preventDefault()
+                      handleUrlSubmit(index)
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={() => handleUrlSubmit(index)}
+                  disabled={isProcessing || !url.trim()}
+                  size="icon"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Link2 className="h-4 w-4" />
+                  )}
+                </Button>
+                {urlInputs.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeUrlInput(index)}
+                    disabled={isProcessing}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 )}
-              </Button>
-            </div>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addUrlInput}
+              disabled={isProcessing}
+              className="w-full"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Lägg till fler URL:er
+            </Button>
             <p className="text-sm text-muted-foreground">
-              Ange en URL för att extrahera innehåll från webbsidan
+              Ange webbadresser för att extrahera innehåll från webbsidor
             </p>
           </div>
         </div>
