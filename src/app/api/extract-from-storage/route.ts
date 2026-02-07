@@ -1,15 +1,9 @@
-// CRITICAL: Import polyfill FIRST for pdfjs-dist serverless compatibility
-import "@ungap/with-resolvers"
-// Force pdfjs-dist to be bundled by Vercel (officeparser uses it dynamically)
-import "pdfjs-dist"
-
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { ConvexHttpClient } from "convex/browser"
 import { api } from "../../../../convex/_generated/api"
 import { Id } from "../../../../convex/_generated/dataModel"
 import mammoth from "mammoth"
-import { parseOffice } from "officeparser"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
@@ -52,27 +46,31 @@ export async function POST(request: NextRequest) {
 
     // Extract based on file type
     if (fileType === "application/pdf") {
-      // Use officeparser for PDF extraction
-      const ast = await parseOffice(buffer, {
-        outputErrorToConsole: false,
-      })
-      extractedText = ast.toText()
+      return NextResponse.json(
+        {
+          error:
+            "PDF extraction is currently unavailable. Please use Word files (.docx) or paste URL instead. PDF libraries have compatibility issues with serverless deployment.",
+        },
+        { status: 400 }
+      )
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
-      // Keep using mammoth for Word (works well)
+      // Use mammoth for Word extraction (works reliably)
       const result = await mammoth.extractRawText({ buffer })
       extractedText = result.value
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.presentationml.presentation"
     ) {
-      // Use officeparser for PowerPoint extraction
-      const ast = await parseOffice(buffer, {
-        outputErrorToConsole: false,
-      })
-      extractedText = ast.toText()
+      return NextResponse.json(
+        {
+          error:
+            "PowerPoint extraction is currently unavailable. Please use Word files (.docx) or paste URL instead. PPTX libraries have compatibility issues with serverless deployment.",
+        },
+        { status: 400 }
+      )
     } else {
       return NextResponse.json(
         { error: "Unsupported file type" },
