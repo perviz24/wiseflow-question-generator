@@ -4,10 +4,17 @@ import { v } from "convex/values"
 /**
  * Generate a temporary upload URL for file storage
  * Returns a signed URL that the client can POST a file to
+ * Requires authentication
  */
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
+    // Check if user is authenticated
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Not authenticated")
+    }
+
     return await ctx.storage.generateUploadUrl()
   },
 })
