@@ -4,6 +4,7 @@ import { ConvexHttpClient } from "convex/browser"
 import { api } from "../../../../convex/_generated/api"
 import { Id } from "../../../../convex/_generated/dataModel"
 import mammoth from "mammoth"
+import { parseOffice } from "officeparser"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
 
@@ -64,13 +65,11 @@ export async function POST(request: NextRequest) {
       fileType ===
       "application/vnd.openxmlformats-officedocument.presentationml.presentation"
     ) {
-      return NextResponse.json(
-        {
-          error:
-            "PowerPoint extraction is currently unavailable. Please use Word files (.docx) or paste URL instead. PPTX libraries have compatibility issues with serverless deployment.",
-        },
-        { status: 400 }
-      )
+      // Use officeparser for PowerPoint extraction (works without pdfjs-dist)
+      const ast = await parseOffice(buffer, {
+        outputErrorToConsole: false,
+      })
+      extractedText = ast.toText()
     } else {
       return NextResponse.json(
         { error: "Unsupported file type" },
