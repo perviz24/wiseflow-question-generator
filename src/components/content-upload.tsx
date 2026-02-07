@@ -7,9 +7,13 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Upload, FileText, Loader2, X, Link2, Plus } from "lucide-react"
 import { toast } from "sonner"
+import { useConvex, useMutation } from "convex/react"
+import { api } from "../../convex/_generated/api"
+import { Id } from "../../convex/_generated/dataModel"
 
 interface ContentUploadProps {
   onContentExtracted: (content: string, source: string) => void
+  onFileUploaded?: (storageId: string, fileName: string, fileType: string) => void
 }
 
 interface UploadedItem {
@@ -18,10 +22,12 @@ interface UploadedItem {
   type: "file" | "url"
 }
 
-export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
+export function ContentUpload({ onContentExtracted, onFileUploaded }: ContentUploadProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
+
+  const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -42,46 +48,62 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
         continue
       }
 
-      // Check file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error("Filen är för stor", {
-          description: `${file.name}: Maximal filstorlek är 10MB.`,
-        })
-        continue
-      }
+      // No file size limit when using Convex storage!
+      // Convex Free: 1GB total, Pro: 10GB total
 
       setIsProcessing(true)
 
       try {
-        const formData = new FormData()
-        formData.append("file", file)
+        // Step 1: Get upload URL from Convex
+        const uploadUrl = await generateUploadUrl()
 
-        const response = await fetch("/api/extract-content", {
+        // Step 2: Upload file directly to Convex storage
+        const uploadResult = await fetch(uploadUrl, {
           method: "POST",
-          body: formData,
+          headers: { "Content-Type": file.type },
+          body: file,
         })
 
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.error || "Failed to extract content")
+        if (!uploadResult.ok) {
+          throw new Error("Failed to upload file to storage")
         }
 
-        onContentExtracted(data.content, `Fil: ${file.name}`)
+        const { storageId } = await uploadResult.json()
+
+        // Step 3: Extract content from the uploaded file for backward compatibility
+        const extractResponse = await fetch("/api/extract-from-storage", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ storageId, fileName: file.name, fileType: file.type }),
+        })
+
+        const extractData = await extractResponse.json()
+
+        if (!extractResponse.ok) {
+          throw new Error(extractData.error || "Failed to extract content from storage")
+        }
+
+        // Notify parent with extracted content (keeps existing flow working)
+        onContentExtracted(extractData.content, `Fil: ${file.name}`)
+
+        // Also notify parent about storageId for future use
+        if (onFileUploaded) {
+          onFileUploaded(storageId, file.name, file.type)
+        }
 
         // Add to uploaded items list
         setUploadedItems(prev => [
           ...prev,
-          { id: Date.now().toString() + Math.random(), name: file.name, type: "file" },
+          { id: storageId, name: file.name, type: "file" },
         ])
 
-        toast.success("Innehåll extraherat!", {
-          description: `Extraherade ${data.content.length} tecken från ${file.name}`,
+        toast.success("Fil uppladdad!", {
+          description: `${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) - Innehåll extraherat!`,
         })
       } catch (error) {
-        console.error("File extraction failed:", error)
-        toast.error("Extraktion misslyckades", {
-          description: error instanceof Error ? error.message : `Kunde inte läsa ${file.name}.`,
+        console.error("File upload failed:", error)
+        toast.error("Uppladdning misslyckades", {
+          description: error instanceof Error ? error.message : `Kunde inte ladda upp ${file.name}.`,
         })
       }
     }
@@ -188,7 +210,7 @@ export function ContentUpload({ onContentExtracted }: ContentUploadProps) {
               className="cursor-pointer"
             />
             <p className="text-sm text-muted-foreground">
-              PDF, Word (.docx) eller PowerPoint (.pptx), max 10MB per fil. Välj flera filer samtidigt.
+              PDF, Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar.
             </p>
           </div>
 

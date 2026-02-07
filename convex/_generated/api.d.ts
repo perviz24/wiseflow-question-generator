@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as fileStorage from "../fileStorage.js";
 import type * as profiles from "../profiles.js";
 import type * as questions from "../questions.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  fileStorage: typeof fileStorage;
   profiles: typeof profiles;
   questions: typeof questions;
 }>;
