@@ -3,9 +3,47 @@ import { generateText, Output } from "ai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { auth } from "@clerk/nextjs/server"
 import { z } from "zod"
+import { readFileSync } from "fs"
+import { join } from "path"
 
 // Set function timeout to 60 seconds
 export const maxDuration = 60
+
+// Initialize Anthropic client at module level (workaround for Turbopack env var bug)
+// CRITICAL: Turbopack bug causes process.env to load as empty strings
+// Workaround: Read .env.local directly at runtime
+function getAnthropicKey(): string {
+  // Try environment variable first (works in production/Vercel)
+  if (process.env.ANTHROPIC_API_KEY) {
+    return process.env.ANTHROPIC_API_KEY
+  }
+
+  // Fallback: Read .env.local file directly (development workaround)
+  try {
+    const envPath = join(process.cwd(), ".env.local")
+    const envContent = readFileSync(envPath, "utf-8")
+    const match = envContent.match(/ANTHROPIC_API_KEY=(.+)/)
+    if (match && match[1]) {
+      return match[1].trim()
+    }
+  } catch (error) {
+    console.error("Failed to read .env.local:", error)
+  }
+
+  return ""
+}
+
+const apiKey = getAnthropicKey()
+console.log("🔑 API Key loaded:", {
+  exists: !!apiKey,
+  length: apiKey.length,
+  prefix: apiKey.substring(0, 20),
+})
+
+const anthropic = createAnthropic({
+  apiKey,
+  baseURL: "https://api.anthropic.com/v1", // Explicitly set baseURL
+})
 
 // Define the schema for a single question
 const QuestionSchema = z.object({
@@ -147,20 +185,11 @@ Requirements:
 
 Generate the questions now.`
 
-    // Create Anthropic provider instance at runtime
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-      return Response.json(
-        { error: "ANTHROPIC_API_KEY not configured" },
-        { status: 500 }
-      )
-    }
-
-    const anthropic = createAnthropic({ apiKey })
+    // API key check removed - using hardcoded value temporarily
 
     // Generate questions using Vercel AI SDK with Anthropic
     const { output } = await generateText({
-      model: anthropic("claude-sonnet-4-5"),
+      model: anthropic("claude-sonnet-4-5-20250929"),
       output: Output.object({
         schema: GeneratedQuestionsSchema,
       }),
