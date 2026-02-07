@@ -38,7 +38,8 @@ interface FormData {
   numQuestions: number
   questionTypes: QuestionType[]
   language: Language
-  context?: string
+  context?: string // Manual user instructions
+  uploadedContext?: string // Content from uploaded files/URLs (stored separately)
   contextPriority: ContextPriority // How AI handles subject/topic vs context
   // Tagging fields
   exportFormat: ExportFormat
@@ -69,7 +70,8 @@ export function QuestionGeneratorForm() {
     numQuestions: 5,
     questionTypes: ["mcq"],
     language: "sv",
-    context: "",
+    context: "", // Manual user instructions
+    uploadedContext: "", // Content from files/URLs
     contextPriority: "subject_topic",
     exportFormat: "legacy",
     term: "",
@@ -94,11 +96,11 @@ export function QuestionGeneratorForm() {
   const userProfile = useQuery(api.profiles.getUserProfile)
 
   const handleContentExtracted = (content: string, source: string) => {
-    // Append uploaded content to the context field
+    // Store uploaded content separately from manual context
     setFormData((prev) => ({
       ...prev,
-      context: prev.context
-        ? `${prev.context}\n\n---\nContent from ${source}:\n${content}`
+      uploadedContext: prev.uploadedContext
+        ? `${prev.uploadedContext}\n\n---\nContent from ${source}:\n${content}`
         : `Content from ${source}:\n${content}`,
     }))
     setUploadedContentSource(source)
@@ -118,10 +120,18 @@ export function QuestionGeneratorForm() {
     setIsGenerating(true)
 
     try {
+      // Combine manual context and uploaded context for API submission
+      const combinedContext = [formData.uploadedContext, formData.context]
+        .filter(Boolean)
+        .join("\n\n---\n\n")
+
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          context: combinedContext, // Send combined context to API
+        }),
       })
 
       const data = await response.json()
@@ -271,7 +281,7 @@ export function QuestionGeneratorForm() {
           {/* Subject */}
           <div className="space-y-2">
             <Label htmlFor="subject">
-              {t("subject")} {formData.contextPriority !== "context_only" || !formData.context ? "*" : "(Optional)"}
+              {t("subject")} {formData.contextPriority !== "context_only" || !formData.uploadedContext ? "*" : "(Optional)"}
             </Label>
             <Input
               id="subject"
@@ -279,14 +289,14 @@ export function QuestionGeneratorForm() {
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               autoComplete="off"
-              required={formData.contextPriority !== "context_only" || !formData.context}
+              required={formData.contextPriority !== "context_only" || !formData.uploadedContext}
             />
           </div>
 
           {/* Topic */}
           <div className="space-y-2">
             <Label htmlFor="topic">
-              {t("topic")} {formData.contextPriority !== "context_only" || !formData.context ? "*" : "(Optional)"}
+              {t("topic")} {formData.contextPriority !== "context_only" || !formData.uploadedContext ? "*" : "(Optional)"}
             </Label>
             <Input
               id="topic"
@@ -294,7 +304,7 @@ export function QuestionGeneratorForm() {
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
               autoComplete="off"
-              required={formData.contextPriority !== "context_only" || !formData.context}
+              required={formData.contextPriority !== "context_only" || !formData.uploadedContext}
             />
           </div>
 
@@ -405,7 +415,7 @@ export function QuestionGeneratorForm() {
           <ContentUpload onContentExtracted={handleContentExtracted} />
 
           {/* Context Priority */}
-          {formData.context && (
+          {formData.uploadedContext && (
             <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
               <Label className="text-sm font-semibold">{t("contextPriorityLabel")}</Label>
               <RadioGroup
