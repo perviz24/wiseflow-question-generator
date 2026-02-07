@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw } from "lucide-react"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 
@@ -40,6 +40,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
+  const [additionalCount, setAdditionalCount] = useState(5)
+  const [additionalTypes, setAdditionalTypes] = useState<string[]>(["mcq"])
+  const [isGeneratingMore, setIsGeneratingMore] = useState(false)
 
   const getQuestionTypeLabel = (type: string) => {
     const labels = {
@@ -165,6 +168,68 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       })
     } finally {
       setRegeneratingIndex(null)
+    }
+  }
+
+  const toggleAdditionalType = (type: string) => {
+    setAdditionalTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    )
+  }
+
+  const handleGenerateMore = async () => {
+    if (additionalTypes.length === 0) {
+      toast.error("No question types selected", {
+        description: "Please select at least one question type to generate."
+      })
+      return
+    }
+
+    if (additionalCount < 1 || additionalCount > 20) {
+      toast.error("Invalid number of questions", {
+        description: "Please enter a number between 1 and 20."
+      })
+      return
+    }
+
+    setIsGeneratingMore(true)
+
+    try {
+      const response = await fetch("/api/generate-more", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: metadata.subject,
+          topic: metadata.topic,
+          difficulty: metadata.difficulty,
+          language: metadata.language,
+          count: additionalCount,
+          questionTypes: additionalTypes,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate additional questions")
+      }
+
+      // Add new questions to existing ones
+      if (onUpdateQuestions && data.questions) {
+        const updatedQuestions = [...questions, ...data.questions]
+        onUpdateQuestions(updatedQuestions)
+        toast.success(`${data.questions.length} questions added!`, {
+          description: "New questions have been added to your set."
+        })
+      }
+    } catch (error) {
+      console.error("Generate more failed:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to generate additional questions"
+      toast.error("Generation failed", {
+        description: errorMessage
+      })
+    } finally {
+      setIsGeneratingMore(false)
     }
   }
 
@@ -363,6 +428,90 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
           </Card>
         )
       })}
+
+      {/* Generate More Questions Section */}
+      <Card className="border-dashed">
+        <CardHeader>
+          <CardTitle className="text-lg">Generate More Questions</CardTitle>
+          <CardDescription>
+            Add additional questions to your existing set without leaving this page
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Number of questions */}
+            <div className="space-y-2">
+              <label htmlFor="additional-count" className="text-sm font-medium">
+                How many more questions?
+              </label>
+              <Input
+                id="additional-count"
+                type="number"
+                min="1"
+                max="20"
+                value={additionalCount}
+                onChange={(e) => setAdditionalCount(parseInt(e.target.value) || 1)}
+                className="w-full"
+              />
+              <p className="text-xs text-muted-foreground">Choose between 1 and 20</p>
+            </div>
+
+            {/* Question types */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Question Types</label>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant={additionalTypes.includes("mcq") ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleAdditionalType("mcq")}
+                  className="flex-1 min-w-[100px]"
+                >
+                  Multiple Choice
+                </Button>
+                <Button
+                  type="button"
+                  variant={additionalTypes.includes("true_false") ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleAdditionalType("true_false")}
+                  className="flex-1 min-w-[100px]"
+                >
+                  True/False
+                </Button>
+                <Button
+                  type="button"
+                  variant={additionalTypes.includes("longtextV2") ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleAdditionalType("longtextV2")}
+                  className="flex-1 min-w-[100px]"
+                >
+                  Essay
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Select one or more types</p>
+            </div>
+          </div>
+
+          <Button
+            onClick={handleGenerateMore}
+            disabled={isGeneratingMore || additionalTypes.length === 0}
+            className="w-full"
+            size="lg"
+          >
+            {isGeneratingMore ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating {additionalCount} more questions...
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                Generate {additionalCount} More {additionalCount === 1 ? "Question" : "Questions"}
+              </>
+            )}
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   )
 }
