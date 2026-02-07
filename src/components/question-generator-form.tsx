@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
+import { useTranslation } from "@/lib/language-context"
 
 type QuestionType = "mcq" | "true_false" | "longtextV2"
 type Difficulty = "easy" | "medium" | "hard"
@@ -56,6 +57,7 @@ interface Question {
 }
 
 export function QuestionGeneratorForm() {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<FormData>({
     subject: "",
     topic: "",
@@ -126,13 +128,13 @@ export function QuestionGeneratorForm() {
       setGeneratedQuestions(data.questions)
       setMetadata(data.metadata)
 
-      toast.success("Questions generated!", {
-        description: `Successfully generated ${data.questions.length} questions.`,
+      toast.success(t("questionsGenerated"), {
+        description: t("questionsGeneratedDesc", { count: data.questions.length }),
       })
     } catch (error) {
       console.error("Generation failed:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to generate questions. Please try again."
-      toast.error("Generation failed", {
+      const errorMessage = error instanceof Error ? error.message : t("generationFailedDesc")
+      toast.error(t("generationFailed"), {
         description: errorMessage,
       })
     } finally {
@@ -169,13 +171,13 @@ export function QuestionGeneratorForm() {
 
       const result = await saveQuestionsMutation({ questions: questionsToSave })
 
-      toast.success("Questions saved!", {
-        description: `Successfully saved ${result.count} questions to your library.`,
+      toast.success(t("questionsSaved"), {
+        description: t("questionsSavedDesc", { count: result.count }),
       })
     } catch (error) {
       console.error("Save failed:", error)
-      toast.error("Save failed", {
-        description: "Failed to save questions. Please try again.",
+      toast.error(t("saveFailed"), {
+        description: t("saveFailedDesc"),
       })
     } finally {
       setIsSaving(false)
@@ -200,13 +202,13 @@ export function QuestionGeneratorForm() {
       }
 
       downloadWiseflowJSON(generatedQuestions, exportMetadata)
-      toast.success("Export successful!", {
-        description: `Questions exported to Wiseflow JSON (${formData.exportFormat === "legacy" ? "Legacy" : "Utgående"} format).`,
+      toast.success(t("exportSuccessful"), {
+        description: t("exportSuccessfulDesc", { format: formData.exportFormat === "legacy" ? "Legacy" : "Utgående" }),
       })
     } catch (error) {
       console.error("Export failed:", error)
-      toast.error("Export failed", {
-        description: "Failed to export questions. Please try again.",
+      toast.error(t("exportFailed"), {
+        description: t("exportFailedDesc"),
       })
     } finally {
       setIsExporting(false)
@@ -241,7 +243,7 @@ export function QuestionGeneratorForm() {
         <div className="flex justify-center">
           <Button onClick={handleGenerateNew} variant="outline">
             <Sparkles className="mr-2 h-4 w-4" />
-            Generate New Questions
+            {t("generateNew")}
           </Button>
         </div>
       </div>
@@ -253,20 +255,20 @@ export function QuestionGeneratorForm() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          Generate Questions
+          {t("generateQuestions")}
         </CardTitle>
         <CardDescription>
-          Create pedagogically sound exam questions using AI
+          {t("createQuestionsSubtitle")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Subject */}
           <div className="space-y-2">
-            <Label htmlFor="subject">Subject *</Label>
+            <Label htmlFor="subject">{t("subject")} *</Label>
             <Input
               id="subject"
-              placeholder="e.g., Biology, Mathematics, History"
+              placeholder={t("subjectPlaceholder")}
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
               autoComplete="off"
@@ -276,10 +278,10 @@ export function QuestionGeneratorForm() {
 
           {/* Topic */}
           <div className="space-y-2">
-            <Label htmlFor="topic">Topic *</Label>
+            <Label htmlFor="topic">{t("topic")} *</Label>
             <Input
               id="topic"
-              placeholder="e.g., Cell division, Algebra, World War II"
+              placeholder={t("topicPlaceholder")}
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
               autoComplete="off"
@@ -289,7 +291,7 @@ export function QuestionGeneratorForm() {
 
           {/* Difficulty */}
           <div className="space-y-2">
-            <Label htmlFor="difficulty">Difficulty Level</Label>
+            <Label htmlFor="difficulty">{t("difficulty")}</Label>
             <Select
               value={formData.difficulty}
               onValueChange={(value: Difficulty) =>
@@ -300,16 +302,16 @@ export function QuestionGeneratorForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="easy">Easy</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="hard">Hard</SelectItem>
+                <SelectItem value="easy">{t("easy")}</SelectItem>
+                <SelectItem value="medium">{t("medium")}</SelectItem>
+                <SelectItem value="hard">{t("hard")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Number of Questions */}
           <div className="space-y-2">
-            <Label htmlFor="numQuestions">Number of Questions</Label>
+            <Label htmlFor="numQuestions">{t("numQuestions")}</Label>
             <Input
               id="numQuestions"
               type="number"
@@ -320,12 +322,12 @@ export function QuestionGeneratorForm() {
                 setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
               }
             />
-            <p className="text-sm text-muted-foreground">Choose between 1 and 20 questions</p>
+            <p className="text-sm text-muted-foreground">{t("numQuestionsHelp")}</p>
           </div>
 
           {/* Question Types */}
           <div className="space-y-2">
-            <Label>Question Types *</Label>
+            <Label>{t("questionTypes")} *</Label>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
               <button
                 type="button"
@@ -337,7 +339,7 @@ export function QuestionGeneratorForm() {
                 }`}
                 aria-pressed={formData.questionTypes.includes("mcq")}
               >
-                Multiple Choice
+                {t("multipleChoice")}
               </button>
               <button
                 type="button"
@@ -349,7 +351,7 @@ export function QuestionGeneratorForm() {
                 }`}
                 aria-pressed={formData.questionTypes.includes("true_false")}
               >
-                True/False
+                {t("trueFalse")}
               </button>
               <button
                 type="button"
@@ -361,19 +363,19 @@ export function QuestionGeneratorForm() {
                 }`}
                 aria-pressed={formData.questionTypes.includes("longtextV2")}
               >
-                Essay
+                {t("essay")}
               </button>
             </div>
             {formData.questionTypes.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                Select at least one question type
+                {t("questionTypesHelp")}
               </p>
             )}
           </div>
 
           {/* Language */}
           <div className="space-y-2">
-            <Label htmlFor="language">Language</Label>
+            <Label htmlFor="language">{t("language")}</Label>
             <Select
               value={formData.language}
               onValueChange={(value: Language) =>
@@ -384,8 +386,8 @@ export function QuestionGeneratorForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="sv">Swedish</SelectItem>
-                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="sv">{t("swedish")}</SelectItem>
+                <SelectItem value="en">{t("english")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -395,23 +397,23 @@ export function QuestionGeneratorForm() {
 
           {/* Context (Optional) */}
           <div className="space-y-2">
-            <Label htmlFor="context">Additional Context (Optional)</Label>
+            <Label htmlFor="context">{t("additionalContext")}</Label>
             <Textarea
               id="context"
-              placeholder="Add any specific instructions, learning outcomes, or context for the questions..."
+              placeholder={t("additionalContextPlaceholder")}
               value={formData.context}
               onChange={(e) => setFormData({ ...formData, context: e.target.value })}
               maxLength={2000}
               rows={4}
             />
             <p className="text-sm text-muted-foreground">
-              {formData.context?.length || 0} / 2000 characters
+              {formData.context?.length || 0} / 2000 {t("charactersCount")}
             </p>
           </div>
 
           {/* Export Format */}
           <div className="space-y-2">
-            <Label htmlFor="exportFormat">Export Format</Label>
+            <Label htmlFor="exportFormat">{t("exportFormat")}</Label>
             <Select
               value={formData.exportFormat}
               onValueChange={(value: ExportFormat) =>
@@ -422,61 +424,61 @@ export function QuestionGeneratorForm() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="legacy">Legacy (tags array)</SelectItem>
-                <SelectItem value="utgaende">Utgående (labels with IDs)</SelectItem>
+                <SelectItem value="legacy">{t("legacyFormat")}</SelectItem>
+                <SelectItem value="utgaende">{t("utgaendeFormat")}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              Choose the Wiseflow JSON format for your exam center
+              {t("exportFormatHelp")}
             </p>
           </div>
 
           {/* Tagging Section */}
           <div className="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
             <div>
-              <h3 className="text-sm font-medium">Tags & Organization</h3>
+              <h3 className="text-sm font-medium">{t("tagsOrganization")}</h3>
               <p className="text-xs text-muted-foreground">
-                Auto-tags: Subject, Topic, Question Type, Difficulty, Language, Timestamp
+                {t("tagsOrganizationHelp")}
               </p>
             </div>
 
             {/* Exam Center Tags */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="term">Term/Period</Label>
+                <Label htmlFor="term">{t("termPeriod")}</Label>
                 <Input
                   id="term"
-                  placeholder="e.g., T3"
+                  placeholder={t("termPlaceholder")}
                   value={formData.term}
                   onChange={(e) => setFormData({ ...formData, term: e.target.value })}
                   autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="semester">Semester</Label>
+                <Label htmlFor="semester">{t("semester")}</Label>
                 <Input
                   id="semester"
-                  placeholder="e.g., HT25"
+                  placeholder={t("semesterPlaceholder")}
                   value={formData.semester}
                   onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
                   autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="examType">Exam Type</Label>
+                <Label htmlFor="examType">{t("examType")}</Label>
                 <Input
                   id="examType"
-                  placeholder="e.g., Ordinarie"
+                  placeholder={t("examTypePlaceholder")}
                   value={formData.examType}
                   onChange={(e) => setFormData({ ...formData, examType: e.target.value })}
                   autoComplete="off"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="courseCode">Course Code</Label>
+                <Label htmlFor="courseCode">{t("courseCode")}</Label>
                 <Input
                   id="courseCode"
-                  placeholder="e.g., BIO101"
+                  placeholder={t("courseCodePlaceholder")}
                   value={formData.courseCode}
                   onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
                   autoComplete="off"
@@ -486,16 +488,16 @@ export function QuestionGeneratorForm() {
 
             {/* Additional Tags */}
             <div className="space-y-2">
-              <Label htmlFor="additionalTags">Additional Tags (Optional)</Label>
+              <Label htmlFor="additionalTags">{t("additionalTags")}</Label>
               <Input
                 id="additionalTags"
-                placeholder="e.g., Ögon, Makula, LO1 (comma-separated)"
+                placeholder={t("additionalTagsPlaceholder")}
                 value={formData.additionalTags}
                 onChange={(e) => setFormData({ ...formData, additionalTags: e.target.value })}
                 autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
-                Separate multiple tags with commas
+                {t("additionalTagsHelp")}
               </p>
             </div>
           </div>
@@ -514,12 +516,12 @@ export function QuestionGeneratorForm() {
             {isGenerating ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating Questions...
+                {t("generating")}
               </>
             ) : (
               <>
                 <Sparkles className="mr-2 h-4 w-4" />
-                Generate Questions
+                {t("generateQuestions")}
               </>
             )}
           </Button>
