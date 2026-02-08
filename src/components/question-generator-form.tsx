@@ -291,7 +291,7 @@ export function QuestionGeneratorForm() {
 
   return (
     <TooltipProvider>
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-zinc-200/60 dark:border-zinc-800/60 hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight">
             <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
@@ -579,7 +579,7 @@ export function QuestionGeneratorForm() {
           </div>
 
           {/* Tagging Section */}
-          <div className="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
+          <div className="space-y-4 rounded-lg border-2 border-zinc-200 bg-zinc-50/50 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
             <div>
               <div className="flex items-center gap-1.5">
                 <h3 className="text-sm font-medium">{t("tagsOrganization")}</h3>
@@ -670,7 +670,7 @@ export function QuestionGeneratorForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full h-11 sm:h-10 touch-action-manipulation"
+            className="w-full h-11 sm:h-10 touch-action-manipulation shadow-md hover:shadow-lg transition-all duration-200"
             disabled={
               isGenerating ||
               formData.questionTypes.length === 0 ||
