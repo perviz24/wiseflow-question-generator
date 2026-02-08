@@ -21,7 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Loader2, Sparkles, Info } from "lucide-react"
+import { Loader2, Sparkles, Info, ChevronDown, ChevronUp } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -31,7 +31,7 @@ import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 import { downloadQti21 } from "@/lib/qti-export"
 import { useTranslation } from "@/lib/language-context"
 
-type QuestionType = "mcq" | "true_false" | "longtextV2"
+type QuestionType = "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
 type Difficulty = "easy" | "medium" | "hard"
 type Language = "sv" | "en"
 type ExportFormat = "legacy" | "utgaende" | "qti21"
@@ -58,7 +58,7 @@ interface FormData {
 }
 
 interface Question {
-  type: "mcq" | "true_false" | "longtextV2"
+  type: QuestionType
   stimulus: string
   options?: Array<{
     label: string
@@ -98,6 +98,7 @@ export function QuestionGeneratorForm() {
   const [isSaving, setIsSaving] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
   const [uploadedContentSource, setUploadedContentSource] = useState<string>("")
+  const [showMoreQuestionTypes, setShowMoreQuestionTypes] = useState(false)
 
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
   const userProfile = useQuery(api.profiles.getUserProfile)
@@ -392,42 +393,232 @@ export function QuestionGeneratorForm() {
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+            <div className="space-y-3">
+              {/* Default visible question types */}
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => toggleQuestionType("mcq")}
+                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        formData.questionTypes.includes("mcq")
+                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                      aria-pressed={formData.questionTypes.includes("mcq")}
+                    >
+                      {t("multipleChoice")}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Fråga med flera svarsalternativ, ett rätt svar</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => toggleQuestionType("true_false")}
+                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        formData.questionTypes.includes("true_false")
+                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                      aria-pressed={formData.questionTypes.includes("true_false")}
+                    >
+                      {t("trueFalse")}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Fråga med två alternativ: Sant eller Falskt</p>
+                  </TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => toggleQuestionType("longtextV2")}
+                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        formData.questionTypes.includes("longtextV2")
+                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                      }`}
+                      aria-pressed={formData.questionTypes.includes("longtextV2")}
+                    >
+                      {t("essay")}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Öppen fråga med längre textsvar (essä)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              {/* Additional question types (collapsible) */}
+              {showMoreQuestionTypes && (
+                <div className="flex flex-wrap gap-2 pt-1" role="group" aria-label="Additional question types">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("short_answer")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("short_answer")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("short_answer")}
+                      >
+                        Kortsvar
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Öppen fråga med kort textsvar (1-3 meningar)</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("fill_blank")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("fill_blank")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("fill_blank")}
+                      >
+                        Lücktext
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Text med luckor att fylla i (ifyllnad)</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("multiple_response")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("multiple_response")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("multiple_response")}
+                      >
+                        Flera rätt svar
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Fråga med flera alternativ där flera kan vara rätt</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("matching")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("matching")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("matching")}
+                      >
+                        Matchning
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Para ihop begrepp eller termer med definitioner</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("ordering")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("ordering")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("ordering")}
+                      >
+                        Ordningsföljd
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Sortera element i rätt ordning eller sekvens</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("hotspot")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("hotspot")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("hotspot")}
+                      >
+                        Bildmarkering
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Markera rätt område på en bild eller diagram</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => toggleQuestionType("rating_scale")}
+                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          formData.questionTypes.includes("rating_scale")
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                        aria-pressed={formData.questionTypes.includes("rating_scale")}
+                      >
+                        Skala/Likert
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">Betygsätta eller värdera på en skala (t.ex. 1-5)</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
+
+              {/* Toggle button */}
               <button
                 type="button"
-                onClick={() => toggleQuestionType("mcq")}
-                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  formData.questionTypes.includes("mcq")
-                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                }`}
-                aria-pressed={formData.questionTypes.includes("mcq")}
+                onClick={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                {t("multipleChoice")}
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleQuestionType("true_false")}
-                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  formData.questionTypes.includes("true_false")
-                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                }`}
-                aria-pressed={formData.questionTypes.includes("true_false")}
-              >
-                {t("trueFalse")}
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleQuestionType("longtextV2")}
-                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                  formData.questionTypes.includes("longtextV2")
-                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                }`}
-                aria-pressed={formData.questionTypes.includes("longtextV2")}
-              >
-                {t("essay")}
+                {showMoreQuestionTypes ? (
+                  <>
+                    <ChevronUp className="h-3.5 w-3.5" />
+                    Visa färre frågetyper
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="h-3.5 w-3.5" />
+                    Visa fler frågetyper ({7} till)
+                  </>
+                )}
               </button>
             </div>
             {formData.questionTypes.length === 0 && (

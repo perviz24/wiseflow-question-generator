@@ -11,7 +11,18 @@ export const saveQuestions = mutation({
         difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
         language: v.union(v.literal("sv"), v.literal("en")),
         tags: v.array(v.string()),
-        type: v.union(v.literal("mcq"), v.literal("longtextV2"), v.literal("true_false")),
+        type: v.union(
+          v.literal("mcq"),
+          v.literal("longtextV2"),
+          v.literal("true_false"),
+          v.literal("short_answer"),
+          v.literal("fill_blank"),
+          v.literal("multiple_response"),
+          v.literal("matching"),
+          v.literal("ordering"),
+          v.literal("hotspot"),
+          v.literal("rating_scale")
+        ),
         stimulus: v.string(),
         options: v.optional(
           v.array(

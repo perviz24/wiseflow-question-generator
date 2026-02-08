@@ -14,7 +14,14 @@ export default defineSchema({
     type: v.union(
       v.literal("mcq"),
       v.literal("longtextV2"),
-      v.literal("true_false")
+      v.literal("true_false"),
+      v.literal("short_answer"),
+      v.literal("fill_blank"),
+      v.literal("multiple_response"),
+      v.literal("matching"),
+      v.literal("ordering"),
+      v.literal("hotspot"),
+      v.literal("rating_scale")
     ),
     stimulus: v.string(), // Question text (HTML allowed)
 

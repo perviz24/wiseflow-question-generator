@@ -1,7 +1,7 @@
 // Export questions to Wiseflow "innehållsbank" JSON format
 
 interface Question {
-  type: "mcq" | "true_false" | "longtextV2"
+  type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
   stimulus: string
   options?: Array<{
     label: string
