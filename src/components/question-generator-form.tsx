@@ -293,11 +293,11 @@ export function QuestionGeneratorForm() {
     <TooltipProvider>
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="px-4 sm:px-6">
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight">
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
             <span className="truncate">{t("generateQuestions")}</span>
           </CardTitle>
-          <CardDescription className="text-sm">
+          <CardDescription className="text-sm sm:text-base text-muted-foreground mt-1.5">
             {t("createQuestionsSubtitle")}
           </CardDescription>
         </CardHeader>
