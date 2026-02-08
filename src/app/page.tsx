@@ -49,7 +49,7 @@ export default function Home() {
         <SignedIn>
           <div className="flex flex-col items-center gap-6 sm:gap-8 w-full">
             <div className="text-center px-2">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
                 {t("createQuestionsTitle")}
               </h2>
               <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
@@ -62,7 +62,7 @@ export default function Home() {
 
         <SignedOut>
           <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tighter bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
               {t("welcomeTitle")}
             </h2>
             <p className="max-w-md text-lg sm:text-xl text-muted-foreground leading-relaxed">
