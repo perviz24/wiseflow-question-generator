@@ -492,11 +492,11 @@ export function QuestionGeneratorForm() {
                         }`}
                         aria-pressed={formData.questionTypes.includes("fill_blank")}
                       >
-                        Lücktext
+                        Ifyllnad
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p className="text-xs">Text med luckor att fylla i (ifyllnad)</p>
+                      <p className="text-xs">Text med luckor att fylla i</p>
                     </TooltipContent>
                   </Tooltip>
 
@@ -592,7 +592,7 @@ export function QuestionGeneratorForm() {
                         }`}
                         aria-pressed={formData.questionTypes.includes("rating_scale")}
                       >
-                        Skala/Likert
+                        Betygsskala
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
