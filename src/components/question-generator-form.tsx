@@ -294,8 +294,8 @@ export function QuestionGeneratorForm() {
       <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-zinc-200/60 dark:border-zinc-800/60 hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight">
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-            <span className="truncate">{t("generateQuestions")}</span>
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0 drop-shadow-sm" />
+            <span className="truncate bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-300 bg-clip-text text-transparent">{t("generateQuestions")}</span>
           </CardTitle>
           <CardDescription className="text-sm sm:text-base text-muted-foreground mt-1.5">
             {t("createQuestionsSubtitle")}
@@ -582,7 +582,7 @@ export function QuestionGeneratorForm() {
           <div className="space-y-4 rounded-lg border-2 border-zinc-200 bg-zinc-50/50 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm font-medium">{t("tagsOrganization")}</h3>
+                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t("tagsOrganization")}</h3>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
