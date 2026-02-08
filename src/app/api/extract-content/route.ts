@@ -4,6 +4,8 @@ import mammoth from "mammoth"
 export const runtime = "nodejs"
 export const maxDuration = 60
 
+const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData()
@@ -21,9 +23,13 @@ export async function POST(req: NextRequest) {
 
     // Extract based on file type
     if (fileType === "application/pdf") {
-      // PDF support coming soon - for now use URL scraping instead
+      // PDF extraction requires Firecrawl API (handles both text and scanned PDFs with OCR)
+      // We need a public URL for Firecrawl, so this must go through Convex storage
       return NextResponse.json(
-        { error: "PDF extraction coming soon. Please use URL scraping for PDFs hosted online." },
+        {
+          error: "PDF requires storage URL. Upload file first, then extract using extract-from-storage endpoint.",
+          requiresStorage: true
+        },
         { status: 400 }
       )
     } else if (fileType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {

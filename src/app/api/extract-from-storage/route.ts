@@ -7,6 +7,7 @@ import mammoth from "mammoth"
 import { parseOffice } from "officeparser"
 
 const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
+const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -47,13 +48,48 @@ export async function POST(request: NextRequest) {
 
     // Extract based on file type
     if (fileType === "application/pdf") {
-      return NextResponse.json(
-        {
-          error:
-            "PDF extraction is currently unavailable. Please use Word files (.docx) or paste URL instead. PDF libraries have compatibility issues with serverless deployment.",
-        },
-        { status: 400 }
-      )
+      // Use Firecrawl API for PDF extraction (handles text + scanned PDFs with OCR)
+      if (!FIRECRAWL_API_KEY) {
+        return NextResponse.json(
+          { error: "Firecrawl API key not configured" },
+          { status: 500 }
+        )
+      }
+
+      try {
+        const firecrawlResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${FIRECRAWL_API_KEY}`,
+          },
+          body: JSON.stringify({
+            url: fileUrl,
+            formats: ["markdown"],
+          }),
+        })
+
+        if (!firecrawlResponse.ok) {
+          const errorData = await firecrawlResponse.json().catch(() => ({}))
+          console.error("Firecrawl API error:", errorData)
+          throw new Error(`Firecrawl API returned ${firecrawlResponse.status}`)
+        }
+
+        const firecrawlData = await firecrawlResponse.json()
+        extractedText = firecrawlData.data?.markdown || ""
+
+        if (!extractedText) {
+          throw new Error("No content returned from Firecrawl")
+        }
+      } catch (error) {
+        console.error("PDF extraction via Firecrawl failed:", error)
+        return NextResponse.json(
+          {
+            error: "Failed to extract PDF content. The file may be corrupted or password-protected.",
+          },
+          { status: 400 }
+        )
+      }
     } else if (
       fileType ===
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
