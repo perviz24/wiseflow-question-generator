@@ -15,13 +15,18 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <h1 className="text-xl font-semibold tracking-tight">
+          <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
             {t("appTitle")}
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <SignedIn>
               <Link href="/settings">
-                <Button variant="ghost" size="icon">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-9 sm:w-9"
+                  aria-label={t("settings")}
+                >
                   <Settings className="h-5 w-5" />
                   <span className="sr-only">{t("settings")}</span>
                 </Button>
@@ -40,14 +45,14 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-3 sm:px-4 py-8 sm:py-12 max-w-full overflow-x-hidden">
         <SignedIn>
-          <div className="flex flex-col items-center gap-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold tracking-tight">
+          <div className="flex flex-col items-center gap-6 sm:gap-8 w-full">
+            <div className="text-center px-2">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
                 {t("createQuestionsTitle")}
               </h2>
-              <p className="mt-2 text-muted-foreground">
+              <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto">
                 {t("createQuestionsSubtitle")}
               </p>
             </div>

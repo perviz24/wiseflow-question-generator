@@ -284,18 +284,18 @@ export function QuestionGeneratorForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          {t("generateQuestions")}
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader className="px-4 sm:px-6">
+        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+          <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+          <span className="truncate">{t("generateQuestions")}</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm">
           {t("createQuestionsSubtitle")}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <CardContent className="px-4 sm:px-6 pb-6">
+        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           {/* Subject */}
           <div className="space-y-2">
             <Label htmlFor="subject">
@@ -303,6 +303,7 @@ export function QuestionGeneratorForm() {
             </Label>
             <Input
               id="subject"
+              name="subject"
               placeholder={t("subjectPlaceholder")}
               value={formData.subject}
               onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -318,6 +319,7 @@ export function QuestionGeneratorForm() {
             </Label>
             <Input
               id="topic"
+              name="topic"
               placeholder={t("topicPlaceholder")}
               value={formData.topic}
               onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
@@ -351,13 +353,16 @@ export function QuestionGeneratorForm() {
             <Label htmlFor="numQuestions">{t("numQuestions")}</Label>
             <Input
               id="numQuestions"
+              name="numQuestions"
               type="number"
+              inputMode="numeric"
               min={1}
               max={20}
               value={formData.numQuestions}
               onChange={(e) =>
                 setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
               }
+              autoComplete="off"
             />
             <p className="text-sm text-muted-foreground">{t("numQuestionsHelp")}</p>
           </div>
@@ -369,7 +374,7 @@ export function QuestionGeneratorForm() {
               <button
                 type="button"
                 onClick={() => toggleQuestionType("mcq")}
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                   formData.questionTypes.includes("mcq")
                     ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
                     : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -381,7 +386,7 @@ export function QuestionGeneratorForm() {
               <button
                 type="button"
                 onClick={() => toggleQuestionType("true_false")}
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                   formData.questionTypes.includes("true_false")
                     ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
                     : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -393,7 +398,7 @@ export function QuestionGeneratorForm() {
               <button
                 type="button"
                 onClick={() => toggleQuestionType("longtextV2")}
-                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                   formData.questionTypes.includes("longtextV2")
                     ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
                     : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
@@ -493,11 +498,13 @@ export function QuestionGeneratorForm() {
             <Label htmlFor="context">{t("additionalContext")}</Label>
             <Textarea
               id="context"
+              name="context"
               placeholder={t("additionalContextPlaceholder")}
               value={formData.context}
               onChange={(e) => setFormData({ ...formData, context: e.target.value })}
               maxLength={2000}
               rows={4}
+              autoComplete="off"
             />
             <p className="text-sm text-muted-foreground">
               {formData.context?.length || 0} / 2000 {t("charactersCount")}
@@ -542,11 +549,12 @@ export function QuestionGeneratorForm() {
             </div>
 
             {/* Exam Center Tags */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-2">
                 <Label htmlFor="term">{t("termPeriod")}</Label>
                 <Input
                   id="term"
+                  name="term"
                   placeholder={t("termPlaceholder")}
                   value={formData.term}
                   onChange={(e) => setFormData({ ...formData, term: e.target.value })}
@@ -557,6 +565,7 @@ export function QuestionGeneratorForm() {
                 <Label htmlFor="semester">{t("semester")}</Label>
                 <Input
                   id="semester"
+                  name="semester"
                   placeholder={t("semesterPlaceholder")}
                   value={formData.semester}
                   onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
@@ -567,6 +576,7 @@ export function QuestionGeneratorForm() {
                 <Label htmlFor="examType">{t("examType")}</Label>
                 <Input
                   id="examType"
+                  name="examType"
                   placeholder={t("examTypePlaceholder")}
                   value={formData.examType}
                   onChange={(e) => setFormData({ ...formData, examType: e.target.value })}
@@ -577,6 +587,7 @@ export function QuestionGeneratorForm() {
                 <Label htmlFor="courseCode">{t("courseCode")}</Label>
                 <Input
                   id="courseCode"
+                  name="courseCode"
                   placeholder={t("courseCodePlaceholder")}
                   value={formData.courseCode}
                   onChange={(e) => setFormData({ ...formData, courseCode: e.target.value })}
@@ -590,6 +601,7 @@ export function QuestionGeneratorForm() {
               <Label htmlFor="additionalTags">{t("additionalTags")}</Label>
               <Input
                 id="additionalTags"
+                name="additionalTags"
                 placeholder={t("additionalTagsPlaceholder")}
                 value={formData.additionalTags}
                 onChange={(e) => setFormData({ ...formData, additionalTags: e.target.value })}
@@ -604,7 +616,7 @@ export function QuestionGeneratorForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full"
+            className="w-full h-11 sm:h-10 touch-action-manipulation"
             disabled={
               isGenerating ||
               formData.questionTypes.length === 0 ||
