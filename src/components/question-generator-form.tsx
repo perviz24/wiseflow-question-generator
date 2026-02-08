@@ -15,7 +15,13 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Loader2, Sparkles } from "lucide-react"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Loader2, Sparkles, Info } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -284,18 +290,19 @@ export function QuestionGeneratorForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader className="px-4 sm:px-6">
-        <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-          <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
-          <span className="truncate">{t("generateQuestions")}</span>
-        </CardTitle>
-        <CardDescription className="text-sm">
-          {t("createQuestionsSubtitle")}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="px-4 sm:px-6 pb-6">
-        <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+    <TooltipProvider>
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader className="px-4 sm:px-6">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0" />
+            <span className="truncate">{t("generateQuestions")}</span>
+          </CardTitle>
+          <CardDescription className="text-sm">
+            {t("createQuestionsSubtitle")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="px-4 sm:px-6 pb-6">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           {/* Subject */}
           <div className="space-y-2">
             <Label htmlFor="subject">
@@ -369,7 +376,22 @@ export function QuestionGeneratorForm() {
 
           {/* Question Types */}
           <div className="space-y-2">
-            <Label>{t("questionTypes")} *</Label>
+            <div className="flex items-center gap-1.5">
+              <Label>{t("questionTypes")} *</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
+                    <Info className="h-3.5 w-3.5" />
+                    <span className="sr-only">Question types information</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    Select one or more question types to generate. You can mix different types in the same set.
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
               <button
                 type="button"
@@ -518,7 +540,24 @@ export function QuestionGeneratorForm() {
 
           {/* Export Format */}
           <div className="space-y-2">
-            <Label htmlFor="exportFormat">{t("exportFormat")}</Label>
+            <div className="flex items-center gap-1.5">
+              <Label htmlFor="exportFormat">{t("exportFormat")}</Label>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
+                    <Info className="h-3.5 w-3.5" />
+                    <span className="sr-only">Export format information</span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p className="text-sm">
+                    <strong>Legacy:</strong> Original format with tags array<br />
+                    <strong>Utgående:</strong> New format for Wiseflow exam center<br />
+                    <strong>QTI 2.1:</strong> Standard format for LMS compatibility
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <Select
               value={formData.exportFormat}
               onValueChange={(value: ExportFormat) =>
@@ -542,8 +581,23 @@ export function QuestionGeneratorForm() {
           {/* Tagging Section */}
           <div className="space-y-4 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800">
             <div>
-              <h3 className="text-sm font-medium">{t("tagsOrganization")}</h3>
-              <p className="text-xs text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-sm font-medium">{t("tagsOrganization")}</h3>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
+                      <Info className="h-3.5 w-3.5" />
+                      <span className="sr-only">Tagging information</span>
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <p className="text-sm">
+                      These tags help organize questions in your Wiseflow exam center. All fields are optional and will be included in the export.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
                 {t("tagsOrganizationHelp")}
               </p>
             </div>
@@ -640,5 +694,6 @@ export function QuestionGeneratorForm() {
         </form>
       </CardContent>
     </Card>
+    </TooltipProvider>
   )
 }
