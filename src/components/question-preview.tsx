@@ -47,6 +47,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [additionalTypes, setAdditionalTypes] = useState<string[]>([])
   const [isGeneratingMore, setIsGeneratingMore] = useState(false)
   const [showMoreTypes, setShowMoreTypes] = useState(false)
+  const [newAnswerInput, setNewAnswerInput] = useState("")
 
   const getQuestionTypeLabel = (type: string) => {
     const translationKeys: Record<string, keyof Translations> = {
@@ -121,6 +122,40 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       correctAnswer: isCurrentlyCorrect
         ? currentAnswers.filter(a => a !== label)
         : [...currentAnswers, label]
+    })
+  }
+
+  const updateCorrectAnswerAtIndex = (index: number, value: string) => {
+    if (!editedQuestion || !editedQuestion.correctAnswer) return
+
+    const updatedAnswers = [...editedQuestion.correctAnswer]
+    updatedAnswers[index] = value
+
+    setEditedQuestion({
+      ...editedQuestion,
+      correctAnswer: updatedAnswers
+    })
+  }
+
+  const removeCorrectAnswerAtIndex = (index: number) => {
+    if (!editedQuestion || !editedQuestion.correctAnswer) return
+
+    const updatedAnswers = editedQuestion.correctAnswer.filter((_, i) => i !== index)
+
+    setEditedQuestion({
+      ...editedQuestion,
+      correctAnswer: updatedAnswers
+    })
+  }
+
+  const addCorrectAnswer = (value: string) => {
+    if (!editedQuestion || !value.trim()) return
+
+    const currentAnswers = editedQuestion.correctAnswer || []
+
+    setEditedQuestion({
+      ...editedQuestion,
+      correctAnswer: [...currentAnswers, value.trim()]
     })
   }
 
@@ -445,16 +480,32 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.options.map((option, optionIndex) => {
                       const isCorrect = displayQuestion.correctAnswer?.includes(option.label)
                       return (
-                        <Card
+                        <div
                           key={optionIndex}
-                          className={`p-3 transition-all ${
+                          className={`flex items-start gap-3 rounded-lg border p-3 ${
                             isCorrect
-                              ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
-                              : "bg-muted/50"
+                              ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
+                              : "border-border"
                           }`}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
+                          {isEditing ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleCorrectAnswer(option.label)}
+                              className="mt-0.5 flex-shrink-0"
+                            >
+                              <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
+                                isCorrect ? "bg-green-100 border-green-300 dark:bg-green-900/50 dark:border-green-700" : ""
+                              }`}>
+                                {isCorrect && (
+                                  <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </div>
+                            </button>
+                          ) : (
+                            <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border mt-0.5 ${
                               isCorrect ? "bg-green-100 border-green-300 dark:bg-green-900/50 dark:border-green-700" : ""
                             }`}>
                               {isCorrect && (
@@ -463,12 +514,20 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                                 </svg>
                               )}
                             </div>
-                            <div className="flex-1">
-                              <span className="font-semibold text-sm mr-2">{option.label}.</span>
-                              <span className="text-sm">{option.value}</span>
-                            </div>
+                          )}
+                          <div className="flex-1 flex items-center gap-2">
+                            <span className="font-medium flex-shrink-0">{option.label}.</span>
+                            {isEditing ? (
+                              <Input
+                                value={option.value}
+                                onChange={(e) => updateEditedOption(optionIndex, 'value', e.target.value)}
+                                className="flex-1"
+                              />
+                            ) : (
+                              <span>{option.value}</span>
+                            )}
                           </div>
-                        </Card>
+                        </div>
                       )
                     })}
                     <p className="text-xs text-muted-foreground mt-2">
@@ -484,20 +543,58 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   <Separator className="my-4" />
                   <div className="space-y-2">
                     <p className="text-sm font-medium mb-3">Match the following pairs:</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                       {displayQuestion.options.map((option, optionIndex) => (
                         <Card key={optionIndex} className="p-3 bg-muted/50">
-                          <div className="flex items-start gap-2">
-                            <Badge variant="outline" className="shrink-0">{option.label}</Badge>
-                            <p className="text-sm">{option.value}</p>
-                          </div>
+                          {isEditing ? (
+                            <div className="flex flex-col gap-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium shrink-0">Term:</span>
+                                <Input
+                                  value={option.label}
+                                  onChange={(e) => updateEditedOption(optionIndex, 'label', e.target.value)}
+                                  className="flex-1"
+                                />
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium shrink-0">Match:</span>
+                                <Input
+                                  value={option.value}
+                                  onChange={(e) => updateEditedOption(optionIndex, 'value', e.target.value)}
+                                  className="flex-1"
+                                />
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-start gap-2">
+                              <Badge variant="outline" className="shrink-0">{option.label}</Badge>
+                              <p className="text-sm">{option.value}</p>
+                            </div>
+                          )}
                         </Card>
                       ))}
                     </div>
-                    {displayQuestion.correctAnswer && (
-                      <p className="text-xs text-green-600 dark:text-green-400 mt-2">
-                        ✓ Correct pairs: {displayQuestion.correctAnswer.join(", ")}
-                      </p>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800 mt-2">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
+                          ✓ Correct pairs:
+                        </p>
+                        {isEditing ? (
+                          <Textarea
+                            value={displayQuestion.correctAnswer.join(", ")}
+                            onChange={(e) => setEditedQuestion(editedQuestion ? {
+                              ...editedQuestion,
+                              correctAnswer: e.target.value.split(",").map(s => s.trim()).filter(Boolean)
+                            } : null)}
+                            className="text-sm bg-white dark:bg-gray-950 min-h-[60px]"
+                            placeholder="e.g., A-1, B-2, C-3"
+                          />
+                        ) : (
+                          <p className="text-sm text-green-800 dark:text-green-200">
+                            {displayQuestion.correctAnswer.join(", ")}
+                          </p>
+                        )}
+                      </Card>
                     )}
                   </div>
                 </>
@@ -514,16 +611,54 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       return (
                         <Card key={optionIndex} className="p-3 bg-muted/50">
                           <div className="flex items-center gap-3">
-                            <Badge variant="default" className="shrink-0 bg-blue-600">
-                              {correctPosition !== undefined && correctPosition !== -1 ? correctPosition + 1 : "?"}
-                            </Badge>
-                            <p className="text-sm flex-1">{option.value}</p>
+                            {isEditing ? (
+                              <Input
+                                type="number"
+                                min="1"
+                                max={displayQuestion.options?.length || 1}
+                                value={correctPosition !== undefined && correctPosition !== -1 ? correctPosition + 1 : ""}
+                                onChange={(e) => {
+                                  const newPosition = parseInt(e.target.value) - 1
+                                  if (!editedQuestion || !editedQuestion.correctAnswer || !editedQuestion.options) return
+
+                                  const newOrder = [...editedQuestion.correctAnswer]
+                                  const currentIndex = newOrder.indexOf(option.label)
+
+                                  if (currentIndex !== -1) {
+                                    newOrder.splice(currentIndex, 1)
+                                  }
+
+                                  if (newPosition >= 0 && newPosition < editedQuestion.options.length) {
+                                    newOrder.splice(newPosition, 0, option.label)
+                                  }
+
+                                  setEditedQuestion({
+                                    ...editedQuestion,
+                                    correctAnswer: newOrder
+                                  })
+                                }}
+                                className="w-16 shrink-0"
+                              />
+                            ) : (
+                              <Badge variant="default" className="shrink-0 bg-blue-600">
+                                {correctPosition !== undefined && correctPosition !== -1 ? correctPosition + 1 : "?"}
+                              </Badge>
+                            )}
+                            {isEditing ? (
+                              <Input
+                                value={option.value}
+                                onChange={(e) => updateEditedOption(optionIndex, 'value', e.target.value)}
+                                className="flex-1"
+                              />
+                            ) : (
+                              <p className="text-sm flex-1">{option.value}</p>
+                            )}
                           </div>
                         </Card>
                       )
                     })}
                     <p className="text-xs text-muted-foreground mt-2">
-                      Numbers show the correct sequence
+                      {isEditing ? "Enter position numbers (1, 2, 3...)" : "Numbers show the correct sequence"}
                     </p>
                   </div>
                 </>
@@ -543,16 +678,72 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                           <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
                             Image-based question
                           </p>
-                          <p className="text-sm text-amber-800 dark:text-amber-200">
-                            {displayQuestion.instructorStimulus || "Click or tap on the correct area of the image/diagram"}
-                          </p>
+                          {isEditing ? (
+                            <Textarea
+                              value={editedQuestion?.instructorStimulus || ""}
+                              onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, instructorStimulus: e.target.value } : null)}
+                              className="text-sm bg-white dark:bg-amber-950"
+                            />
+                          ) : (
+                            <p className="text-sm text-amber-800 dark:text-amber-200">
+                              {displayQuestion.instructorStimulus || "Click or tap on the correct area of the image/diagram"}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </Card>
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
-                      <p className="text-xs text-green-600 dark:text-green-400">
-                        ✓ Correct area(s): {displayQuestion.correctAnswer.join(", ")}
-                      </p>
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
+                          ✓ Correct area(s):
+                        </p>
+                        {isEditing ? (
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap gap-2">
+                              {displayQuestion.correctAnswer.map((area, index) => (
+                                <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                                  {area}
+                                  <button
+                                    type="button"
+                                    onClick={() => removeCorrectAnswerAtIndex(index)}
+                                    className="ml-1"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </Badge>
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                value={newAnswerInput}
+                                onChange={(e) => setNewAnswerInput(e.target.value)}
+                                placeholder="Add area name..."
+                                className="flex-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    addCorrectAnswer(newAnswerInput)
+                                    setNewAnswerInput("")
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => {
+                                  addCorrectAnswer(newAnswerInput)
+                                  setNewAnswerInput("")
+                                }}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-green-800 dark:text-green-200">
+                            {displayQuestion.correctAnswer.join(", ")}
+                          </p>
+                        )}
+                      </Card>
                     )}
                   </div>
                 </>
@@ -582,13 +773,62 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
                           ✓ Correct answers:
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {displayQuestion.correctAnswer.map((answer, index) => (
-                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
-                              [{index + 1}] {answer}
-                            </Badge>
-                          ))}
-                        </div>
+                        {isEditing ? (
+                          <div className="space-y-2">
+                            {displayQuestion.correctAnswer.map((answer, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <Badge variant="outline" className="bg-white dark:bg-gray-950 shrink-0">
+                                  [{index + 1}]
+                                </Badge>
+                                <Input
+                                  value={answer}
+                                  onChange={(e) => updateCorrectAnswerAtIndex(index, e.target.value)}
+                                  className="flex-1"
+                                />
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => removeCorrectAnswerAtIndex(index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                            <div className="flex items-center gap-2">
+                              <Input
+                                value={newAnswerInput}
+                                onChange={(e) => setNewAnswerInput(e.target.value)}
+                                placeholder="Add new answer..."
+                                className="flex-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    addCorrectAnswer(newAnswerInput)
+                                    setNewAnswerInput("")
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => {
+                                  addCorrectAnswer(newAnswerInput)
+                                  setNewAnswerInput("")
+                                }}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex flex-wrap gap-2">
+                            {displayQuestion.correctAnswer.map((answer, index) => (
+                              <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                                [{index + 1}] {answer}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
                       </Card>
                     )}
                   </div>
@@ -612,9 +852,20 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
                           ✓ Sample answer:
                         </p>
-                        <p className="text-sm text-green-800 dark:text-green-200">
-                          {displayQuestion.correctAnswer.join(", ")}
-                        </p>
+                        {isEditing ? (
+                          <Textarea
+                            value={displayQuestion.correctAnswer.join(", ")}
+                            onChange={(e) => setEditedQuestion(editedQuestion ? {
+                              ...editedQuestion,
+                              correctAnswer: [e.target.value]
+                            } : null)}
+                            className="text-sm bg-white dark:bg-gray-950 min-h-[60px]"
+                          />
+                        ) : (
+                          <p className="text-sm text-green-800 dark:text-green-200">
+                            {displayQuestion.correctAnswer.join(", ")}
+                          </p>
+                        )}
                       </Card>
                     )}
                   </div>
@@ -632,15 +883,31 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                           const isCorrect = displayQuestion.correctAnswer?.includes(rating.toString())
                           return (
                             <div key={rating} className="flex flex-col items-center gap-2">
-                              <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
-                                isCorrect
-                                  ? "bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600"
-                                  : "border-gray-300 dark:border-gray-700"
-                              }`}>
-                                <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-300" : ""}`}>
-                                  {rating}
-                                </span>
-                              </div>
+                              {isEditing ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleCorrectAnswer(rating.toString())}
+                                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 ${
+                                    isCorrect
+                                      ? "bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600"
+                                      : "border-gray-300 dark:border-gray-700"
+                                  }`}
+                                >
+                                  <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-300" : ""}`}>
+                                    {rating}
+                                  </span>
+                                </button>
+                              ) : (
+                                <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
+                                  isCorrect
+                                    ? "bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600"
+                                    : "border-gray-300 dark:border-gray-700"
+                                }`}>
+                                  <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-300" : ""}`}>
+                                    {rating}
+                                  </span>
+                                </div>
+                              )}
                               <span className="text-xs text-muted-foreground">
                                 {rating === 1 ? "Low" : rating === 5 ? "High" : ""}
                               </span>
