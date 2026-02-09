@@ -134,6 +134,9 @@ export interface Translations {
   showing: string
   of: string
   questions: string
+  sortBy: string
+  sortNewest: string
+  sortOldest: string
 
   // Toast Messages
   questionsGenerated: string
@@ -278,6 +281,9 @@ export const translations: Record<Language, Translations> = {
     showing: "Visar",
     of: "av",
     questions: "frågor",
+    sortBy: "Sortera efter",
+    sortNewest: "Nyast först",
+    sortOldest: "Äldst först",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -430,6 +436,9 @@ export const translations: Record<Language, Translations> = {
     showing: "Showing",
     of: "of",
     questions: "questions",
+    sortBy: "Sort by",
+    sortNewest: "Newest first",
+    sortOldest: "Oldest first",
 
     // Settings Page
     profileSettings: "Profile Settings",

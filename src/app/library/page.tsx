@@ -47,6 +47,7 @@ export default function LibraryPage() {
   const [filterType, setFilterType] = useState<string>("")
   const [filterDifficulty, setFilterDifficulty] = useState<string>("")
   const [filterSearch, setFilterSearch] = useState<string>("")
+  const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest")
 
   const toggleQuestion = (id: string) => {
     const newSelected = new Set(selectedQuestions)
@@ -276,6 +277,8 @@ export default function LibraryPage() {
     }
 
     return true
+  }).sort((a, b) => {
+    return sortBy === "newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt
   }) || []
 
   // Get unique tags from all questions for filter dropdown
@@ -418,7 +421,7 @@ export default function LibraryPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                       {/* Search filter */}
                       <Input
                         placeholder="Search questions..."
@@ -472,6 +475,17 @@ export default function LibraryPage() {
                           <SelectItem value="easy">Lätt</SelectItem>
                           <SelectItem value="medium">Medel</SelectItem>
                           <SelectItem value="hard">Svår</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {/* Sort dropdown */}
+                      <Select value={sortBy} onValueChange={(value) => setSortBy(value as "newest" | "oldest")}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder={t("sortBy")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="newest">{t("sortNewest")}</SelectItem>
+                          <SelectItem value="oldest">{t("sortOldest")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
