@@ -25,10 +25,10 @@ export default function Home() {
                   variant="ghost"
                   size="icon"
                   className="h-10 w-10 sm:h-9 sm:w-9"
-                  aria-label="Bibliotek"
+                  aria-label={t("myLibrary")}
                 >
                   <BookOpen className="h-5 w-5" />
-                  <span className="sr-only">Bibliotek</span>
+                  <span className="sr-only">{t("myLibrary")}</span>
                 </Button>
               </Link>
               <Link href="/settings">
