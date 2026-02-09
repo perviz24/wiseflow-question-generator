@@ -11,6 +11,15 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/language-context"
 import type { Translations } from "@/lib/translations"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
+import { downloadQti21 } from "@/lib/qti-export"
+import { downloadCSV } from "@/lib/csv-export"
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
@@ -30,6 +39,13 @@ interface QuestionPreviewProps {
     topic: string
     difficulty: string
     language: string
+    exportFormat?: "legacy" | "utgaende" | "qti21"
+    term?: string
+    semester?: string
+    examType?: string
+    courseCode?: string
+    additionalTags?: string
+    tutorInitials?: string
   }
   onSave?: () => void
   onExport?: () => void
@@ -48,6 +64,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [isGeneratingMore, setIsGeneratingMore] = useState(false)
   const [showMoreTypes, setShowMoreTypes] = useState(false)
   const [newAnswerInput, setNewAnswerInput] = useState("")
+  const [isExportingFormat, setIsExportingFormat] = useState(false)
 
   const getQuestionTypeLabel = (type: string) => {
     const translationKeys: Record<string, keyof Translations> = {
@@ -280,6 +297,43 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
     }
   }
 
+  const handleExport = async (format: "wiseflow-legacy" | "wiseflow-utgaende" | "qti21" | "csv") => {
+    setIsExportingFormat(true)
+
+    try {
+      if (format === "csv") {
+        downloadCSV(questions, metadata)
+        toast.success("CSV exported!", {
+          description: "Questions exported in CSV format for Excel/Google Sheets."
+        })
+      } else if (format === "qti21") {
+        await downloadQti21(questions, metadata)
+        toast.success("QTI 2.1 exported!", {
+          description: "Questions exported in QTI 2.1 format (ZIP file)."
+        })
+      } else {
+        // Wiseflow JSON formats
+        const exportFormat = format === "wiseflow-legacy" ? "legacy" : "utgaende"
+        downloadWiseflowJSON(questions, {
+          ...metadata,
+          exportFormat
+        })
+        const formatName = exportFormat === "legacy" ? "Legacy" : "Utgående"
+        toast.success(`Wiseflow JSON (${formatName}) exported!`, {
+          description: "Questions exported in Wiseflow innehållsbank format."
+        })
+      }
+    } catch (error) {
+      console.error("Export failed:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to export questions"
+      toast.error("Export failed", {
+        description: errorMessage
+      })
+    } finally {
+      setIsExportingFormat(false)
+    }
+  }
+
   return (
     <div className="w-full max-w-4xl space-y-6">
       {/* Header with metadata */}
@@ -294,7 +348,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={onSave} variant="default" disabled={isSaving || isExporting}>
+              <Button onClick={onSave} variant="default" disabled={isSaving || isExportingFormat}>
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -307,19 +361,39 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   </>
                 )}
               </Button>
-              <Button onClick={onExport} variant="outline" disabled={isSaving || isExporting}>
-                {isExporting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Exporting...
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export JSON
-                  </>
-                )}
-              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" disabled={isSaving || isExportingFormat}>
+                    {isExportingFormat ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => handleExport("wiseflow-legacy")}>
+                    Wiseflow JSON (Legacy)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("wiseflow-utgaende")}>
+                    Wiseflow JSON (Utgående)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("qti21")}>
+                    QTI 2.1 (ZIP)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("csv")}>
+                    CSV (Excel/Sheets)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </CardHeader>
