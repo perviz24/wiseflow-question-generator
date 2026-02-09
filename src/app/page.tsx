@@ -29,7 +29,7 @@ export default function Home() {
                   className="h-11 w-11"
                   aria-label={t("myLibrary")}
                 >
-                  <Library className="h-6 w-6" />
+                  <Library className="h-7 w-7" />
                   <span className="sr-only">{t("myLibrary")}</span>
                 </Button>
               </Link>
@@ -40,7 +40,7 @@ export default function Home() {
                   className="h-11 w-11"
                   aria-label={t("settings")}
                 >
-                  <Settings className="h-6 w-6" />
+                  <Settings className="h-7 w-7" />
                   <span className="sr-only">{t("settings")}</span>
                 </Button>
               </Link>

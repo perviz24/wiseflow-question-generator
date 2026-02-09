@@ -75,7 +75,7 @@ export default function SettingsPage() {
     <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-4">
         <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-5 w-5" />
+          <ArrowLeft className="mr-2 h-6 w-6" />
           {t("back")}
         </Button>
       </div>

@@ -351,12 +351,12 @@ export default function LibraryPage() {
           <div className="flex items-center gap-2">
             <Link href="/">
               <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Hem">
-                <Home className="h-6 w-6" />
+                <Home className="h-7 w-7" />
               </Button>
             </Link>
             <Link href="/settings">
               <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Inställningar">
-                <SettingsIcon className="h-6 w-6" />
+                <SettingsIcon className="h-7 w-7" />
               </Button>
             </Link>
             <UserButton afterSignOutUrl="/">
