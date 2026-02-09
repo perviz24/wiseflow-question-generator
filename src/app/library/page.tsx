@@ -428,12 +428,12 @@ export default function LibraryPage() {
                       />
 
                       {/* Tag filter */}
-                      <Select value={filterTag} onValueChange={setFilterTag}>
+                      <Select value={filterTag || "all"} onValueChange={(value) => setFilterTag(value === "all" ? "" : value)}>
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder={t("filterByTag")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All tags</SelectItem>
+                          <SelectItem value="all">All tags</SelectItem>
                           {allTags.map((tag) => (
                             <SelectItem key={tag} value={tag}>
                               {tag}
@@ -443,12 +443,12 @@ export default function LibraryPage() {
                       </Select>
 
                       {/* Type filter */}
-                      <Select value={filterType} onValueChange={setFilterType}>
+                      <Select value={filterType || "all"} onValueChange={(value) => setFilterType(value === "all" ? "" : value)}>
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder={t("filterByType")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">{t("allTypes")}</SelectItem>
+                          <SelectItem value="all">{t("allTypes")}</SelectItem>
                           <SelectItem value="mcq">Flerval</SelectItem>
                           <SelectItem value="true_false">Sant/Falskt</SelectItem>
                           <SelectItem value="longtextV2">Essä</SelectItem>
@@ -463,12 +463,12 @@ export default function LibraryPage() {
                       </Select>
 
                       {/* Difficulty filter */}
-                      <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
+                      <Select value={filterDifficulty || "all"} onValueChange={(value) => setFilterDifficulty(value === "all" ? "" : value)}>
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder={t("filterByDifficulty")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">{t("allDifficulties")}</SelectItem>
+                          <SelectItem value="all">{t("allDifficulties")}</SelectItem>
                           <SelectItem value="easy">Lätt</SelectItem>
                           <SelectItem value="medium">Medel</SelectItem>
                           <SelectItem value="hard">Svår</SelectItem>
