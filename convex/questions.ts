@@ -156,6 +156,65 @@ export const updateQuestion = mutation({
   },
 })
 
+// Update question difficulty
+export const updateDifficulty = mutation({
+  args: {
+    questionId: v.id("questions"),
+    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const question = await ctx.db.get(args.questionId)
+    if (!question) {
+      throw new Error("Question not found")
+    }
+
+    if (question.userId !== identity.subject) {
+      throw new Error("Unauthorized")
+    }
+
+    await ctx.db.patch(args.questionId, {
+      difficulty: args.difficulty,
+    })
+
+    return { success: true }
+  },
+})
+
+// Update question score
+export const updateScore = mutation({
+  args: {
+    questionId: v.id("questions"),
+    score: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const question = await ctx.db.get(args.questionId)
+    if (!question) {
+      throw new Error("Question not found")
+    }
+
+    if (question.userId !== identity.subject) {
+      throw new Error("Unauthorized")
+    }
+
+    await ctx.db.patch(args.questionId, {
+      score: args.score,
+      maxScore: args.score,
+    })
+
+    return { success: true }
+  },
+})
+
 // Delete a question
 export const deleteQuestion = mutation({
   args: { id: v.id("questions") },

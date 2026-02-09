@@ -138,6 +138,12 @@ export interface Translations {
   sortBy: string
   sortNewest: string
   sortOldest: string
+  points: string
+  editPoints: string
+  editDifficulty: string
+  pointsUpdated: string
+  difficultyUpdated: string
+  updateFailed: string
 
   // Toast Messages
   questionsGenerated: string
@@ -286,6 +292,12 @@ export const translations: Record<Language, Translations> = {
     sortBy: "Sortera efter",
     sortNewest: "Nyast först",
     sortOldest: "Äldst först",
+    points: "Poäng",
+    editPoints: "Redigera poäng",
+    editDifficulty: "Redigera svårighetsgrad",
+    pointsUpdated: "Poäng uppdaterade",
+    difficultyUpdated: "Svårighetsgrad uppdaterad",
+    updateFailed: "Uppdatering misslyckades",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -442,6 +454,12 @@ export const translations: Record<Language, Translations> = {
     sortBy: "Sort by",
     sortNewest: "Newest first",
     sortOldest: "Oldest first",
+    points: "Points",
+    editPoints: "Edit points",
+    editDifficulty: "Edit difficulty",
+    pointsUpdated: "Points updated",
+    difficultyUpdated: "Difficulty updated",
+    updateFailed: "Update failed",
 
     // Settings Page
     profileSettings: "Profile Settings",

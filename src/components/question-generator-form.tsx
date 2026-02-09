@@ -1,6 +1,20 @@
 "use client"
 
 import { useState } from "react"
+
+// Calculate default score based on difficulty
+function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
+  switch (difficulty) {
+    case "easy":
+      return 1
+    case "medium":
+      return 1.5
+    case "hard":
+      return 2
+    default:
+      return 1
+  }
+}
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -199,9 +213,9 @@ export function QuestionGeneratorForm() {
         formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
         instructorStimulus: q.instructorStimulus,
         submitOverLimit: false,
-        score: 1,
+        score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
         minScore: 0,
-        maxScore: 1,
+        maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
         tutorInitials: userProfile?.tutorInitials || "",
         generatedBy: "ai" as const,
       }))
