@@ -10,6 +10,7 @@ import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, 
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/language-context"
+import type { Translations } from "@/lib/translations"
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
@@ -48,19 +49,20 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [showMoreTypes, setShowMoreTypes] = useState(false)
 
   const getQuestionTypeLabel = (type: string) => {
-    const labels = {
-      mcq: "Multiple Choice",
-      true_false: "True/False",
-      longtextV2: "Essay",
-      short_answer: "Short Answer",
-      fill_blank: "Fill-in-the-blank",
-      multiple_response: "Multiple Response",
-      matching: "Matching",
-      ordering: "Ordering/Sequencing",
-      hotspot: "Hotspot",
-      rating_scale: "Rating Scale",
+    const translationKeys: Record<string, keyof Translations> = {
+      mcq: "questionType_mcq",
+      true_false: "questionType_trueFalse",
+      longtextV2: "questionType_essay",
+      short_answer: "questionType_shortAnswer",
+      fill_blank: "questionType_fillBlank",
+      multiple_response: "questionType_multipleResponse",
+      matching: "questionType_matching",
+      ordering: "questionType_ordering",
+      hotspot: "questionType_hotspot",
+      rating_scale: "questionType_ratingScale",
     }
-    return labels[type as keyof typeof labels] || type
+    const key = translationKeys[type]
+    return key ? t(key) : type
   }
 
   const getDifficultyColor = (difficulty: string) => {
