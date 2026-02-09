@@ -126,6 +126,7 @@ export const updateQuestion = mutation({
     ),
     correctAnswer: v.optional(v.array(v.string())),
     instructorStimulus: v.optional(v.string()),
+    tags: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
@@ -147,6 +148,7 @@ export const updateQuestion = mutation({
       options: args.options,
       correctAnswer: args.correctAnswer,
       instructorStimulus: args.instructorStimulus,
+      tags: args.tags,
     })
 
     return { success: true }

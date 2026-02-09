@@ -24,6 +24,7 @@ interface EditState {
   options?: Array<{ label: string; value: string }>
   correctAnswer?: string[]
   instructorStimulus?: string
+  tags?: string[]
 }
 
 export default function LibraryPage() {
@@ -37,6 +38,8 @@ export default function LibraryPage() {
   const [editState, setEditState] = useState<EditState | null>(null)
   const [isExporting, setIsExporting] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [editingTagsId, setEditingTagsId] = useState<string | null>(null)
+  const [newTagInput, setNewTagInput] = useState("")
 
   const toggleQuestion = (id: string) => {
     const newSelected = new Set(selectedQuestions)
@@ -65,6 +68,7 @@ export default function LibraryPage() {
       options: question.options,
       correctAnswer: question.correctAnswer,
       instructorStimulus: question.instructorStimulus,
+      tags: question.tags || [],
     })
   }
 
@@ -83,16 +87,13 @@ export default function LibraryPage() {
         options: editState.options,
         correctAnswer: editState.correctAnswer,
         instructorStimulus: editState.instructorStimulus,
+        tags: editState.tags,
       })
-      toast.success("Fråga uppdaterad", {
-        description: "Ändringar sparade"
-      })
+      toast.success(t("tagsUpdated"))
       setEditingId(null)
       setEditState(null)
     } catch (error) {
-      toast.error("Misslyckades att spara", {
-        description: "Kunde inte uppdatera frågan"
-      })
+      toast.error(t("tagsUpdateFailed"))
     }
   }
 
@@ -116,6 +117,30 @@ export default function LibraryPage() {
         ? currentAnswers.filter(a => a !== label)
         : [...currentAnswers, label]
     })
+  }
+
+  const addTag = (questionId: string) => {
+    if (!newTagInput.trim()) return
+
+    if (editState && editState.questionId === questionId) {
+      const currentTags = editState.tags || []
+      if (!currentTags.includes(newTagInput.trim())) {
+        setEditState({
+          ...editState,
+          tags: [...currentTags, newTagInput.trim()]
+        })
+      }
+    }
+    setNewTagInput("")
+  }
+
+  const removeTag = (questionId: string, tagToRemove: string) => {
+    if (editState && editState.questionId === questionId) {
+      setEditState({
+        ...editState,
+        tags: (editState.tags || []).filter(tag => tag !== tagToRemove)
+      })
+    }
   }
 
   const handleDelete = async (questionId: string) => {
@@ -404,32 +429,67 @@ export default function LibraryPage() {
                             </div>
 
                             {/* Tags - Show ALL tags */}
-                            <div className="flex flex-wrap gap-2">
-                              <Badge variant="outline">
-                                <Tag className="mr-1 h-3 w-3" />
-                                {question.subject}
-                              </Badge>
-                              <Badge variant={
-                                question.type === "mcq" ? "default" :
-                                question.type === "true_false" ? "secondary" :
-                                "outline"
-                              }>
-                                {getQuestionTypeLabel(question.type)}
-                              </Badge>
-                              <Badge variant="outline" className={
-                                question.difficulty === "easy" ? "bg-green-100 dark:bg-green-950" :
-                                question.difficulty === "medium" ? "bg-yellow-100 dark:bg-yellow-950" :
-                                "bg-red-100 dark:bg-red-950"
-                              }>
-                                {question.difficulty === "easy" ? "Lätt" :
-                                 question.difficulty === "medium" ? "Medel" :
-                                 "Svår"}
-                              </Badge>
-                              {question.tags && question.tags.map((tag, idx) => (
-                                <Badge key={idx} variant="secondary" className="text-xs">
-                                  {tag}
+                            <div className="space-y-2">
+                              <div className="flex flex-wrap gap-2">
+                                <Badge variant="outline">
+                                  <Tag className="mr-1 h-3 w-3" />
+                                  {question.subject}
                                 </Badge>
-                              ))}
+                                <Badge variant={
+                                  question.type === "mcq" ? "default" :
+                                  question.type === "true_false" ? "secondary" :
+                                  "outline"
+                                }>
+                                  {getQuestionTypeLabel(question.type)}
+                                </Badge>
+                                <Badge variant="outline" className={
+                                  question.difficulty === "easy" ? "bg-green-100 dark:bg-green-950" :
+                                  question.difficulty === "medium" ? "bg-yellow-100 dark:bg-yellow-950" :
+                                  "bg-red-100 dark:bg-red-950"
+                                }>
+                                  {question.difficulty === "easy" ? "Lätt" :
+                                   question.difficulty === "medium" ? "Medel" :
+                                   "Svår"}
+                                </Badge>
+                                {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
+                                    {tag}
+                                    {isEditing && (
+                                      <button
+                                        type="button"
+                                        onClick={() => removeTag(question._id, tag)}
+                                        className="ml-1 hover:text-destructive"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </button>
+                                    )}
+                                  </Badge>
+                                ))}
+                              </div>
+                              {isEditing && (
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    value={newTagInput}
+                                    onChange={(e) => setNewTagInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        e.preventDefault()
+                                        addTag(question._id)
+                                      }
+                                    }}
+                                    placeholder={t("addTagPlaceholder")}
+                                    className="max-w-xs text-sm"
+                                  />
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => addTag(question._id)}
+                                    disabled={!newTagInput.trim()}
+                                  >
+                                    {t("addTag")}
+                                  </Button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

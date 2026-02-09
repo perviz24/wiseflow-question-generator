@@ -116,6 +116,15 @@ export interface Translations {
   uiLanguageHelp: string
   saveSettings: string
 
+  // Library Page
+  editTags: string
+  addTag: string
+  addTagPlaceholder: string
+  tagAdded: string
+  tagRemoved: string
+  tagsUpdated: string
+  tagsUpdateFailed: string
+
   // Toast Messages
   questionsGenerated: string
   questionsGeneratedDesc: string
@@ -240,6 +249,15 @@ export const translations: Record<Language, Translations> = {
     questionType_ratingScale: "Betygsskala",
     showMoreTypes: "Fler frågetyper",
     showLessTypes: "Färre frågetyper",
+
+    // Library Page
+    editTags: "Redigera taggar",
+    addTag: "Lägg till tagg",
+    addTagPlaceholder: "Skriv taggnamn...",
+    tagAdded: "Tagg tillagd",
+    tagRemoved: "Tagg borttagen",
+    tagsUpdated: "Taggar uppdaterade",
+    tagsUpdateFailed: "Kunde inte uppdatera taggar",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -373,6 +391,15 @@ export const translations: Record<Language, Translations> = {
     questionType_ratingScale: "Rating Scale",
     showMoreTypes: "More Question Types",
     showLessTypes: "Less Question Types",
+
+    // Library Page
+    editTags: "Edit Tags",
+    addTag: "Add Tag",
+    addTagPlaceholder: "Enter tag name...",
+    tagAdded: "Tag added",
+    tagRemoved: "Tag removed",
+    tagsUpdated: "Tags updated",
+    tagsUpdateFailed: "Could not update tags",
 
     // Settings Page
     profileSettings: "Profile Settings",
