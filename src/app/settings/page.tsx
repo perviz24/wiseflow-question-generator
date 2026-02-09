@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/select"
 import { toast } from "sonner"
 import { Settings, Loader2, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTranslation } from "@/lib/language-context"
 
 export default function SettingsPage() {
   const { t } = useTranslation()
+  const router = useRouter()
   // Settings page for tutor profile configuration
   const profile = useQuery(api.profiles.getUserProfile)
   const upsertProfile = useMutation(api.profiles.upsertProfile)
@@ -73,12 +74,10 @@ export default function SettingsPage() {
   return (
     <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-4">
-        <Link href="/">
-          <Button variant="ghost" size="sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("back")}
-          </Button>
-        </Link>
+        <Button variant="ghost" size="sm" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          {t("back")}
+        </Button>
       </div>
       <Card>
         <CardHeader>
