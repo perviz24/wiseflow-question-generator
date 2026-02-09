@@ -202,6 +202,7 @@ export function QuestionGeneratorForm() {
         score: 1,
         minScore: 0,
         maxScore: 1,
+        tutorInitials: userProfile?.tutorInitials || "",
         generatedBy: "ai" as const,
       }))
 

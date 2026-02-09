@@ -46,6 +46,7 @@ export default defineSchema({
 
     // Metadata
     userId: v.string(), // Clerk user ID
+    tutorInitials: v.string(), // Tutor initials from profile
     createdAt: v.number(),
     generatedBy: v.union(v.literal("ai"), v.literal("manual"))
   })

@@ -620,6 +620,11 @@ export default function LibraryPage() {
                                    question.difficulty === "medium" ? "Medel" :
                                    "Svår"}
                                 </Badge>
+                                {question.tutorInitials && (
+                                  <Badge variant="outline" className="bg-blue-100 dark:bg-blue-950">
+                                    {question.tutorInitials}
+                                  </Badge>
+                                )}
                                 {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => (
                                   <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
                                     {tag}
