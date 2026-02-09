@@ -52,6 +52,13 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       mcq: "Multiple Choice",
       true_false: "True/False",
       longtextV2: "Essay",
+      short_answer: "Short Answer",
+      fill_blank: "Fill-in-the-blank",
+      multiple_response: "Multiple Response",
+      matching: "Matching",
+      ordering: "Ordering/Sequencing",
+      hotspot: "Hotspot",
+      rating_scale: "Rating Scale",
     }
     return labels[type as keyof typeof labels] || type
   }
