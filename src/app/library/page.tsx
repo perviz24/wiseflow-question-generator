@@ -223,7 +223,7 @@ export default function LibraryPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <BookOpen className="h-6 w-6" />
-            <h1 className="text-xl font-semibold tracking-tight">Frågebibliotek</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{t("questionLibrary")}</h1>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <Link href="/">
@@ -253,7 +253,7 @@ export default function LibraryPage() {
         <SignedOut>
           <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
             <BookOpen className="h-16 w-16 text-muted-foreground" />
-            <h2 className="text-3xl font-bold">Frågebibliotek</h2>
+            <h2 className="text-3xl font-bold">{t("questionLibrary")}</h2>
             <p className="max-w-md text-lg text-muted-foreground">
               Logga in för att se dina sparade frågor
             </p>
@@ -277,7 +277,7 @@ export default function LibraryPage() {
                         id="select-all"
                       />
                       <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
-                        Markera alla ({selectedQuestions.size}/{questions.length})
+                        {t("selectAll")} ({selectedQuestions.size}/{questions.length})
                       </label>
                     </div>
                     <div className="flex gap-2">

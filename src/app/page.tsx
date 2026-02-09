@@ -45,7 +45,7 @@ export default function Home() {
               <UserButton afterSignOutUrl="/">
                 <UserButton.MenuItems>
                   <UserButton.Link
-                    label="Mitt bibliotek"
+                    label={t("myLibrary")}
                     labelIcon={<BookOpen className="h-4 w-4" />}
                     href="/library"
                   />

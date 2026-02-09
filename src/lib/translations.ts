@@ -9,6 +9,9 @@ export interface Translations {
   signOut: string
   settings: string
   back: string
+  myLibrary: string
+  questionLibrary: string
+  selectAll: string
 
   // Home Page
   welcomeTitle: string
@@ -134,6 +137,9 @@ export const translations: Record<Language, Translations> = {
     signOut: "Logga ut",
     settings: "Inställningar",
     back: "Tillbaka",
+    myLibrary: "Mitt bibliotek",
+    questionLibrary: "Frågebibliotek",
+    selectAll: "Markera alla",
 
     // Home Page
     welcomeTitle: "Välkommen till Wiseflow Frågegenerator",
@@ -257,6 +263,9 @@ export const translations: Record<Language, Translations> = {
     signOut: "Sign Out",
     settings: "Settings",
     back: "Back",
+    myLibrary: "My Library",
+    questionLibrary: "Question Library",
+    selectAll: "Select All",
 
     // Home Page
     welcomeTitle: "Welcome to Wiseflow Question Generator",
