@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, Home, Settings as SettingsIcon, CheckCircle2, Circle, Trash2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, Home, Settings as SettingsIcon, CheckCircle2, Circle, Trash2, Filter } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
 import Link from "next/link"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
@@ -40,6 +41,12 @@ export default function LibraryPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingTagsId, setEditingTagsId] = useState<string | null>(null)
   const [newTagInput, setNewTagInput] = useState("")
+
+  // Filter state
+  const [filterTag, setFilterTag] = useState<string>("")
+  const [filterType, setFilterType] = useState<string>("")
+  const [filterDifficulty, setFilterDifficulty] = useState<string>("")
+  const [filterSearch, setFilterSearch] = useState<string>("")
 
   const toggleQuestion = (id: string) => {
     const newSelected = new Set(selectedQuestions)
@@ -241,6 +248,54 @@ export default function LibraryPage() {
     return labels[type] || type
   }
 
+  // Filter questions based on active filters
+  const filteredQuestions = questions?.filter((question) => {
+    // Filter by tag
+    if (filterTag && !question.tags?.includes(filterTag)) {
+      return false
+    }
+
+    // Filter by type
+    if (filterType && question.type !== filterType) {
+      return false
+    }
+
+    // Filter by difficulty
+    if (filterDifficulty && question.difficulty !== filterDifficulty) {
+      return false
+    }
+
+    // Filter by search (title or stimulus)
+    if (filterSearch) {
+      const searchLower = filterSearch.toLowerCase()
+      const titleMatch = question.title.toLowerCase().includes(searchLower)
+      const stimulusMatch = question.stimulus.toLowerCase().includes(searchLower)
+      if (!titleMatch && !stimulusMatch) {
+        return false
+      }
+    }
+
+    return true
+  }) || []
+
+  // Get unique tags from all questions for filter dropdown
+  const allTags = Array.from(
+    new Set(
+      questions?.flatMap((q) => q.tags || []) || []
+    )
+  ).sort()
+
+  // Check if any filters are active
+  const hasActiveFilters = Boolean(filterTag || filterType || filterDifficulty || filterSearch)
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setFilterTag("")
+    setFilterType("")
+    setFilterDifficulty("")
+    setFilterSearch("")
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
       {/* Header */}
@@ -343,6 +398,95 @@ export default function LibraryPage() {
               </Card>
             )}
 
+            {/* Filters */}
+            {questions && questions.length > 0 && (
+              <Card>
+                <CardContent className="py-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="text-sm font-semibold">Filters</h3>
+                      {hasActiveFilters && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={clearAllFilters}
+                          className="ml-auto text-xs"
+                        >
+                          {t("clearFilters")}
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {/* Search filter */}
+                      <Input
+                        placeholder="Search questions..."
+                        value={filterSearch}
+                        onChange={(e) => setFilterSearch(e.target.value)}
+                        className="text-sm"
+                      />
+
+                      {/* Tag filter */}
+                      <Select value={filterTag} onValueChange={setFilterTag}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder={t("filterByTag")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">All tags</SelectItem>
+                          {allTags.map((tag) => (
+                            <SelectItem key={tag} value={tag}>
+                              {tag}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+
+                      {/* Type filter */}
+                      <Select value={filterType} onValueChange={setFilterType}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder={t("filterByType")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">{t("allTypes")}</SelectItem>
+                          <SelectItem value="mcq">Flerval</SelectItem>
+                          <SelectItem value="true_false">Sant/Falskt</SelectItem>
+                          <SelectItem value="longtextV2">Essä</SelectItem>
+                          <SelectItem value="short_answer">Kort svar</SelectItem>
+                          <SelectItem value="fill_blank">Ifyllnad</SelectItem>
+                          <SelectItem value="multiple_response">Flera rätt</SelectItem>
+                          <SelectItem value="matching">Matchning</SelectItem>
+                          <SelectItem value="ordering">Ordningsföljd</SelectItem>
+                          <SelectItem value="hotspot">Bildmarkering</SelectItem>
+                          <SelectItem value="rating_scale">Betygsskala</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {/* Difficulty filter */}
+                      <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
+                        <SelectTrigger className="text-sm">
+                          <SelectValue placeholder={t("filterByDifficulty")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">{t("allDifficulties")}</SelectItem>
+                          <SelectItem value="easy">Lätt</SelectItem>
+                          <SelectItem value="medium">Medel</SelectItem>
+                          <SelectItem value="hard">Svår</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Results count */}
+                    {hasActiveFilters && (
+                      <p className="text-sm text-muted-foreground">
+                        {t("showing")} {filteredQuestions.length} {t("of")} {questions.length} {t("questions")}
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Loading state */}
             {questions === undefined ? (
               <div className="flex items-center justify-center py-12">
@@ -361,9 +505,20 @@ export default function LibraryPage() {
                   </Link>
                 </CardContent>
               </Card>
+            ) : filteredQuestions.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                  <Filter className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No questions match filters</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Try adjusting your filters to see more results
+                  </p>
+                  <Button onClick={clearAllFilters}>{t("clearFilters")}</Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid gap-4">
-                {questions.map((question) => {
+                {filteredQuestions.map((question) => {
                   const isEditing = editingId === question._id
                   const displayQuestion = isEditing && editState ? editState : question
 

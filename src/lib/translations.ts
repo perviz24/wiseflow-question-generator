@@ -124,6 +124,16 @@ export interface Translations {
   tagRemoved: string
   tagsUpdated: string
   tagsUpdateFailed: string
+  filterByTag: string
+  filterByType: string
+  filterByDifficulty: string
+  filterByDate: string
+  allTypes: string
+  allDifficulties: string
+  clearFilters: string
+  showing: string
+  of: string
+  questions: string
 
   // Toast Messages
   questionsGenerated: string
@@ -258,6 +268,16 @@ export const translations: Record<Language, Translations> = {
     tagRemoved: "Tagg borttagen",
     tagsUpdated: "Taggar uppdaterade",
     tagsUpdateFailed: "Kunde inte uppdatera taggar",
+    filterByTag: "Filtrera på tagg",
+    filterByType: "Filtrera på typ",
+    filterByDifficulty: "Filtrera på svårighetsgrad",
+    filterByDate: "Filtrera på datum",
+    allTypes: "Alla typer",
+    allDifficulties: "Alla svårighetsgrader",
+    clearFilters: "Rensa filter",
+    showing: "Visar",
+    of: "av",
+    questions: "frågor",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -400,6 +420,16 @@ export const translations: Record<Language, Translations> = {
     tagRemoved: "Tag removed",
     tagsUpdated: "Tags updated",
     tagsUpdateFailed: "Could not update tags",
+    filterByTag: "Filter by tag",
+    filterByType: "Filter by type",
+    filterByDifficulty: "Filter by difficulty",
+    filterByDate: "Filter by date",
+    allTypes: "All types",
+    allDifficulties: "All difficulties",
+    clearFilters: "Clear filters",
+    showing: "Showing",
+    of: "of",
+    questions: "questions",
 
     // Settings Page
     profileSettings: "Profile Settings",
