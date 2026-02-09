@@ -43,7 +43,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
   const [additionalCount, setAdditionalCount] = useState(5)
-  const [additionalTypes, setAdditionalTypes] = useState<string[]>(["mcq"])
+  const [additionalTypes, setAdditionalTypes] = useState<string[]>([])
   const [isGeneratingMore, setIsGeneratingMore] = useState(false)
   const [showMoreTypes, setShowMoreTypes] = useState(false)
 
