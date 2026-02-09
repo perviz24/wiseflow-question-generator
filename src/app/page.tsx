@@ -15,9 +15,11 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
-            {t("appTitle")}
-          </h1>
+          <Link href="/">
+            <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity">
+              {t("appTitle")}
+            </h1>
+          </Link>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <SignedIn>
               <Link href="/library">
