@@ -124,6 +124,13 @@ export async function POST(req: NextRequest) {
       mcq: "multiple choice questions with 4 options each (A, B, C, D)",
       true_false: "true/false questions with 2 options (A: True, B: False)",
       longtextV2: "essay questions that require detailed written responses",
+      short_answer: "short answer questions requiring 1-3 sentence responses",
+      fill_blank: "fill-in-the-blank questions with gaps in sentences to complete",
+      multiple_response: "multiple response questions with several options where multiple can be correct",
+      matching: "matching questions pairing terms with definitions or concepts",
+      ordering: "ordering/sequencing questions where items must be arranged in correct order",
+      hotspot: "image-based hotspot questions requiring selection of correct area on diagram/image",
+      rating_scale: "rating scale questions using Likert-style 1-5 scale for evaluation",
     }
 
     const typesList = questionTypes

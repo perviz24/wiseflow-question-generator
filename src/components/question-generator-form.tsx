@@ -258,8 +258,13 @@ export function QuestionGeneratorForm() {
   const handleGenerateNew = () => {
     setGeneratedQuestions(null)
     setMetadata(null)
-    // Clear uploaded context so it doesn't carry over to new generation
-    setFormData(prev => ({ ...prev, context: "" }))
+    // Clear ALL context (both manual and uploaded) so it doesn't carry over
+    setFormData(prev => ({
+      ...prev,
+      context: "",
+      uploadedContext: "",
+      contextPriority: "subject_topic"
+    }))
     setUploadedContentSource("")
   }
 

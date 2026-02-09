@@ -3,7 +3,7 @@
 import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
-import { Settings } from "lucide-react"
+import { Settings, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -20,6 +20,17 @@ export default function Home() {
           </h1>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <SignedIn>
+              <Link href="/library">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-9 sm:w-9"
+                  aria-label="Bibliotek"
+                >
+                  <BookOpen className="h-5 w-5" />
+                  <span className="sr-only">Bibliotek</span>
+                </Button>
+              </Link>
               <Link href="/settings">
                 <Button
                   variant="ghost"
