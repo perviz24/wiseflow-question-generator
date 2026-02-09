@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus } from "lucide-react"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus, ChevronDown, ChevronUp } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/language-context"
@@ -45,6 +45,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [additionalCount, setAdditionalCount] = useState(5)
   const [additionalTypes, setAdditionalTypes] = useState<string[]>(["mcq"])
   const [isGeneratingMore, setIsGeneratingMore] = useState(false)
+  const [showMoreTypes, setShowMoreTypes] = useState(false)
 
   const getQuestionTypeLabel = (type: string) => {
     const labels = {
@@ -444,7 +445,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
             {/* Number of questions */}
             <div className="space-y-2">
               <label htmlFor="additional-count" className="text-sm font-medium">
-                How many more questions?
+                {t("howManyMore")}
               </label>
               <Input
                 id="additional-count"
@@ -455,13 +456,14 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 onChange={(e) => setAdditionalCount(parseInt(e.target.value) || 1)}
                 className="w-full"
               />
-              <p className="text-xs text-muted-foreground">Choose between 1 and 20</p>
+              <p className="text-xs text-muted-foreground">{t("chooseBetween")}</p>
             </div>
 
             {/* Question types */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Question Types</label>
+              <label className="text-sm font-medium">{t("questionTypes")}</label>
               <div className="flex flex-wrap gap-2">
+                {/* First 3 classic types - always visible */}
                 <Button
                   type="button"
                   variant={additionalTypes.includes("mcq") ? "default" : "outline"}
@@ -469,7 +471,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   onClick={() => toggleAdditionalType("mcq")}
                   className="flex-1 min-w-[100px]"
                 >
-                  Multiple Choice
+                  {t("questionType_mcq")}
                 </Button>
                 <Button
                   type="button"
@@ -478,7 +480,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   onClick={() => toggleAdditionalType("true_false")}
                   className="flex-1 min-w-[100px]"
                 >
-                  True/False
+                  {t("questionType_trueFalse")}
                 </Button>
                 <Button
                   type="button"
@@ -487,10 +489,101 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   onClick={() => toggleAdditionalType("longtextV2")}
                   className="flex-1 min-w-[100px]"
                 >
-                  Essay
+                  {t("questionType_essay")}
                 </Button>
+
+                {/* Expandable additional types */}
+                {showMoreTypes && (
+                  <>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("short_answer") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("short_answer")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_shortAnswer")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("fill_blank") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("fill_blank")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_fillBlank")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("multiple_response") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("multiple_response")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_multipleResponse")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("matching") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("matching")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_matching")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("ordering") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("ordering")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_ordering")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("hotspot") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("hotspot")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_hotspot")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={additionalTypes.includes("rating_scale") ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleAdditionalType("rating_scale")}
+                      className="flex-1 min-w-[100px]"
+                    >
+                      {t("questionType_ratingScale")}
+                    </Button>
+                  </>
+                )}
               </div>
-              <p className="text-xs text-muted-foreground">Select one or more types</p>
+
+              {/* Toggle button */}
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowMoreTypes(!showMoreTypes)}
+                className="w-full mt-2"
+              >
+                {showMoreTypes ? (
+                  <>
+                    <ChevronUp className="mr-2 h-4 w-4" />
+                    {t("showLessTypes")}
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="mr-2 h-4 w-4" />
+                    {t("showMoreTypes")}
+                  </>
+                )}
+              </Button>
+
+              <p className="text-xs text-muted-foreground">{t("selectOneOrMore")}</p>
             </div>
           </div>
 
@@ -503,12 +596,12 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
             {isGeneratingMore ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating {additionalCount} more questions...
+                {t("generatingMore", { count: additionalCount })}
               </>
             ) : (
               <>
                 <Plus className="mr-2 h-4 w-4" />
-                Generate {additionalCount} More {additionalCount === 1 ? "Question" : "Questions"}
+                {t("generateNew")} ({additionalCount})
               </>
             )}
           </Button>

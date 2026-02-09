@@ -79,6 +79,22 @@ export interface Translations {
   generateNew: string
   generateMoreTitle: string
   generateMoreDesc: string
+  howManyMore: string
+  chooseBetween: string
+  selectOneOrMore: string
+  generatingMore: string
+  questionType_mcq: string
+  questionType_trueFalse: string
+  questionType_essay: string
+  questionType_shortAnswer: string
+  questionType_fillBlank: string
+  questionType_multipleResponse: string
+  questionType_matching: string
+  questionType_ordering: string
+  questionType_hotspot: string
+  questionType_ratingScale: string
+  showMoreTypes: string
+  showLessTypes: string
 
   // Settings Page
   profileSettings: string
@@ -188,6 +204,22 @@ export const translations: Record<Language, Translations> = {
     generateNew: "Generera nya frågor",
     generateMoreTitle: "Generera fler frågor",
     generateMoreDesc: "Lägg till fler frågor till ditt befintliga set utan att lämna denna sida",
+    howManyMore: "Hur många fler frågor?",
+    chooseBetween: "Välj mellan 1 och 20",
+    selectOneOrMore: "Välj en eller flera typer",
+    generatingMore: "Genererar {count} fler frågor...",
+    questionType_mcq: "Flervalsfråga",
+    questionType_trueFalse: "Sant/Falskt",
+    questionType_essay: "Essä",
+    questionType_shortAnswer: "Kort svar",
+    questionType_fillBlank: "Ifyllnad",
+    questionType_multipleResponse: "Flera rätt",
+    questionType_matching: "Matchning",
+    questionType_ordering: "Ordningsföljd",
+    questionType_hotspot: "Bildmarkering",
+    questionType_ratingScale: "Betygsskala",
+    showMoreTypes: "Fler frågetyper",
+    showLessTypes: "Färre frågetyper",
 
     // Settings Page
     profileSettings: "Profilinställningar",
@@ -295,6 +327,22 @@ export const translations: Record<Language, Translations> = {
     generateNew: "Generate New Questions",
     generateMoreTitle: "Generate More Questions",
     generateMoreDesc: "Add additional questions to your existing set without leaving this page",
+    howManyMore: "How many more questions?",
+    chooseBetween: "Choose between 1 and 20",
+    selectOneOrMore: "Select one or more types",
+    generatingMore: "Generating {count} more questions...",
+    questionType_mcq: "Multiple Choice",
+    questionType_trueFalse: "True/False",
+    questionType_essay: "Essay",
+    questionType_shortAnswer: "Short Answer",
+    questionType_fillBlank: "Fill in the Blank",
+    questionType_multipleResponse: "Multiple Response",
+    questionType_matching: "Matching",
+    questionType_ordering: "Ordering",
+    questionType_hotspot: "Image Hotspot",
+    questionType_ratingScale: "Rating Scale",
+    showMoreTypes: "More Question Types",
+    showLessTypes: "Less Question Types",
 
     // Settings Page
     profileSettings: "Profile Settings",
