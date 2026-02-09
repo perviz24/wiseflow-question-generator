@@ -434,6 +434,227 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   </div>
                 </>
               )}
+
+              {/* Multiple Response - show options with multiple correct answers */}
+              {displayQuestion.type === "multiple_response" && displayQuestion.options && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    {displayQuestion.options.map((option, optionIndex) => {
+                      const isCorrect = displayQuestion.correctAnswer?.includes(option.label)
+                      return (
+                        <Card
+                          key={optionIndex}
+                          className={`p-3 transition-all ${
+                            isCorrect
+                              ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
+                              : "bg-muted/50"
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border ${
+                              isCorrect ? "bg-green-100 border-green-300 dark:bg-green-900/50 dark:border-green-700" : ""
+                            }`}>
+                              {isCorrect && (
+                                <svg className="h-3 w-3 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-semibold text-sm mr-2">{option.label}.</span>
+                              <span className="text-sm">{option.value}</span>
+                            </div>
+                          </div>
+                        </Card>
+                      )
+                    })}
+                    <p className="text-xs text-muted-foreground mt-2">
+                      ✓ Multiple correct answers possible
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Matching - show pairs of terms and definitions */}
+              {displayQuestion.type === "matching" && displayQuestion.options && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium mb-3">Match the following pairs:</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {displayQuestion.options.map((option, optionIndex) => (
+                        <Card key={optionIndex} className="p-3 bg-muted/50">
+                          <div className="flex items-start gap-2">
+                            <Badge variant="outline" className="shrink-0">{option.label}</Badge>
+                            <p className="text-sm">{option.value}</p>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                    {displayQuestion.correctAnswer && (
+                      <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                        ✓ Correct pairs: {displayQuestion.correctAnswer.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Ordering - show sequence of items */}
+              {displayQuestion.type === "ordering" && displayQuestion.options && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium mb-3">Arrange in correct order:</p>
+                    {displayQuestion.options.map((option, optionIndex) => {
+                      const correctPosition = displayQuestion.correctAnswer?.indexOf(option.label)
+                      return (
+                        <Card key={optionIndex} className="p-3 bg-muted/50">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="default" className="shrink-0 bg-blue-600">
+                              {correctPosition !== undefined && correctPosition !== -1 ? correctPosition + 1 : "?"}
+                            </Badge>
+                            <p className="text-sm flex-1">{option.value}</p>
+                          </div>
+                        </Card>
+                      )
+                    })}
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Numbers show the correct sequence
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Hotspot - show description of image/diagram */}
+              {displayQuestion.type === "hotspot" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+                      <div className="flex items-start gap-3">
+                        <svg className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
+                            Image-based question
+                          </p>
+                          <p className="text-sm text-amber-800 dark:text-amber-200">
+                            {displayQuestion.instructorStimulus || "Click or tap on the correct area of the image/diagram"}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        ✓ Correct area(s): {displayQuestion.correctAnswer.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Fill-in-the-blank - show blanks with answers */}
+              {displayQuestion.type === "fill_blank" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-3">
+                    <Card className="p-4 bg-muted/50">
+                      <p className="text-sm whitespace-pre-wrap">
+                        {displayQuestion.stimulus.split("[___]").map((part, index, array) => (
+                          <span key={index}>
+                            {part}
+                            {index < array.length - 1 && (
+                              <span className="inline-block mx-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded text-blue-700 dark:text-blue-300 font-medium">
+                                [{index + 1}]
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
+                          ✓ Correct answers:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.correctAnswer.map((answer, index) => (
+                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                              [{index + 1}] {answer}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Short Answer - show text input field */}
+              {displayQuestion.type === "short_answer" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <Textarea
+                        readOnly
+                        placeholder="Student writes 1-3 sentence answer here..."
+                        className="min-h-[80px] resize-none"
+                      />
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
+                          ✓ Sample answer:
+                        </p>
+                        <p className="text-sm text-green-800 dark:text-green-200">
+                          {displayQuestion.correctAnswer.join(", ")}
+                        </p>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Rating Scale - show Likert scale */}
+              {displayQuestion.type === "rating_scale" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <div className="flex items-center justify-between gap-4">
+                        {[1, 2, 3, 4, 5].map((rating) => {
+                          const isCorrect = displayQuestion.correctAnswer?.includes(rating.toString())
+                          return (
+                            <div key={rating} className="flex flex-col items-center gap-2">
+                              <div className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
+                                isCorrect
+                                  ? "bg-green-100 border-green-500 dark:bg-green-900/50 dark:border-green-600"
+                                  : "border-gray-300 dark:border-gray-700"
+                              }`}>
+                                <span className={`font-semibold ${isCorrect ? "text-green-700 dark:text-green-300" : ""}`}>
+                                  {rating}
+                                </span>
+                              </div>
+                              <span className="text-xs text-muted-foreground">
+                                {rating === 1 ? "Low" : rating === 5 ? "High" : ""}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </Card>
+                    {displayQuestion.correctAnswer && (
+                      <p className="text-xs text-green-600 dark:text-green-400">
+                        ✓ Expected rating: {displayQuestion.correctAnswer.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         )
