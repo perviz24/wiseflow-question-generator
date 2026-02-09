@@ -47,7 +47,18 @@ const anthropic = createAnthropic({
 
 // Define the schema for a single question
 const QuestionSchema = z.object({
-  type: z.enum(["mcq", "true_false", "longtextV2"]),
+  type: z.enum([
+    "mcq",
+    "true_false",
+    "longtextV2",
+    "short_answer",
+    "fill_blank",
+    "multiple_response",
+    "matching",
+    "ordering",
+    "hotspot",
+    "rating_scale"
+  ]),
   stimulus: z.string().describe("The question text"),
   options: z
     .array(
@@ -183,9 +194,15 @@ ${context ? `Additional context: ${context}` : ""}`
     prompt += `
 
 Requirements:
+- IMPORTANT: Distribute questions EVENLY across all selected question types. DO NOT favor MCQ or older formats.
+- If multiple types selected, ensure balanced representation (e.g., 10 questions with 3 types = 3-4 of each type).
 - For MCQ: Provide exactly 4 options (A, B, C, D). Mark the correct answer(s) in correctAnswer array.
 - For True/False: Provide exactly 2 options (A: True, B: False). Mark the correct answer.
 - For Essays: Provide clear question prompts and guidance for instructors in instructorStimulus.
+- For Hotspot: Describe the image/diagram and indicate which area(s) should be selected.
+- For Matching: Provide pairs in options array (left side labels, right side values).
+- For Ordering: List items that need sequencing with correct order in correctAnswer.
+- For Fill-in-blank: Use [___] to indicate blanks, provide answers in correctAnswer array.
 - Questions should test understanding, not just memorization.
 - Avoid ambiguous wording.
 - Ensure questions are pedagogically sound and aligned with learning outcomes.
