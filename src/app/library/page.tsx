@@ -17,7 +17,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 import { toast } from "sonner"
 import { Id } from "../../../convex/_generated/dataModel"
 import { exportToWiseflowJSON } from "@/lib/wiseflow-export"
-import { exportToQti21 } from "@/lib/qti-export"
+import { exportToQti21, exportToQti22 } from "@/lib/qti-export"
 
 interface EditState {
   questionId: string
@@ -215,7 +215,7 @@ export default function LibraryPage() {
     }
   }
 
-  const exportSelected = async (format: "legacy" | "utg" | "qti") => {
+  const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22") => {
     if (!questions || selectedQuestions.size === 0) {
       toast.error("Ingen fråga vald", {
         description: "Välj minst en fråga att exportera"
@@ -226,44 +226,61 @@ export default function LibraryPage() {
     setIsExporting(true)
     try {
       const selected = questions.filter(q => selectedQuestions.has(q._id))
-
-      let jsonContent: string
-      let filename: string
-
-      if (format === "qti") {
-        const qtiArray = exportToQti21(selected, {
-          subject: selected[0]?.subject || "Export",
-          topic: selected[0]?.tags?.[0] || "",
-          difficulty: selected[0]?.difficulty || "medium",
-          language: selected[0]?.language || "sv"
-        })
-        // QTI export returns array of files, combine them or use first one
-        jsonContent = qtiArray[0]?.content || ""
-        filename = `library-export-qti-${Date.now()}.xml`
-      } else {
-        jsonContent = exportToWiseflowJSON(selected, {
-          subject: selected[0]?.subject || "Export",
-          topic: selected[0]?.tags?.[0] || "",
-          difficulty: selected[0]?.difficulty || "medium",
-          language: selected[0]?.language || "sv",
-          exportFormat: format === "legacy" ? "legacy" : "utgaende"
-        })
-        filename = `library-export-${format}-${Date.now()}.json`
+      const metadata = {
+        subject: selected[0]?.subject || "Export",
+        topic: selected[0]?.tags?.[0] || "",
+        difficulty: selected[0]?.difficulty || "medium",
+        language: selected[0]?.language || "sv"
       }
 
-      const blob = new Blob([jsonContent], { type: format === "qti" ? "application/xml" : "application/json" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      if (format === "qti21" || format === "qti22") {
+        // QTI export as ZIP
+        const JSZip = (await import("jszip")).default
+        const zip = new JSZip()
+        const files = format === "qti21" ? exportToQti21(selected, metadata) : exportToQti22(selected, metadata)
 
-      toast.success("Export lyckades!", {
-        description: `${selectedQuestions.size} frågor exporterade (${format.toUpperCase()})`
-      })
+        files.forEach(file => {
+          zip.file(file.name, file.content)
+        })
+
+        const blob = await zip.generateAsync({ type: "blob" })
+        const url = URL.createObjectURL(blob)
+        const timestamp = new Date().toISOString().split("T")[0]
+        const filename = `library_export_${format}_${timestamp}.zip`
+
+        const a = document.createElement("a")
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+
+        toast.success(`${format.toUpperCase()} export lyckades!`, {
+          description: `${selectedQuestions.size} frågor exporterade som ZIP`
+        })
+      } else {
+        // Wiseflow JSON export
+        const jsonContent = exportToWiseflowJSON(selected, {
+          ...metadata,
+          exportFormat: format === "legacy" ? "legacy" : "utgaende"
+        })
+        const filename = `library-export-${format}-${Date.now()}.json`
+
+        const blob = new Blob([jsonContent], { type: "application/json" })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+
+        toast.success("Export lyckades!", {
+          description: `${selectedQuestions.size} frågor exporterade (${format.toUpperCase()})`
+        })
+      }
     } catch (error) {
       toast.error("Export misslyckades", {
         description: "Kunde inte exportera frågor"
@@ -427,13 +444,22 @@ export default function LibraryPage() {
                         Utgående JSON
                       </Button>
                       <Button
-                        onClick={() => exportSelected("qti")}
+                        onClick={() => exportSelected("qti21")}
                         disabled={selectedQuestions.size === 0 || isExporting}
                         variant="outline"
                         size="sm"
                       >
                         <Download className="mr-2 h-4 w-4" />
                         QTI 2.1
+                      </Button>
+                      <Button
+                        onClick={() => exportSelected("qti22")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        QTI 2.2 Inspera
                       </Button>
                     </div>
                   </div>

@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
-import { downloadQti21 } from "@/lib/qti-export"
+import { downloadQti21, downloadQti22 } from "@/lib/qti-export"
 import { downloadCSV } from "@/lib/csv-export"
 
 interface Question {
@@ -312,7 +312,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
     }
   }
 
-  const handleExport = async (format: "wiseflow-legacy" | "wiseflow-utgaende" | "qti21" | "csv") => {
+  const handleExport = async (format: "wiseflow-legacy" | "wiseflow-utgaende" | "qti21" | "qti22" | "csv") => {
     setIsExportingFormat(true)
 
     try {
@@ -325,6 +325,11 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
         await downloadQti21(questions, metadata)
         toast.success("QTI 2.1 exported!", {
           description: "Questions exported in QTI 2.1 format (ZIP file)."
+        })
+      } else if (format === "qti22") {
+        await downloadQti22(questions, metadata)
+        toast.success("QTI 2.2 Inspera exported!", {
+          description: "Questions exported in QTI 2.2 Inspera format (ZIP file)."
         })
       } else {
         // Wiseflow JSON formats
@@ -403,6 +408,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("qti21")}>
                     QTI 2.1 (ZIP)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("qti22")}>
+                    QTI 2.2 Inspera (ZIP)
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("csv")}>
                     CSV (Excel/Sheets)
