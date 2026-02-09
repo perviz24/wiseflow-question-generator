@@ -1,152 +1,539 @@
 "use client"
 
-import { useQuery } from "convex/react"
+import { useState } from "react"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Loader2, BookOpen, Calendar, Tag } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, Home, Settings as SettingsIcon, CheckCircle2, Circle, Trash2 } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
 import Link from "next/link"
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
+import { toast } from "sonner"
+import { Id } from "../../../convex/_generated/dataModel"
+import { exportToWiseflowJSON } from "@/lib/wiseflow-export"
+import { exportToQti21 } from "@/lib/qti-export"
+
+interface EditState {
+  questionId: string
+  stimulus: string
+  options?: Array<{ label: string; value: string }>
+  correctAnswer?: string[]
+  instructorStimulus?: string
+}
 
 export default function LibraryPage() {
   const { t } = useTranslation()
   const questions = useQuery(api.questions.getUserQuestions)
+  const updateQuestion = useMutation(api.questions.updateQuestion)
+  const deleteQuestion = useMutation(api.questions.deleteQuestion)
+
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set())
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editState, setEditState] = useState<EditState | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const toggleQuestion = (id: string) => {
+    const newSelected = new Set(selectedQuestions)
+    if (newSelected.has(id)) {
+      newSelected.delete(id)
+    } else {
+      newSelected.add(id)
+    }
+    setSelectedQuestions(newSelected)
+  }
+
+  const toggleAll = () => {
+    if (!questions) return
+    if (selectedQuestions.size === questions.length) {
+      setSelectedQuestions(new Set())
+    } else {
+      setSelectedQuestions(new Set(questions.map(q => q._id)))
+    }
+  }
+
+  const startEditing = (question: any) => {
+    setEditingId(question._id)
+    setEditState({
+      questionId: question._id,
+      stimulus: question.stimulus,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      instructorStimulus: question.instructorStimulus,
+    })
+  }
+
+  const cancelEditing = () => {
+    setEditingId(null)
+    setEditState(null)
+  }
+
+  const saveEdit = async () => {
+    if (!editState) return
+
+    try {
+      await updateQuestion({
+        questionId: editState.questionId as Id<"questions">,
+        stimulus: editState.stimulus,
+        options: editState.options,
+        correctAnswer: editState.correctAnswer,
+        instructorStimulus: editState.instructorStimulus,
+      })
+      toast.success("Fråga uppdaterad", {
+        description: "Ändringar sparade"
+      })
+      setEditingId(null)
+      setEditState(null)
+    } catch (error) {
+      toast.error("Misslyckades att spara", {
+        description: "Kunde inte uppdatera frågan"
+      })
+    }
+  }
+
+  const updateEditOption = (optionIndex: number, field: 'label' | 'value', newValue: string) => {
+    if (!editState?.options) return
+    const updatedOptions = [...editState.options]
+    updatedOptions[optionIndex] = {
+      ...updatedOptions[optionIndex],
+      [field]: newValue
+    }
+    setEditState({ ...editState, options: updatedOptions })
+  }
+
+  const toggleCorrectAnswer = (label: string) => {
+    if (!editState) return
+    const currentAnswers = editState.correctAnswer || []
+    const isCurrentlyCorrect = currentAnswers.includes(label)
+    setEditState({
+      ...editState,
+      correctAnswer: isCurrentlyCorrect
+        ? currentAnswers.filter(a => a !== label)
+        : [...currentAnswers, label]
+    })
+  }
+
+  const handleDelete = async (questionId: string) => {
+    if (!confirm("Är du säker på att du vill ta bort denna fråga?")) {
+      return
+    }
+
+    setDeletingId(questionId)
+    try {
+      await deleteQuestion({ id: questionId as Id<"questions"> })
+      toast.success("Fråga borttagen", {
+        description: "Frågan har tagits bort från biblioteket"
+      })
+      // Remove from selected if it was selected
+      const newSelected = new Set(selectedQuestions)
+      newSelected.delete(questionId)
+      setSelectedQuestions(newSelected)
+    } catch (error) {
+      toast.error("Misslyckades att ta bort", {
+        description: "Kunde inte ta bort frågan"
+      })
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const exportSelected = async (format: "legacy" | "utg" | "qti") => {
+    if (!questions || selectedQuestions.size === 0) {
+      toast.error("Ingen fråga vald", {
+        description: "Välj minst en fråga att exportera"
+      })
+      return
+    }
+
+    setIsExporting(true)
+    try {
+      const selected = questions.filter(q => selectedQuestions.has(q._id))
+
+      let jsonContent: string
+      let filename: string
+
+      if (format === "qti") {
+        const qtiArray = exportToQti21(selected, {
+          subject: selected[0]?.subject || "Export",
+          topic: selected[0]?.tags?.[0] || "",
+          difficulty: selected[0]?.difficulty || "medium",
+          language: selected[0]?.language || "sv"
+        })
+        // QTI export returns array of files, combine them or use first one
+        jsonContent = qtiArray[0]?.content || ""
+        filename = `library-export-qti-${Date.now()}.xml`
+      } else {
+        jsonContent = exportToWiseflowJSON(selected, {
+          subject: selected[0]?.subject || "Export",
+          topic: selected[0]?.tags?.[0] || "",
+          difficulty: selected[0]?.difficulty || "medium",
+          language: selected[0]?.language || "sv",
+          exportFormat: format === "legacy" ? "legacy" : "utgaende"
+        })
+        filename = `library-export-${format}-${Date.now()}.json`
+      }
+
+      const blob = new Blob([jsonContent], { type: format === "qti" ? "application/xml" : "application/json" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+
+      toast.success("Export lyckades!", {
+        description: `${selectedQuestions.size} frågor exporterade (${format.toUpperCase()})`
+      })
+    } catch (error) {
+      toast.error("Export misslyckades", {
+        description: "Kunde inte exportera frågor"
+      })
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const getQuestionTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      mcq: "Flerval",
+      true_false: "Sant/Falskt",
+      longtextV2: "Essä",
+      short_answer: "Kort svar",
+      fill_blank: "Ifyllnad",
+      multiple_response: "Flera rätt",
+      matching: "Matchning",
+      ordering: "Ordningsföljd",
+      hotspot: "Bildmarkering",
+      rating_scale: "Betygsskala"
+    }
+    return labels[type] || type
+  }
 
   return (
-    <div className="container mx-auto max-w-6xl py-8 px-4">
-      <SignedOut>
-        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-          <BookOpen className="h-16 w-16 text-muted-foreground" />
-          <h2 className="text-3xl font-bold">Frågebibliotek</h2>
-          <p className="max-w-md text-lg text-muted-foreground">
-            Logga in för att se dina sparade frågor
-          </p>
-          <SignInButton mode="modal">
-            <Button size="lg">Logga in</Button>
-          </SignInButton>
-        </div>
-      </SignedOut>
-
-      <SignedIn>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Frågebibliotek</h1>
-              <p className="text-muted-foreground mt-2">
-                Dina sparade frågor från tidigare generationer
-              </p>
-            </div>
-            <Link href="/">
-              <Button variant="outline">Skapa nya frågor</Button>
-            </Link>
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
+      {/* Header */}
+      <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <BookOpen className="h-6 w-6" />
+            <h1 className="text-xl font-semibold tracking-tight">Frågebibliotek</h1>
           </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/">
+              <Button variant="ghost" size="icon" aria-label="Hem">
+                <Home className="h-5 w-5" />
+              </Button>
+            </Link>
+            <Link href="/settings">
+              <Button variant="ghost" size="icon" aria-label="Inställningar">
+                <SettingsIcon className="h-5 w-5" />
+              </Button>
+            </Link>
+            <UserButton afterSignOutUrl="/">
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label="Mitt bibliotek"
+                  labelIcon={<BookOpen className="h-4 w-4" />}
+                  href="/library"
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+          </div>
+        </div>
+      </header>
 
-          {questions === undefined ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            </div>
-          ) : questions.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Inga sparade frågor än</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Skapa och spara frågor från huvudsidan för att se dem här
-                </p>
-                <Link href="/">
-                  <Button>Skapa frågor</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {questions.map((question) => (
-                <Card key={question._id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-2 flex-1">
-                        <CardTitle className="text-lg leading-tight">
-                          {question.title}
-                        </CardTitle>
-                        <CardDescription className="flex flex-wrap gap-2 items-center">
-                          <span className="inline-flex items-center gap-1">
-                            <Tag className="h-3 w-3" />
-                            {question.subject}
-                          </span>
-                          {question.tags && question.tags.length > 0 && (
-                            <>
-                              {question.tags.map((tag, idx) => (
-                                <Badge key={idx} variant="outline" className="text-xs">
+      <main className="container mx-auto max-w-6xl py-8 px-4">
+        <SignedOut>
+          <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+            <BookOpen className="h-16 w-16 text-muted-foreground" />
+            <h2 className="text-3xl font-bold">Frågebibliotek</h2>
+            <p className="max-w-md text-lg text-muted-foreground">
+              Logga in för att se dina sparade frågor
+            </p>
+            <SignInButton mode="modal">
+              <Button size="lg">Logga in</Button>
+            </SignInButton>
+          </div>
+        </SignedOut>
+
+        <SignedIn>
+          <div className="space-y-6">
+            {/* Actions bar */}
+            {questions && questions.length > 0 && (
+              <Card>
+                <CardContent className="py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <Checkbox
+                        checked={questions.length > 0 && selectedQuestions.size === questions.length}
+                        onCheckedChange={toggleAll}
+                        id="select-all"
+                      />
+                      <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                        Markera alla ({selectedQuestions.size}/{questions.length})
+                      </label>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => exportSelected("legacy")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        {isExporting ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
+                        Legacy JSON
+                      </Button>
+                      <Button
+                        onClick={() => exportSelected("utg")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Utgående JSON
+                      </Button>
+                      <Button
+                        onClick={() => exportSelected("qti")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        QTI 2.1
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Loading state */}
+            {questions === undefined ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              </div>
+            ) : questions.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                  <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Inga sparade frågor än</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Skapa och spara frågor från huvudsidan för att se dem här
+                  </p>
+                  <Link href="/">
+                    <Button>Skapa frågor</Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {questions.map((question) => {
+                  const isEditing = editingId === question._id
+                  const displayQuestion = isEditing && editState ? editState : question
+
+                  return (
+                    <Card key={question._id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start gap-4">
+                          <Checkbox
+                            checked={selectedQuestions.has(question._id)}
+                            onCheckedChange={() => toggleQuestion(question._id)}
+                            className="mt-1"
+                          />
+                          <div className="flex-1 space-y-2">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <CardTitle className="text-lg leading-tight mb-2">
+                                  {question.title}
+                                </CardTitle>
+                                {isEditing ? (
+                                  <Textarea
+                                    value={editState?.stimulus || ""}
+                                    onChange={(e) => setEditState(editState ? { ...editState, stimulus: e.target.value } : null)}
+                                    className="min-h-[80px] mb-2"
+                                  />
+                                ) : (
+                                  <div
+                                    className="prose prose-sm max-w-none mb-2"
+                                    dangerouslySetInnerHTML={{ __html: question.stimulus }}
+                                  />
+                                )}
+                              </div>
+                              <div className="flex gap-2">
+                                {isEditing ? (
+                                  <>
+                                    <Button size="sm" variant="default" onClick={saveEdit}>
+                                      <Check className="h-4 w-4" />
+                                    </Button>
+                                    <Button size="sm" variant="outline" onClick={cancelEditing}>
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Button size="sm" variant="ghost" onClick={() => startEditing(question)}>
+                                      <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleDelete(question._id)}
+                                      disabled={deletingId === question._id}
+                                      className="text-destructive hover:text-destructive"
+                                    >
+                                      {deletingId === question._id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Tags - Show ALL tags */}
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant="outline">
+                                <Tag className="mr-1 h-3 w-3" />
+                                {question.subject}
+                              </Badge>
+                              <Badge variant={
+                                question.type === "mcq" ? "default" :
+                                question.type === "true_false" ? "secondary" :
+                                "outline"
+                              }>
+                                {getQuestionTypeLabel(question.type)}
+                              </Badge>
+                              <Badge variant="outline" className={
+                                question.difficulty === "easy" ? "bg-green-100 dark:bg-green-950" :
+                                question.difficulty === "medium" ? "bg-yellow-100 dark:bg-yellow-950" :
+                                "bg-red-100 dark:bg-red-950"
+                              }>
+                                {question.difficulty === "easy" ? "Lätt" :
+                                 question.difficulty === "medium" ? "Medel" :
+                                 "Svår"}
+                              </Badge>
+                              {question.tags && question.tags.map((tag, idx) => (
+                                <Badge key={idx} variant="secondary" className="text-xs">
                                   {tag}
                                 </Badge>
                               ))}
-                            </>
-                          )}
-                        </CardDescription>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <Badge variant={
-                          question.type === "mcq" ? "default" :
-                          question.type === "true_false" ? "secondary" :
-                          "outline"
-                        }>
-                          {question.type === "mcq" ? "Flerval" :
-                           question.type === "true_false" ? "Sant/Falskt" :
-                           question.type === "longtextV2" ? "Essä" :
-                           question.type}
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {question.difficulty === "easy" ? "Lätt" :
-                           question.difficulty === "medium" ? "Medel" :
-                           "Svår"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div
-                      className="prose prose-sm max-w-none mb-4"
-                      dangerouslySetInnerHTML={{ __html: question.stimulus }}
-                    />
-                    {question.options && question.options.length > 0 && (
-                      <div className="space-y-1">
-                        {question.options.map((option) => (
-                          <div
-                            key={option.value}
-                            className={`text-sm px-3 py-2 rounded ${
-                              question.correctAnswer?.includes(option.value)
-                                ? "bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800"
-                                : "bg-muted"
-                            }`}
-                          >
-                            <span className="font-medium mr-2">{option.label}:</span>
-                            {option.value}
+                            </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        {new Date(question.createdAt).toLocaleDateString("sv-SE", {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric"
-                        })}
-                      </span>
-                      <span>
-                        {question.generatedBy === "ai" ? "AI-genererad" : "Manuell"}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-      </SignedIn>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        {/* Options */}
+                        {displayQuestion.options && displayQuestion.options.length > 0 && (
+                          <div className="space-y-2 mb-4">
+                            {displayQuestion.options.map((option, optionIndex) => {
+                              const isCorrect = displayQuestion.correctAnswer?.includes(option.label)
+                              return (
+                                <div
+                                  key={optionIndex}
+                                  className={`flex items-start gap-3 rounded-lg border p-3 ${
+                                    isCorrect
+                                      ? "border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/30"
+                                      : "border-border"
+                                  }`}
+                                >
+                                  {isEditing ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleCorrectAnswer(option.label)}
+                                      className="mt-0.5 flex-shrink-0"
+                                    >
+                                      {isCorrect ? (
+                                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                      ) : (
+                                        <Circle className="h-5 w-5 text-muted-foreground" />
+                                      )}
+                                    </button>
+                                  ) : (
+                                    isCorrect ? (
+                                      <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                                    ) : (
+                                      <Circle className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                                    )
+                                  )}
+                                  <div className="flex-1 flex items-center gap-2">
+                                    <span className="font-medium flex-shrink-0">{option.label}.</span>
+                                    {isEditing ? (
+                                      <Input
+                                        value={option.value}
+                                        onChange={(e) => updateEditOption(optionIndex, 'value', e.target.value)}
+                                        className="flex-1"
+                                      />
+                                    ) : (
+                                      <span>{option.value}</span>
+                                    )}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        )}
+
+                        {/* Instructor guidance */}
+                        {displayQuestion.instructorStimulus && (
+                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30 mb-4">
+                            <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                              Lärarhandledning
+                            </div>
+                            {isEditing ? (
+                              <Textarea
+                                value={editState?.instructorStimulus || ""}
+                                onChange={(e) => setEditState(editState ? { ...editState, instructorStimulus: e.target.value } : null)}
+                                className="text-sm bg-white dark:bg-blue-950"
+                              />
+                            ) : (
+                              <p className="text-sm text-blue-800 dark:text-blue-200">
+                                {question.instructorStimulus}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Metadata */}
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(question.createdAt).toLocaleDateString("sv-SE", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit"
+                            })}
+                          </span>
+                          <span>
+                            {question.generatedBy === "ai" ? "AI-genererad" : "Manuell"}
+                          </span>
+                          <span>
+                            Poäng: {question.score} ({question.minScore}-{question.maxScore})
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </SignedIn>
+      </main>
     </div>
   )
 }

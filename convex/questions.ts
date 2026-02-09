@@ -111,6 +111,48 @@ export const getQuestionsBySubject = query({
   },
 })
 
+// Update a question
+export const updateQuestion = mutation({
+  args: {
+    questionId: v.id("questions"),
+    stimulus: v.optional(v.string()),
+    options: v.optional(
+      v.array(
+        v.object({
+          label: v.string(),
+          value: v.string(),
+        })
+      )
+    ),
+    correctAnswer: v.optional(v.array(v.string())),
+    instructorStimulus: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const question = await ctx.db.get(args.questionId)
+    if (!question) {
+      throw new Error("Question not found")
+    }
+
+    if (question.userId !== identity.subject) {
+      throw new Error("Unauthorized")
+    }
+
+    await ctx.db.patch(args.questionId, {
+      stimulus: args.stimulus,
+      options: args.options,
+      correctAnswer: args.correctAnswer,
+      instructorStimulus: args.instructorStimulus,
+    })
+
+    return { success: true }
+  },
+})
+
 // Delete a question
 export const deleteQuestion = mutation({
   args: { id: v.id("questions") },
