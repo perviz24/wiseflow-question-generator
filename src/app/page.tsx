@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
       {/* Header */}
-      <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50">
+      <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
             {t("appTitle")}
@@ -42,7 +42,15 @@ export default function Home() {
                   <span className="sr-only">{t("settings")}</span>
                 </Button>
               </Link>
-              <UserButton afterSignOutUrl="/" />
+              <UserButton afterSignOutUrl="/">
+                <UserButton.MenuItems>
+                  <UserButton.Link
+                    label="Mitt bibliotek"
+                    labelIcon={<BookOpen className="h-4 w-4" />}
+                    href="/library"
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
