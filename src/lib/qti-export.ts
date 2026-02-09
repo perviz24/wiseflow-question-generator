@@ -47,7 +47,8 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
   const itemId = generateQtiId("item", index)
   const responseId = generateQtiId("response", index)
 
-  let qtiXml = `  <assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+  let qtiXml = `<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/qti/qtiv2p1/imsqti_v2p1.xsd"
     identifier="${itemId}"
@@ -107,7 +108,7 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
   qtiXml += `    </itemBody>
 
     <responseProcessing template="http://www.imsglobal.org/question/qti_v2p1/rptemplates/match_correct"/>
-  </assessmentItem>
+</assessmentItem>
 `
 
   return qtiXml
