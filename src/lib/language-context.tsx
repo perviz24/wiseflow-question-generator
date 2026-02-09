@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, ReactNode } from "react"
+import { createContext, useContext, ReactNode, useEffect } from "react"
 import { useQuery } from "convex/react"
 import { useAuth } from "@clerk/nextjs"
 import { api } from "../../convex/_generated/api"
@@ -24,6 +24,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Default to Swedish, use profile language if available
   const language: Language = profile?.uiLanguage || "sv"
   const isLoading = Boolean(isSignedIn && profile === undefined)
+
+  // Save language to localStorage for Clerk localization
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("wiseflow_ui_language", language)
+      // Dispatch custom event for same-tab language changes
+      window.dispatchEvent(new Event("languageChanged"))
+    }
+  }, [language])
 
   const t = (
     key: keyof Translations,
