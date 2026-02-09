@@ -26,7 +26,7 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-11 w-11 sm:h-10 sm:w-10"
+                  className="h-11 w-11"
                   aria-label={t("myLibrary")}
                 >
                   <Library className="h-6 w-6" />
@@ -37,10 +37,10 @@ export default function Home() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-10 w-10 sm:h-9 sm:w-9"
+                  className="h-11 w-11"
                   aria-label={t("settings")}
                 >
-                  <Settings className="h-5 w-5" />
+                  <Settings className="h-6 w-6" />
                   <span className="sr-only">{t("settings")}</span>
                 </Button>
               </Link>

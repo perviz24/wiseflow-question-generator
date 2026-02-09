@@ -74,15 +74,15 @@ export default function SettingsPage() {
   return (
     <div className="container mx-auto max-w-2xl py-8">
       <div className="mb-4">
-        <Button variant="ghost" size="sm" onClick={() => router.back()}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+        <Button variant="ghost" onClick={() => router.back()}>
+          <ArrowLeft className="mr-2 h-5 w-5" />
           {t("back")}
         </Button>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-3">
+            <Settings className="h-6 w-6 text-primary" />
             {t("profileSettings")}
           </CardTitle>
           <CardDescription>
