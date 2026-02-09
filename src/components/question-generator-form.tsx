@@ -15,6 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Tooltip,
   TooltipContent,
@@ -55,6 +56,7 @@ interface FormData {
   examType?: string // Ordinarie, Omtentamen, Quiz
   courseCode?: string // BIO101, MATH202
   additionalTags?: string // Comma-separated custom tags
+  includeAITag: boolean // Whether to include "AI-generated" tag
 }
 
 interface Question {
@@ -86,6 +88,7 @@ export function QuestionGeneratorForm() {
     examType: "",
     courseCode: "",
     additionalTags: "",
+    includeAITag: true, // Default to true (include AI-generated tag)
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedQuestions, setGeneratedQuestions] = useState<Question[] | null>(null)
@@ -232,6 +235,7 @@ export function QuestionGeneratorForm() {
         courseCode: formData.courseCode,
         additionalTags: formData.additionalTags,
         tutorInitials: userProfile?.tutorInitials || "",
+        includeAITag: formData.includeAITag,
       }
 
       // Choose export format based on user selection
@@ -278,7 +282,16 @@ export function QuestionGeneratorForm() {
       <div className="space-y-4">
         <QuestionPreview
           questions={generatedQuestions}
-          metadata={metadata}
+          metadata={{
+            ...metadata,
+            includeAITag: formData.includeAITag,
+            tutorInitials: userProfile?.tutorInitials || "",
+            term: formData.term,
+            semester: formData.semester,
+            examType: formData.examType,
+            courseCode: formData.courseCode,
+            additionalTags: formData.additionalTags,
+          }}
           onSave={handleSave}
           onExport={handleExport}
           onUpdateQuestions={handleUpdateQuestions}
@@ -860,6 +873,23 @@ export function QuestionGeneratorForm() {
               <p className="text-xs text-muted-foreground">
                 {t("additionalTagsHelp")}
               </p>
+            </div>
+
+            {/* AI Tag Toggle */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="includeAITag"
+                checked={formData.includeAITag}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, includeAITag: checked as boolean })
+                }
+              />
+              <Label
+                htmlFor="includeAITag"
+                className="text-sm font-normal cursor-pointer"
+              >
+                {t("includeAITag")}
+              </Label>
             </div>
           </div>
 

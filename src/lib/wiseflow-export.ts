@@ -60,6 +60,7 @@ interface ExportMetadata {
   courseCode?: string
   additionalTags?: string
   tutorInitials?: string
+  includeAITag?: boolean // Whether to include "AI-generated" tag
 }
 
 function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>): string[] {
@@ -86,8 +87,11 @@ function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>):
   const timestamp = new Date().toLocaleString("sv-SE")
   autoTags.push(timestamp)
 
-  // Add AI-generated marker
-  autoTags.push("AI-generated")
+  // Add AI-generated marker (only if enabled)
+  if (metadata.includeAITag !== false) {
+    // Default to true if not specified
+    autoTags.push("AI-generated")
+  }
 
   // Add tutor initials if provided
   if (metadata.tutorInitials && metadata.tutorInitials.trim()) {

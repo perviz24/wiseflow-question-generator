@@ -20,6 +20,7 @@ interface ExportMetadata {
   topic: string
   difficulty: string
   language: string
+  includeAITag?: boolean
 }
 
 // Escape CSV field (handle quotes and commas)

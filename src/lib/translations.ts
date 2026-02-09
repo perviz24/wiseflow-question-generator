@@ -79,6 +79,7 @@ export interface Translations {
   additionalTags: string
   additionalTagsPlaceholder: string
   additionalTagsHelp: string
+  includeAITag: string
 
   // Question Preview
   generatedQuestions: string
@@ -236,6 +237,7 @@ export const translations: Record<Language, Translations> = {
     additionalTags: "Ytterligare taggar (valfritt)",
     additionalTagsPlaceholder: "t.ex. Ögon, Makula, LO1 (kommaseparerade)",
     additionalTagsHelp: "Separera flera taggar med kommatecken",
+    includeAITag: "Inkludera 'AI-genererad' tagg",
 
     // Question Preview
     generatedQuestions: "Genererade frågor",
@@ -391,6 +393,7 @@ export const translations: Record<Language, Translations> = {
     additionalTags: "Additional Tags (Optional)",
     additionalTagsPlaceholder: "e.g., Ögon, Makula, LO1 (comma-separated)",
     additionalTagsHelp: "Separate multiple tags with commas",
+    includeAITag: "Include 'AI-generated' tag",
 
     // Question Preview
     generatedQuestions: "Generated Questions",

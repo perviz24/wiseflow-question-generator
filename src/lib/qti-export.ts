@@ -23,6 +23,7 @@ interface ExportMetadata {
   courseCode?: string
   additionalTags?: string
   tutorInitials?: string
+  includeAITag?: boolean
 }
 
 // Generate unique identifier for QTI items
