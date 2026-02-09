@@ -10,6 +10,7 @@ import { toast } from "sonner"
 import { useConvex, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
+import { useTranslation } from "@/lib/language-context"
 
 interface ContentUploadProps {
   onContentExtracted: (content: string, source: string) => void
@@ -24,6 +25,7 @@ interface UploadedItem {
 }
 
 export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRemoved }: ContentUploadProps) {
+  const { t } = useTranslation()
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
@@ -205,7 +207,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           {/* File Upload */}
           <div className="space-y-2">
             <Label htmlFor="file-upload">
-              Ladda upp dokument (valfritt)
+              {t("uploadDocument")}
             </Label>
             <Input
               id="file-upload"
@@ -217,7 +219,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               className="cursor-pointer"
             />
             <p className="text-sm text-muted-foreground">
-              PDF, Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar.
+              {t("uploadDocumentHelp")}
             </p>
           </div>
 
@@ -258,14 +260,14 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                eller
+                {t("or")}
               </span>
             </div>
           </div>
 
           {/* URL Inputs */}
           <div className="space-y-3">
-            <Label>Hämta från webbadresser (valfritt)</Label>
+            <Label>{t("fetchFromUrls")}</Label>
             {urlInputs.map((url, index) => (
               <div key={index} className="flex gap-2">
                 <Input
@@ -315,7 +317,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Lägg till fler URL:er
+              {t("addMoreUrls")}
             </Button>
             <p className="text-sm text-muted-foreground">
               Ange webbadresser för att extrahera innehåll från webbsidor

@@ -621,7 +621,7 @@ export function QuestionGeneratorForm() {
                 ) : (
                   <>
                     <ChevronDown className="h-3.5 w-3.5" />
-                    Visa fler frågetyper ({7} till)
+                    {t("showMoreTypes")} ({7} till)
                   </>
                 )}
               </button>

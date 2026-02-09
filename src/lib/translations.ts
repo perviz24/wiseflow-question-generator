@@ -58,6 +58,13 @@ export interface Translations {
   utgaendeFormat: string
   qti21Format: string
 
+  // Content Upload
+  uploadDocument: string
+  uploadDocumentHelp: string
+  or: string
+  fetchFromUrls: string
+  addMoreUrls: string
+
   // Tagging Section
   tagsOrganization: string
   tagsOrganizationHelp: string
@@ -186,6 +193,13 @@ export const translations: Record<Language, Translations> = {
     utgaendeFormat: "Utgående (labels med ID)",
     qti21Format: "QTI 2.1 (Universal LMS)",
 
+    // Content Upload
+    uploadDocument: "Ladda upp dokument (valfritt)",
+    uploadDocumentHelp: "PDF, Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar.",
+    or: "eller",
+    fetchFromUrls: "Hämta från webbadresser (valfritt)",
+    addMoreUrls: "Lägg till fler URL:er",
+
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
     tagsOrganizationHelp: "Auto-taggar: Ämne, Ämnesområde, Frågetyp, Svårighetsgrad, Språk, Tidsstämpel",
@@ -311,6 +325,13 @@ export const translations: Record<Language, Translations> = {
     legacyFormat: "Legacy (tags array)",
     utgaendeFormat: "Utgående (labels with IDs)",
     qti21Format: "QTI 2.1 (Universal LMS)",
+
+    // Content Upload
+    uploadDocument: "Upload Document (Optional)",
+    uploadDocumentHelp: "PDF, Word (.docx), or PowerPoint (.pptx). Select multiple files at once. No file size limitations.",
+    or: "or",
+    fetchFromUrls: "Fetch from URLs (Optional)",
+    addMoreUrls: "Add More URLs",
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",
