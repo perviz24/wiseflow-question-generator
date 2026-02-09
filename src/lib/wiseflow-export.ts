@@ -11,20 +11,64 @@ interface Question {
   instructorStimulus?: string
 }
 
-interface WiseflowQuestion {
+// Legacy format (nya versionen) - Learnosity structure
+interface WiseflowLegacyQuestion {
+  type: string
+  widget_type: "response"
+  reference: string
   data: {
-    type: string
-    stimulus: string
+    minScore: number
     options?: Array<{ label: string; value: string }>
+    score: number
+    shuffle_options?: boolean
+    stimulus: string
+    type: string
+    ui_style?: {
+      choice_label: "upper-alpha"
+      type: "horizontal" | "block"
+    }
     validation?: {
+      scoring_type: "exactMatch"
       valid_response: {
+        score: number
         value: string[]
       }
     }
-    max_length?: number
-    formatting_options?: string[]
-    submit_over_limit?: boolean
-    instructor_stimulus?: string
+  }
+  metadata: null
+}
+
+interface WiseflowLegacyItem {
+  reference: string
+  title: string
+  description: string
+  stimulus: string
+  workflow: []
+  metadata: []
+  note: string
+  source: string
+  definition: {
+    template: "dynamic"
+    widgets: Array<{ reference: string }>
+  }
+  status: "published"
+  questions: WiseflowLegacyQuestion[]
+  features: []
+  tags: string[]
+  labels: Array<{
+    id: number
+    name: string
+    type: "personal"
+  }>
+}
+
+interface WiseflowLegacyRoot {
+  data: WiseflowLegacyItem[]
+  metadata: {
+    author_version: string
+    date_created: number
+    created_by: number
+    content: "item"
   }
 }
 
@@ -34,19 +78,59 @@ interface WiseflowLabel {
   type: "personal"
 }
 
-interface WiseflowItemLegacy {
-  title: string
-  questions: WiseflowQuestion[]
-  tags?: string[]
+// Utgående format (gamla versionen) - array structure
+interface WiseflowUtgaendeQuestion {
+  id: number
+  data: {
+    options?: Array<{ label: string; value: string }>
+    ui_style?: {
+      choice_label: "upper-alpha"
+      type: "block"
+    }
+    stimulus: string
+    type: string
+    validation?: {
+      scoring_type: "exactMatch"
+      valid_response: {
+        score: number
+        value: string[]
+      }
+    }
+    shuffle_options?: boolean
+    score: number
+    minScore: number
+  }
+  itemId: number
+  maxScore: number
+  minScore: number
 }
 
-interface WiseflowItemUtgaende {
+interface WiseflowUtgaendeItem {
+  id: number
+  baseId: number
   title: string
-  questions: WiseflowQuestion[]
-  labels?: WiseflowLabel[]
+  assignmentId: null
+  assignment: null
+  file: null
+  extras: []
+  features: string
+  reference: string
+  shared: false
+  tools: []
+  questions: WiseflowUtgaendeQuestion[]
+  lastChanged: string
+  shareType: -1
+  shareFirstName: string
+  shareLastName: string
+  showAsItem: 1
+  maxScore: number
+  tags: string[]
+  type: 0
+  questionCount: number
+  extraCount: 0
+  hidden: false
+  shareObj: null
 }
-
-type WiseflowItem = WiseflowItemLegacy | WiseflowItemUtgaende
 
 interface ExportMetadata {
   subject: string
@@ -152,75 +236,201 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
   const manualTags = generateManualTags(metadata)
   const allTags = [...autoTags, ...manualTags]
 
-  const wiseflowItems: WiseflowItem[] = questions.map((question, index) => {
-    const wiseflowQuestion: WiseflowQuestion = {
-      data: {
+  if (metadata.exportFormat === "legacy") {
+    // LEGACY FORMAT (nya versionen) - Learnosity JSON structure
+    const timestamp = Date.now()
+
+    const items: WiseflowLegacyItem[] = questions.map((question, index) => {
+      const questionRef = generateUUID()
+      const itemRef = generateUUID()
+
+      // Strip HTML tags from stimulus for title
+      const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
+      const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
+
+      const wiseflowQuestion: WiseflowLegacyQuestion = {
         type: question.type,
+        widget_type: "response",
+        reference: questionRef,
+        data: {
+          minScore: 0,
+          score: 1,
+          stimulus: question.stimulus,
+          type: question.type,
+        },
+        metadata: null,
+      }
+
+      // Add MCQ/True-False specific fields
+      if ((question.type === "mcq" || question.type === "true_false") && question.options) {
+        wiseflowQuestion.data.options = question.options
+        wiseflowQuestion.data.shuffle_options = true
+        wiseflowQuestion.data.ui_style = {
+          choice_label: "upper-alpha",
+          type: "horizontal",
+        }
+
+        // Map correct answers to index-based values
+        if (question.correctAnswer) {
+          const validResponseValues = question.correctAnswer.map((label) => {
+            const index = question.options!.findIndex((opt) => opt.label === label)
+            return index.toString()
+          })
+
+          wiseflowQuestion.data.validation = {
+            scoring_type: "exactMatch",
+            valid_response: {
+              score: 1,
+              value: validResponseValues,
+            },
+          }
+        }
+      }
+
+      return {
+        reference: itemRef,
+        title,
+        description: "",
         stimulus: question.stimulus,
+        workflow: [],
+        metadata: [],
+        note: "",
+        source: "",
+        definition: {
+          template: "dynamic",
+          widgets: [{ reference: questionRef }],
+        },
+        status: "published",
+        questions: [wiseflowQuestion],
+        features: [],
+        tags: [],
+        labels: generateLabelsFromTags(allTags),
+      }
+    })
+
+    const root: WiseflowLegacyRoot = {
+      data: items,
+      metadata: {
+        author_version: "4.8.1",
+        date_created: Math.floor(timestamp / 1000),
+        created_by: 2321143,
+        content: "item",
       },
     }
 
-    // Add options and validation for MCQ and True/False
-    if ((question.type === "mcq" || question.type === "true_false") && question.options) {
-      wiseflowQuestion.data.options = question.options.map((opt) => ({
-        label: opt.label,
-        value: opt.value,
-      }))
+    return JSON.stringify(root, null, 2)
+  } else {
+    // UTGÅENDE FORMAT (gamla versionen) - Array structure
+    const timestamp = Math.floor(Date.now() / 1000)
+    const userProfile = getUserProfile(metadata)
 
-      // Map correct answers to index-based values (A=0, B=1, C=2, D=3)
-      if (question.correctAnswer) {
-        const validResponseValues = question.correctAnswer.map((label) => {
-          const index = question.options!.findIndex((opt) => opt.label === label)
-          return index.toString()
-        })
+    const items: WiseflowUtgaendeItem[] = questions.map((question, index) => {
+      const baseId = 3500001 + index
+      const itemId = 700001 + index
+      const questionId = 6000001 + index
 
-        wiseflowQuestion.data.validation = {
-          valid_response: {
-            value: validResponseValues,
-          },
+      // Strip HTML tags from stimulus for title
+      const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
+      const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
+
+      const utgaendeQuestion: WiseflowUtgaendeQuestion = {
+        id: questionId,
+        data: {
+          stimulus: question.stimulus,
+          type: question.type,
+          shuffle_options: true,
+          score: 1,
+          minScore: 0,
+        },
+        itemId: baseId,
+        maxScore: 1,
+        minScore: 0,
+      }
+
+      // Add MCQ/True-False specific fields
+      if ((question.type === "mcq" || question.type === "true_false") && question.options) {
+        utgaendeQuestion.data.options = question.options
+        utgaendeQuestion.data.ui_style = {
+          choice_label: "upper-alpha",
+          type: "block",
+        }
+
+        // Map correct answers to index-based values
+        if (question.correctAnswer) {
+          const validResponseValues = question.correctAnswer.map((label) => {
+            const index = question.options!.findIndex((opt) => opt.label === label)
+            return index.toString()
+          })
+
+          utgaendeQuestion.data.validation = {
+            scoring_type: "exactMatch",
+            valid_response: {
+              score: 1,
+              value: validResponseValues,
+            },
+          }
         }
       }
-    }
 
-    // Add essay-specific fields
-    if (question.type === "longtextV2") {
-      wiseflowQuestion.data.max_length = 5000
-      wiseflowQuestion.data.formatting_options = ["bold", "italic", "underline"]
-      wiseflowQuestion.data.submit_over_limit = false
+      const reference = metadata.tutorInitials ? `${metadata.tutorInitials.toUpperCase()}${String(index + 1).padStart(2, "0")}` : `Q${String(index + 1).padStart(2, "0")}`
 
-      if (question.instructorStimulus) {
-        wiseflowQuestion.data.instructor_stimulus = question.instructorStimulus
-      }
-    }
-
-    // Create item with title (use first 100 chars of question or generate from metadata)
-    const title =
-      question.stimulus.length > 100
-        ? question.stimulus.substring(0, 97) + "..."
-        : question.stimulus
-
-    const baseItem = {
-      title: title || `${metadata.subject} - ${metadata.topic} - Question ${index + 1}`,
-      questions: [wiseflowQuestion],
-    }
-
-    // Add tags or labels based on export format
-    if (metadata.exportFormat === "legacy") {
       return {
-        ...baseItem,
+        id: itemId,
+        baseId,
+        title,
+        assignmentId: null,
+        assignment: null,
+        file: null,
+        extras: [],
+        features: `<span class='learnosity-response question-${baseId}q${questionId}'></span>`,
+        reference,
+        shared: false,
+        tools: [],
+        questions: [utgaendeQuestion],
+        lastChanged: timestamp.toString(),
+        shareType: -1,
+        shareFirstName: userProfile.firstName,
+        shareLastName: userProfile.lastName,
+        showAsItem: 1,
+        maxScore: 1,
         tags: allTags,
-      } as WiseflowItemLegacy
-    } else {
-      // utgaende format
-      return {
-        ...baseItem,
-        labels: generateLabelsFromTags(allTags),
-      } as WiseflowItemUtgaende
-    }
-  })
+        type: 0,
+        questionCount: 1,
+        extraCount: 0,
+        hidden: false,
+        shareObj: null,
+      }
+    })
 
-  // Return formatted JSON with 2-space indentation
-  return JSON.stringify(wiseflowItems, null, 2)
+    return JSON.stringify(items, null, 2)
+  }
+}
+
+// Helper to generate UUID for legacy format
+function generateUUID(): string {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0
+    const v = c === "x" ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+// Helper to extract user profile from metadata
+function getUserProfile(metadata: ExportMetadata): { firstName: string; lastName: string } {
+  // Parse tutor initials like "id:pma" or "JD"
+  const initials = metadata.tutorInitials || ""
+
+  if (initials.startsWith("id:")) {
+    // Format: id:pma → First: Parvis, Last: Assar
+    const id = initials.substring(3).toLowerCase()
+    // Simple mapping - in real app this would come from user profile
+    return { firstName: "Tutor", lastName: id.toUpperCase() }
+  } else if (initials.length >= 2) {
+    // Format: JD → First: J, Last: D
+    return { firstName: initials[0], lastName: initials.substring(1) }
+  }
+
+  return { firstName: "Unknown", lastName: "User" }
 }
 
 export function downloadWiseflowJSON(questions: Question[], metadata: ExportMetadata) {
