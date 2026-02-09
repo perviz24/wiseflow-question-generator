@@ -1,6 +1,20 @@
 "use client"
 
 import { useState } from "react"
+
+// Calculate points based on difficulty
+function getPointsForDifficulty(difficulty: string): number {
+  switch (difficulty) {
+    case "easy":
+      return 1
+    case "medium":
+      return 1.5
+    case "hard":
+      return 2
+    default:
+      return 1
+  }
+}
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -426,6 +440,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
+                    <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950">
+                      {getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
+                    </Badge>
                     <span className="text-sm text-muted-foreground">Question {index + 1}</span>
                   </div>
                   {isEditing ? (

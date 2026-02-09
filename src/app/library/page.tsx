@@ -33,6 +33,8 @@ export default function LibraryPage() {
   const questions = useQuery(api.questions.getUserQuestions)
   const updateQuestion = useMutation(api.questions.updateQuestion)
   const deleteQuestion = useMutation(api.questions.deleteQuestion)
+  const updateDifficulty = useMutation(api.questions.updateDifficulty)
+  const updateScore = useMutation(api.questions.updateScore)
 
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set())
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -41,6 +43,9 @@ export default function LibraryPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [editingTagsId, setEditingTagsId] = useState<string | null>(null)
   const [newTagInput, setNewTagInput] = useState("")
+  const [editingDifficultyId, setEditingDifficultyId] = useState<string | null>(null)
+  const [editingPointsId, setEditingPointsId] = useState<string | null>(null)
+  const [pointsInput, setPointsInput] = useState("")
 
   // Filter state
   const [filterTag, setFilterTag] = useState<string>("")
@@ -148,6 +153,41 @@ export default function LibraryPage() {
         ...editState,
         tags: (editState.tags || []).filter(tag => tag !== tagToRemove)
       })
+    }
+  }
+
+  const handleDifficultyUpdate = async (questionId: string, difficulty: "easy" | "medium" | "hard") => {
+    try {
+      await updateDifficulty({
+        questionId: questionId as Id<"questions">,
+        difficulty
+      })
+      toast.success(t("difficultyUpdated"))
+      setEditingDifficultyId(null)
+    } catch (error) {
+      toast.error(t("updateFailed"))
+    }
+  }
+
+  const handlePointsUpdate = async (questionId: string) => {
+    const points = parseFloat(pointsInput)
+    if (isNaN(points) || points <= 0) {
+      toast.error(t("updateFailed"), {
+        description: "Poäng måste vara ett positivt tal"
+      })
+      return
+    }
+
+    try {
+      await updateScore({
+        questionId: questionId as Id<"questions">,
+        score: points
+      })
+      toast.success(t("pointsUpdated"))
+      setEditingPointsId(null)
+      setPointsInput("")
+    } catch (error) {
+      toast.error(t("updateFailed"))
     }
   }
 
@@ -611,15 +651,91 @@ export default function LibraryPage() {
                                 }>
                                   {getQuestionTypeLabel(question.type)}
                                 </Badge>
-                                <Badge variant="outline" className={
-                                  question.difficulty === "easy" ? "bg-green-100 dark:bg-green-950" :
-                                  question.difficulty === "medium" ? "bg-yellow-100 dark:bg-yellow-950" :
-                                  "bg-red-100 dark:bg-red-950"
-                                }>
-                                  {question.difficulty === "easy" ? "Lätt" :
-                                   question.difficulty === "medium" ? "Medel" :
-                                   "Svår"}
-                                </Badge>
+                                {/* Difficulty Badge - Editable */}
+                                {editingDifficultyId === question._id ? (
+                                  <Select
+                                    value={question.difficulty}
+                                    onValueChange={(value) => handleDifficultyUpdate(question._id, value as "easy" | "medium" | "hard")}
+                                  >
+                                    <SelectTrigger className="w-32 h-7">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="easy">{t("easy")}</SelectItem>
+                                      <SelectItem value="medium">{t("medium")}</SelectItem>
+                                      <SelectItem value="hard">{t("hard")}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                ) : (
+                                  <Badge
+                                    variant="outline"
+                                    className={`cursor-pointer hover:opacity-80 ${
+                                      question.difficulty === "easy" ? "bg-green-100 dark:bg-green-950" :
+                                      question.difficulty === "medium" ? "bg-yellow-100 dark:bg-yellow-950" :
+                                      "bg-red-100 dark:bg-red-950"
+                                    }`}
+                                    onClick={() => setEditingDifficultyId(question._id)}
+                                    title={t("editDifficulty")}
+                                  >
+                                    {question.difficulty === "easy" ? t("easy") :
+                                     question.difficulty === "medium" ? t("medium") :
+                                     t("hard")}
+                                  </Badge>
+                                )}
+
+                                {/* Points Badge - Editable */}
+                                {editingPointsId === question._id ? (
+                                  <div className="flex items-center gap-1">
+                                    <Input
+                                      type="number"
+                                      step="0.5"
+                                      min="0"
+                                      value={pointsInput}
+                                      onChange={(e) => setPointsInput(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") handlePointsUpdate(question._id)
+                                        if (e.key === "Escape") {
+                                          setEditingPointsId(null)
+                                          setPointsInput("")
+                                        }
+                                      }}
+                                      className="w-20 h-7 text-sm"
+                                      placeholder={String(question.score)}
+                                      autoFocus
+                                    />
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => handlePointsUpdate(question._id)}
+                                    >
+                                      <Check className="h-4 w-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-7 w-7 p-0"
+                                      onClick={() => {
+                                        setEditingPointsId(null)
+                                        setPointsInput("")
+                                      }}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <Badge
+                                    variant="outline"
+                                    className="cursor-pointer hover:opacity-80 bg-purple-100 dark:bg-purple-950"
+                                    onClick={() => {
+                                      setEditingPointsId(question._id)
+                                      setPointsInput(String(question.score))
+                                    }}
+                                    title={t("editPoints")}
+                                  >
+                                    {question.score} {t("points").toLowerCase()}
+                                  </Badge>
+                                )}
                                 {question.tutorInitials && (
                                   <Badge variant="outline" className="bg-blue-100 dark:bg-blue-950">
                                     {question.tutorInitials}
