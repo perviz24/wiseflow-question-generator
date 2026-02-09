@@ -149,32 +149,43 @@ interface ExportMetadata {
 
 function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>): string[] {
   const autoTags: string[] = []
+  const isSv = metadata.language === "sv"
 
   // Add subject and topic
   autoTags.push(metadata.subject)
   autoTags.push(metadata.topic)
 
-  // Add all unique question types from the set
+  // Add all unique question types from the set (in correct language)
   questionTypes.forEach((type) => {
-    if (type === "mcq") autoTags.push("MCQ")
-    else if (type === "true_false") autoTags.push("True/False")
-    else if (type === "longtextV2") autoTags.push("Essay")
+    if (type === "mcq") autoTags.push(isSv ? "Flervalsfråga" : "MCQ")
+    else if (type === "true_false") autoTags.push(isSv ? "Sant/Falskt" : "True/False")
+    else if (type === "longtextV2") autoTags.push(isSv ? "Essä" : "Essay")
+    else if (type === "short_answer") autoTags.push(isSv ? "Kort svar" : "Short Answer")
+    else if (type === "fill_blank") autoTags.push(isSv ? "Ifyllnad" : "Fill in the Blank")
+    else if (type === "multiple_response") autoTags.push(isSv ? "Flera rätt" : "Multiple Response")
+    else if (type === "matching") autoTags.push(isSv ? "Matchning" : "Matching")
+    else if (type === "ordering") autoTags.push(isSv ? "Ordningsföljd" : "Ordering")
+    else if (type === "hotspot") autoTags.push(isSv ? "Bildmarkering" : "Image Hotspot")
+    else if (type === "rating_scale") autoTags.push(isSv ? "Betygsskala" : "Rating Scale")
   })
 
-  // Add difficulty
-  autoTags.push(metadata.difficulty)
+  // Add difficulty (in correct language)
+  if (metadata.difficulty === "easy") autoTags.push(isSv ? "Lätt" : "Easy")
+  else if (metadata.difficulty === "medium") autoTags.push(isSv ? "Medium" : "Medium")
+  else if (metadata.difficulty === "hard") autoTags.push(isSv ? "Svår" : "Hard")
+  else autoTags.push(metadata.difficulty) // Fallback if unexpected value
 
-  // Add language
-  autoTags.push(metadata.language === "sv" ? "Swedish" : "English")
+  // Add language tag (in correct language)
+  autoTags.push(isSv ? "Svenska" : "English")
 
   // Add timestamp
   const timestamp = new Date().toLocaleString("sv-SE")
   autoTags.push(timestamp)
 
-  // Add AI-generated marker (only if enabled)
+  // Add AI-generated marker (only if enabled, in correct language)
   if (metadata.includeAITag !== false) {
     // Default to true if not specified
-    autoTags.push("AI-generated")
+    autoTags.push(isSv ? "AI-genererad" : "AI-generated")
   }
 
   // Add tutor initials if provided

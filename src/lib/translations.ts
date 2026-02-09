@@ -212,8 +212,8 @@ export const translations: Record<Language, Translations> = {
     subjectTopicCleared: "Ämne och ämnesområde rensade - de kommer inte påverka frågegenerering",
     exportFormat: "Exportformat",
     exportFormatHelp: "Välj Wiseflow JSON-format för ditt tentacenter",
-    legacyFormat: "Legacy (tags-array)",
-    utgaendeFormat: "Utgående (labels med ID)",
+    legacyFormat: "Utgående (labels med ID)",
+    utgaendeFormat: "Legacy (tags-array)",
     qti21Format: "QTI 2.1 (Universal LMS)",
 
     // Content Upload
@@ -368,8 +368,8 @@ export const translations: Record<Language, Translations> = {
     subjectTopicCleared: "Subject and topic cleared - they won't influence question generation",
     exportFormat: "Export Format",
     exportFormatHelp: "Choose the Wiseflow JSON format for your exam center",
-    legacyFormat: "Legacy (tags array)",
-    utgaendeFormat: "Utgående (labels with IDs)",
+    legacyFormat: "Utgående (labels with IDs)",
+    utgaendeFormat: "Legacy (tags array)",
     qti21Format: "QTI 2.1 (Universal LMS)",
 
     // Content Upload
