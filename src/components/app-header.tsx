@@ -1,0 +1,96 @@
+"use client"
+
+import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { Settings, Library, BookOpen, Home } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useTranslation } from "@/lib/language-context"
+
+export function AppHeader() {
+  const { t } = useTranslation()
+  const router = useRouter()
+
+  const handleTitleClick = () => {
+    // Clear preview session when clicking title
+    localStorage.removeItem("wiseflow-preview-session")
+    router.push("/")
+  }
+
+  return (
+    <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <h1
+          onClick={handleTitleClick}
+          className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          {t("appTitle")}
+        </h1>
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <Link href="/">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-11 w-11"
+              aria-label={t("home")}
+            >
+              <Home className="h-7 w-7" />
+              <span className="sr-only">{t("home")}</span>
+            </Button>
+          </Link>
+          <Link href="/docs">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-11 w-11"
+              aria-label={t("documentation")}
+            >
+              <BookOpen className="h-7 w-7" />
+              <span className="sr-only">{t("documentation")}</span>
+            </Button>
+          </Link>
+          <SignedIn>
+            <Link href="/library">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11"
+                aria-label={t("myLibrary")}
+              >
+                <Library className="h-7 w-7" />
+                <span className="sr-only">{t("myLibrary")}</span>
+              </Button>
+            </Link>
+            <Link href="/settings">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11"
+                aria-label={t("settings")}
+              >
+                <Settings className="h-7 w-7" />
+                <span className="sr-only">{t("settings")}</span>
+              </Button>
+            </Link>
+            <UserButton afterSignOutUrl="/">
+              <UserButton.MenuItems>
+                <UserButton.Link
+                  label={t("myLibrary")}
+                  labelIcon={<Library className="h-4 w-4" />}
+                  href="/library"
+                />
+              </UserButton.MenuItems>
+            </UserButton>
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                {t("signIn")}
+              </button>
+            </SignInButton>
+          </SignedOut>
+        </div>
+      </div>
+    </header>
+  )
+}

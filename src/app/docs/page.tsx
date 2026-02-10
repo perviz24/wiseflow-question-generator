@@ -1,9 +1,8 @@
 "use client"
 
 import { useTranslation } from "@/lib/language-context"
-import Link from "next/link"
-import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { AppHeader } from "@/components/app-header"
+import { BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -15,22 +14,7 @@ export default function DocsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
-      {/* Header */}
-      <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/">
-            <h1 className="text-base sm:text-xl font-semibold tracking-tight cursor-pointer hover:opacity-80 transition-opacity">
-              {t("appTitle")}
-            </h1>
-          </Link>
-          <Link href="/">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("back")}
-            </Button>
-          </Link>
-        </div>
-      </header>
+      <AppHeader />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-5xl">

@@ -9,6 +9,7 @@ export interface Translations {
   signOut: string
   settings: string
   back: string
+  home: string
   myLibrary: string
   questionLibrary: string
   selectAll: string
@@ -184,6 +185,7 @@ export const translations: Record<Language, Translations> = {
     signOut: "Logga ut",
     settings: "Inställningar",
     back: "Tillbaka",
+    home: "Hem",
     myLibrary: "Mitt bibliotek",
     questionLibrary: "Frågebibliotek",
     selectAll: "Markera alla",
@@ -357,6 +359,7 @@ export const translations: Record<Language, Translations> = {
     signOut: "Sign Out",
     settings: "Settings",
     back: "Back",
+    home: "Home",
     myLibrary: "My Library",
     questionLibrary: "Question Library",
     selectAll: "Select All",
