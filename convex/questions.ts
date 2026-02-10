@@ -41,7 +41,7 @@ export const saveQuestions = mutation({
         score: v.number(),
         minScore: v.number(),
         maxScore: v.number(),
-        tutorInitials: v.string(),
+        tutorInitials: v.optional(v.string()),
         generatedBy: v.union(v.literal("ai"), v.literal("manual")),
       })
     ),
