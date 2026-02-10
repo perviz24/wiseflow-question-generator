@@ -197,28 +197,53 @@ export function QuestionGeneratorForm() {
 
     setIsSaving(true)
     try {
+      // Build base auto-tags (same for all questions)
+      const baseAutoTags = [
+        metadata.subject,
+        metadata.topic,
+        metadata.difficulty,
+        metadata.language,
+        formData.term,
+        formData.semester,
+        formData.examType,
+        formData.courseCode,
+      ].filter((tag): tag is string => Boolean(tag)) // Remove empty strings
+
+      // Parse custom tags from comma-separated string
+      const customTags = formData.additionalTags
+        ? formData.additionalTags.split(',').map(tag => tag.trim()).filter((tag): tag is string => Boolean(tag))
+        : []
+
+      // Add AI-generated tag if requested
+      const aiTag = formData.includeAITag ? (metadata.language === 'sv' ? 'AI-genererad' : 'AI-generated') : null
+
       // Transform questions to match Convex schema
-      const questionsToSave = generatedQuestions.map((q) => ({
-        title: q.stimulus.substring(0, 100), // Use first 100 chars as title
-        subject: metadata.subject,
-        difficulty: metadata.difficulty as "easy" | "medium" | "hard",
-        language: metadata.language as "sv" | "en",
-        tags: [metadata.topic],
-        type: q.type,
-        stimulus: q.stimulus,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        shuffleOptions: q.type === "mcq",
-        maxLength: q.type === "longtextV2" ? 5000 : undefined,
-        formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
-        instructorStimulus: q.instructorStimulus,
-        submitOverLimit: false,
-        score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
-        minScore: 0,
-        maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
-        tutorInitials: userProfile?.tutorInitials || "N/A",
-        generatedBy: "ai" as const,
-      }))
+      const questionsToSave = generatedQuestions.map((q) => {
+        // Combine all tags including question-specific type
+        const allTags = [...baseAutoTags, q.type, ...customTags, ...(aiTag ? [aiTag] : [])]
+
+        return {
+          title: q.stimulus.substring(0, 100), // Use first 100 chars as title
+          subject: metadata.subject,
+          difficulty: metadata.difficulty as "easy" | "medium" | "hard",
+          language: metadata.language as "sv" | "en",
+          tags: allTags,
+          type: q.type,
+          stimulus: q.stimulus,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          shuffleOptions: q.type === "mcq",
+          maxLength: q.type === "longtextV2" ? 5000 : undefined,
+          formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
+          instructorStimulus: q.instructorStimulus,
+          submitOverLimit: false,
+          score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
+          minScore: 0,
+          maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
+          tutorInitials: userProfile?.tutorInitials || "N/A",
+          generatedBy: "ai" as const,
+        }
+      })
 
       const result = await saveQuestionsMutation({ questions: questionsToSave })
 
