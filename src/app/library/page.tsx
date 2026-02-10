@@ -420,7 +420,7 @@ export default function LibraryPage() {
                         {t("selectAll")} ({selectedQuestions.size}/{questions.length})
                       </label>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         onClick={() => exportSelected("legacy")}
                         disabled={selectedQuestions.size === 0 || isExporting}
