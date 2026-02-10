@@ -87,6 +87,27 @@ export default function Home() {
               <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {t("createQuestionsSubtitle")}
               </p>
+              {/* Hero Benefits */}
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{t("language") === "sv" ? "Spara tid med AI" : "Save time with AI"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{t("language") === "sv" ? "Granska och redigera" : "Review and edit"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>{t("language") === "sv" ? "Flera exportformat" : "Multiple export formats"}</span>
+                </div>
+              </div>
             </div>
             <QuestionGeneratorForm />
           </div>
@@ -100,6 +121,27 @@ export default function Home() {
             <p className="max-w-md text-lg sm:text-xl text-muted-foreground leading-relaxed">
               {t("welcomeSubtitle")}
             </p>
+            {/* Hero Benefits */}
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{t("language") === "sv" ? "Spara tid med AI" : "Save time with AI"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{t("language") === "sv" ? "Granska och redigera" : "Review and edit"}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>{t("language") === "sv" ? "Flera exportformat" : "Multiple export formats"}</span>
+              </div>
+            </div>
             <SignInButton mode="modal">
               <button className="mt-4 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90">
                 {t("signInToContinue")}
