@@ -215,6 +215,35 @@ export const updateScore = mutation({
   },
 })
 
+// Update tutor initials
+export const updateTutorInitials = mutation({
+  args: {
+    questionId: v.id("questions"),
+    tutorInitials: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    const question = await ctx.db.get(args.questionId)
+    if (!question) {
+      throw new Error("Question not found")
+    }
+
+    if (question.userId !== identity.subject) {
+      throw new Error("Unauthorized")
+    }
+
+    await ctx.db.patch(args.questionId, {
+      tutorInitials: args.tutorInitials,
+    })
+
+    return { success: true }
+  },
+})
+
 // Delete a question
 export const deleteQuestion = mutation({
   args: { id: v.id("questions") },

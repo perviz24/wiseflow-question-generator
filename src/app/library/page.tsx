@@ -35,6 +35,7 @@ export default function LibraryPage() {
   const deleteQuestion = useMutation(api.questions.deleteQuestion)
   const updateDifficulty = useMutation(api.questions.updateDifficulty)
   const updateScore = useMutation(api.questions.updateScore)
+  const updateTutorInitials = useMutation(api.questions.updateTutorInitials)
 
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set())
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -46,6 +47,8 @@ export default function LibraryPage() {
   const [editingDifficultyId, setEditingDifficultyId] = useState<string | null>(null)
   const [editingPointsId, setEditingPointsId] = useState<string | null>(null)
   const [pointsInput, setPointsInput] = useState("")
+  const [editingInitialsId, setEditingInitialsId] = useState<string | null>(null)
+  const [initialsInput, setInitialsInput] = useState("")
 
   // Filter state
   const [filterTag, setFilterTag] = useState<string>("")
@@ -186,6 +189,35 @@ export default function LibraryPage() {
       toast.success(t("pointsUpdated"))
       setEditingPointsId(null)
       setPointsInput("")
+    } catch (error) {
+      toast.error(t("updateFailed"))
+    }
+  }
+
+  const handleInitialsUpdate = async (questionId: string) => {
+    const initials = initialsInput.trim()
+    if (!initials) {
+      toast.error(t("updateFailed"), {
+        description: "Lärarinitialer kan inte vara tomma"
+      })
+      return
+    }
+
+    if (initials.length > 10) {
+      toast.error(t("updateFailed"), {
+        description: "Lärarinitialer får max vara 10 tecken"
+      })
+      return
+    }
+
+    try {
+      await updateTutorInitials({
+        questionId: questionId as Id<"questions">,
+        tutorInitials: initials
+      })
+      toast.success("Lärarinitialer uppdaterade")
+      setEditingInitialsId(null)
+      setInitialsInput("")
     } catch (error) {
       toast.error(t("updateFailed"))
     }
@@ -762,10 +794,54 @@ export default function LibraryPage() {
                                     {question.score} {t("points").toLowerCase()}
                                   </Badge>
                                 )}
-                                {question.tutorInitials && (
-                                  <Badge variant="outline" className="bg-blue-100 dark:bg-blue-950">
-                                    {question.tutorInitials}
-                                  </Badge>
+                                {editingInitialsId === question._id ? (
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="text"
+                                      value={initialsInput}
+                                      onChange={(e) => setInitialsInput(e.target.value)}
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          handleInitialsUpdate(question._id)
+                                        }
+                                      }}
+                                      className="w-24 h-7"
+                                      maxLength={10}
+                                      autoFocus
+                                    />
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleInitialsUpdate(question._id)}
+                                      className="h-7 px-2"
+                                    >
+                                      ✓
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => {
+                                        setEditingInitialsId(null)
+                                        setInitialsInput("")
+                                      }}
+                                      className="h-7 px-2"
+                                    >
+                                      ✕
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  question.tutorInitials && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-blue-100 dark:bg-blue-950 cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-900"
+                                      onClick={() => {
+                                        setEditingInitialsId(question._id)
+                                        setInitialsInput(question.tutorInitials || "")
+                                      }}
+                                      title="Klicka för att redigera lärarinitialer"
+                                    >
+                                      {question.tutorInitials}
+                                    </Badge>
+                                  )
                                 )}
                                 {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => {
                                   const isAITag = tag === "AI-genererad" || tag === "AI-generated"
