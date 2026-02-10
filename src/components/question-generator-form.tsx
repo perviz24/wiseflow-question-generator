@@ -762,45 +762,6 @@ export function QuestionGeneratorForm() {
             )}
           </div>
 
-          {/* Export Format */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Label htmlFor="exportFormat">{t("exportFormat")}</Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
-                    <Info className="h-3.5 w-3.5" />
-                    <span className="sr-only">Export format information</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="text-sm">
-                    <strong>Legacy:</strong> Original format with tags array<br />
-                    <strong>Utgående:</strong> New format for Wiseflow exam center<br />
-                    <strong>QTI 2.1:</strong> Standard format for LMS compatibility
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <Select
-              value={formData.exportFormat}
-              onValueChange={(value: ExportFormat) =>
-                setFormData({ ...formData, exportFormat: value })
-              }
-            >
-              <SelectTrigger id="exportFormat">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="legacy">{t("legacyFormat")}</SelectItem>
-                <SelectItem value="utgaende">{t("utgaendeFormat")}</SelectItem>
-                <SelectItem value="qti21">{t("qti21Format")}</SelectItem>
-              </SelectContent>
-            </Select>
-            <p className="text-sm text-muted-foreground">
-              {t("exportFormatHelp")}
-            </p>
-          </div>
 
           {/* Tagging Section */}
           <div className="space-y-4 rounded-lg border-2 border-zinc-200 bg-zinc-50/50 p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/30">
