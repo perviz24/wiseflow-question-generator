@@ -3,9 +3,10 @@
 import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Settings, Library, BookOpen, Home } from "lucide-react"
+import { Library, BookOpen, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
+import { SettingsSheet } from "@/components/settings-sheet"
 
 export function AppHeader() {
   const { t } = useTranslation()
@@ -61,17 +62,7 @@ export function AppHeader() {
                 <span className="sr-only">{t("myLibrary")}</span>
               </Button>
             </Link>
-            <Link href="/settings">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-11 w-11"
-                aria-label={t("settings")}
-              >
-                <Settings className="h-7 w-7" />
-                <span className="sr-only">{t("settings")}</span>
-              </Button>
-            </Link>
+            <SettingsSheet />
             <UserButton afterSignOutUrl="/">
               <UserButton.MenuItems>
                 <UserButton.Link
