@@ -410,19 +410,19 @@ export function QuestionGeneratorForm() {
                 <SelectItem value="easy">
                   <span className="flex items-center justify-between w-full gap-4">
                     <span>{t("easy")}</span>
-                    <span className="text-xs text-muted-foreground">1-3 {t("points").toLowerCase()}</span>
+                    <span className="text-xs text-muted-foreground">1 poäng</span>
                   </span>
                 </SelectItem>
                 <SelectItem value="medium">
                   <span className="flex items-center justify-between w-full gap-4">
                     <span>{t("medium")}</span>
-                    <span className="text-xs text-muted-foreground">4-6 {t("points").toLowerCase()}</span>
+                    <span className="text-xs text-muted-foreground">2 {t("points").toLowerCase()}</span>
                   </span>
                 </SelectItem>
                 <SelectItem value="hard">
                   <span className="flex items-center justify-between w-full gap-4">
                     <span>{t("hard")}</span>
-                    <span className="text-xs text-muted-foreground">7-10 {t("points").toLowerCase()}</span>
+                    <span className="text-xs text-muted-foreground">3 {t("points").toLowerCase()}</span>
                   </span>
                 </SelectItem>
               </SelectContent>

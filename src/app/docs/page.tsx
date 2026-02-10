@@ -162,8 +162,8 @@ export default function DocsPage() {
                         <span>
                           <strong>{isSv ? "Svårighetsgrad" : "Difficulty"}:</strong>{" "}
                           {isSv
-                            ? "Lätt (1-3 poäng), Medium (4-6 poäng), eller Svår (7-10 poäng)"
-                            : "Easy (1-3 points), Medium (4-6 points), or Hard (7-10 points)"}
+                            ? "Lätt (1 poäng), Medium (2 poäng), eller Svår (3 poäng)"
+                            : "Easy (1 point), Medium (2 points), or Hard (3 points)"}
                         </span>
                       </li>
                     </ul>
