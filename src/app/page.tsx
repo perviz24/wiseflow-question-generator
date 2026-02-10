@@ -4,7 +4,7 @@ import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Settings, Library, BookOpen } from "lucide-react"
+import { Settings, Library, BookOpen, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -117,6 +117,18 @@ export default function Home() {
                   <span>{t("heroMultipleFormats")}</span>
                 </div>
               </div>
+              {/* Generate Button at Top */}
+              <Button
+                size="lg"
+                onClick={() => {
+                  const form = document.querySelector('form')
+                  form?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                }}
+                className="mt-2"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                {t("generateQuestions")}
+              </Button>
             </div>
             <QuestionGeneratorForm />
           </div>

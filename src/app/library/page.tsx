@@ -395,7 +395,7 @@ export default function LibraryPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <BookOpen className="h-7 w-7 text-primary" />
-            <h1 className="text-xl font-semibold tracking-tight">{t("questionLibrary")}</h1>
+            <h1 className="text-xl font-semibold tracking-tight">{t("appTitle")}</h1>
           </div>
           <div className="flex items-center gap-2">
             <Link href="/">
@@ -437,6 +437,18 @@ export default function LibraryPage() {
 
         <SignedIn>
           <div className="space-y-6">
+            {/* Page Title and Subtitle */}
+            <div className="text-center space-y-2">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
+                {t("questionLibrary")}
+              </h2>
+              <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+                {t("language") === "sv"
+                  ? "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i Wiseflow eller andra LMS-plattformar."
+                  : "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in Wiseflow or other LMS platforms."}
+              </p>
+            </div>
+
             {/* Actions bar */}
             {questions && questions.length > 0 && (
               <Card>
