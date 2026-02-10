@@ -3,23 +3,32 @@
 import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Settings, Library, BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
 export default function Home() {
   const { t } = useTranslation()
+  const router = useRouter()
+
+  const handleTitleClick = () => {
+    // Clear preview session when clicking title
+    localStorage.removeItem("wiseflow-preview-session")
+    router.push("/")
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
       {/* Header */}
       <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Link href="/">
-            <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity">
-              {t("appTitle")}
-            </h1>
-          </Link>
+          <h1
+            onClick={handleTitleClick}
+            className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            {t("appTitle")}
+          </h1>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Link href="/docs">
               <Button
