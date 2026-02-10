@@ -164,6 +164,11 @@ export interface Translations {
   settingsSavedDescUpdated: string
   settingsSaveFailed: string
   settingsSaveFailedDesc: string
+
+  // Hero Benefits
+  heroSaveTime: string
+  heroReviewEdit: string
+  heroMultipleFormats: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -329,6 +334,11 @@ export const translations: Record<Language, Translations> = {
     settingsSavedDescUpdated: "Dina inställningar har uppdaterats.",
     settingsSaveFailed: "Misslyckades att spara",
     settingsSaveFailedDesc: "Kunde inte spara inställningar. Försök igen.",
+
+    // Hero Benefits
+    heroSaveTime: "Spara tid med AI",
+    heroReviewEdit: "Granska och redigera",
+    heroMultipleFormats: "Flera exportformat",
   },
   en: {
     // Header & Navigation
@@ -492,6 +502,11 @@ export const translations: Record<Language, Translations> = {
     settingsSavedDescUpdated: "Your settings have been updated.",
     settingsSaveFailed: "Failed to save",
     settingsSaveFailedDesc: "Could not save settings. Please try again.",
+
+    // Hero Benefits
+    heroSaveTime: "Save time with AI",
+    heroReviewEdit: "Review and edit",
+    heroMultipleFormats: "Multiple export formats",
   },
 }
 

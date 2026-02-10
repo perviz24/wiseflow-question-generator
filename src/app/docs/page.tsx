@@ -119,7 +119,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint eller URL:er f\u00f6r fr\u00e5gor baserade p\u00e5 specifikt material</>
+                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint eller URL:er för frågor baserade på specifikt material</>
                         : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, or URLs for questions based on specific material</>}
                     </span>
                   </div>
@@ -127,7 +127,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>10+ fr\u00e5getyper:</strong> Flerval, Sant/Falskt, Essay, Kort svar, Matchning, Ifyllnad, och mer</>
+                        ? <><strong>10+ frågetyper:</strong> Flerval, Sant/Falskt, Essay, Kort svar, Matchning, Ifyllnad, och mer</>
                         : <><strong>10+ question types:</strong> Multiple Choice, True/False, Essay, Short Answer, Matching, Fill Blank, and more</>}
                     </span>
                   </div>
@@ -135,7 +135,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Fullst\u00e4ndig kontroll:</strong> Redigera fr\u00e5getext, svarsalternativ, po\u00e4ng och sv\u00e5righetsgrad innan export</>
+                        ? <><strong>Fullständig kontroll:</strong> Redigera frågetext, svarsalternativ, poäng och svårighetsgrad innan export</>
                         : <><strong>Complete control:</strong> Edit question text, answer options, points, and difficulty before export</>}
                     </span>
                   </div>
@@ -143,7 +143,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Fr\u00e5gebibliotek:</strong> Spara och organisera alla dina fr\u00e5gor med taggar f\u00f6r enkel \u00e5teranv\u00e4ndning</>
+                        ? <><strong>Frågebibliotek:</strong> Spara och organisera alla dina frågor med taggar för enkel återanvändning</>
                         : <><strong>Question library:</strong> Save and organize all your questions with tags for easy reuse</>}
                     </span>
                   </div>
@@ -151,7 +151,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Kontextprioritet:</strong> V\u00e4lj hur AI balanserar mellan \u00e4mne och uppladdad kontext</>
+                        ? <><strong>Kontextprioritet:</strong> Välj hur AI balanserar mellan ämne och uppladdad kontext</>
                         : <><strong>Context priority:</strong> Choose how AI balances between subject and uploaded context</>}
                     </span>
                   </div>
@@ -159,7 +159,7 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Generera fler:</strong> L\u00e4gg till nya fr\u00e5gor till befintligt set utan att starta om</>
+                        ? <><strong>Generera fler:</strong> Lägg till nya frågor till befintligt set utan att starta om</>
                         : <><strong>Generate more:</strong> Add new questions to existing set without starting over</>}
                     </span>
                   </div>

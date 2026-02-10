@@ -102,19 +102,19 @@ export default function Home() {
                   <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>{t("language") === "sv" ? "Spara tid med AI" : "Save time with AI"}</span>
+                  <span>{t("heroSaveTime")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>{t("language") === "sv" ? "Granska och redigera" : "Review and edit"}</span>
+                  <span>{t("heroReviewEdit")}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>{t("language") === "sv" ? "Flera exportformat" : "Multiple export formats"}</span>
+                  <span>{t("heroMultipleFormats")}</span>
                 </div>
               </div>
             </div>
@@ -136,19 +136,19 @@ export default function Home() {
                 <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>{t("language") === "sv" ? "Spara tid med AI" : "Save time with AI"}</span>
+                <span>{t("heroSaveTime")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>{t("language") === "sv" ? "Granska och redigera" : "Review and edit"}</span>
+                <span>{t("heroReviewEdit")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>{t("language") === "sv" ? "Flera exportformat" : "Multiple export formats"}</span>
+                <span>{t("heroMultipleFormats")}</span>
               </div>
             </div>
             <SignInButton mode="modal">
