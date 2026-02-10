@@ -411,42 +411,65 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </div>
           </div>
 
-          {/* YouTube Video URL */}
-          <div className="space-y-3">
-            <Label htmlFor="youtube-url">
-              Video URL med text
-            </Label>
-            <div className="flex gap-2">
-              <Input
-                id="youtube-url"
-                type="url"
-                placeholder="https://youtube.com/watch?v=..."
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                disabled={isProcessing}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && youtubeUrl.trim()) {
-                    e.preventDefault()
-                    handleYoutubeSubmit()
-                  }
-                }}
-              />
-              <Button
-                type="button"
-                onClick={handleYoutubeSubmit}
-                disabled={isProcessing || !youtubeUrl.trim()}
-                size="icon"
-              >
-                {isProcessing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Video className="h-4 w-4" />
-                )}
-              </Button>
+          {/* Video Section */}
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <Label className="text-base font-semibold">
+                {t("videoSectionTitle")}
+              </Label>
             </div>
-            <p className="text-sm text-muted-foreground">
-              <strong>Just nu stödjer funktionen endast YouTube-videor.</strong> Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. Stöd för direktuppladdning av videofiler och andra videoplattformar kommer snart.
-            </p>
+
+            {/* Video File Upload */}
+            <div className="space-y-2">
+              <Label htmlFor="video-upload">
+                {t("uploadVideoFile")}
+              </Label>
+              <Input
+                id="video-upload"
+                type="file"
+                accept="video/*"
+                disabled={true}
+                className="cursor-not-allowed opacity-50"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t("videoSupportNote")}
+              </p>
+            </div>
+
+            {/* Video URL Input */}
+            <div className="space-y-2">
+              <Label htmlFor="youtube-url">
+                {t("videoUrlLabel")}
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="youtube-url"
+                  type="url"
+                  placeholder={t("videoUrlPlaceholder")}
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  disabled={isProcessing}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && youtubeUrl.trim()) {
+                      e.preventDefault()
+                      handleYoutubeSubmit()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={handleYoutubeSubmit}
+                  disabled={isProcessing || !youtubeUrl.trim()}
+                  size="icon"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Video className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

@@ -67,6 +67,11 @@ export interface Translations {
   fetchFromUrls: string
   addMoreUrls: string
   contextGuidanceTip: string
+  videoSectionTitle: string
+  uploadVideoFile: string
+  videoUrlLabel: string
+  videoUrlPlaceholder: string
+  videoSupportNote: string
 
   // Tagging Section
   tagsOrganization: string
@@ -243,6 +248,11 @@ export const translations: Record<Language, Translations> = {
     fetchFromUrls: "Hämta från webbadresser (valfritt)",
     addMoreUrls: "Lägg till fler URL:er",
     contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
+    videoSectionTitle: "Skapa frågor från en videoföreläsning",
+    uploadVideoFile: "Ladda upp videofil",
+    videoUrlLabel: "eller klistra in video-URL",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
+    videoSupportNote: "Just nu stödjer funktionen endast YouTube-videor. Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. Stöd för direktuppladdning av videofiler kommer snart.",
 
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
@@ -417,6 +427,11 @@ export const translations: Record<Language, Translations> = {
     fetchFromUrls: "Fetch from URLs (Optional)",
     addMoreUrls: "Add More URLs",
     contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
+    videoSectionTitle: "Create questions from a video lecture",
+    uploadVideoFile: "Upload video file",
+    videoUrlLabel: "or paste video URL",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
+    videoSupportNote: "Currently only YouTube videos are supported. You can upload your videos to YouTube as private or unlisted and use them here. Support for direct video file uploads coming soon.",
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",
