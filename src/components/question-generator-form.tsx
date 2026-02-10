@@ -216,7 +216,7 @@ export function QuestionGeneratorForm() {
         score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
         minScore: 0,
         maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
-        tutorInitials: userProfile?.tutorInitials || "",
+        tutorInitials: userProfile?.tutorInitials || "N/A",
         generatedBy: "ai" as const,
       }))
 
@@ -249,7 +249,7 @@ export function QuestionGeneratorForm() {
         examType: formData.examType,
         courseCode: formData.courseCode,
         additionalTags: formData.additionalTags,
-        tutorInitials: userProfile?.tutorInitials || "",
+        tutorInitials: userProfile?.tutorInitials || "N/A",
         includeAITag: formData.includeAITag,
       }
 
@@ -300,7 +300,7 @@ export function QuestionGeneratorForm() {
           metadata={{
             ...metadata,
             includeAITag: formData.includeAITag,
-            tutorInitials: userProfile?.tutorInitials || "",
+            tutorInitials: userProfile?.tutorInitials || "N/A",
             term: formData.term,
             semester: formData.semester,
             examType: formData.examType,
