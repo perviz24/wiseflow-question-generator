@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Upload, FileText, Loader2, X, Link2, Plus } from "lucide-react"
+import { Upload, FileText, Loader2, X, Link2, Plus, Video } from "lucide-react"
 import { toast } from "sonner"
 import { useConvex, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
@@ -21,7 +21,7 @@ interface ContentUploadProps {
 interface UploadedItem {
   id: string
   name: string
-  type: "file" | "url"
+  type: "file" | "url" | "youtube"
 }
 
 export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRemoved }: ContentUploadProps) {
@@ -29,6 +29,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
+  const [youtubeUrl, setYoutubeUrl] = useState("")
 
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
 
@@ -200,6 +201,58 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     setUrlInputs(newUrls)
   }
 
+  const handleYoutubeSubmit = async () => {
+    const url = youtubeUrl.trim()
+    if (!url) return
+
+    // Validate YouTube URL
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+/
+    if (!youtubeRegex.test(url)) {
+      toast.error("Ogiltig YouTube URL", {
+        description: "Ange en giltig YouTube-video URL.",
+      })
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      const response = await fetch("/api/extract-youtube-transcript", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url, language: "sv" }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to extract transcript")
+      }
+
+      onContentExtracted(data.transcript, `YouTube Video: ${url}`)
+
+      // Add to uploaded items list
+      setUploadedItems(prev => [
+        ...prev,
+        { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
+      ])
+
+      toast.success("Transkription extraherad!", {
+        description: `Extraherade ${data.characterCount} tecken från YouTube-video`,
+      })
+
+      // Clear YouTube input
+      setYoutubeUrl("")
+    } catch (error) {
+      console.error("YouTube transcript extraction failed:", error)
+      toast.error("Extraktion misslyckades", {
+        description: error instanceof Error ? error.message : "Kunde inte hämta transkription från YouTube-video.",
+      })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <Card className="border-dashed">
       <CardContent className="pt-6">
@@ -234,6 +287,8 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
                 >
                   {item.type === "file" ? (
                     <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  ) : item.type === "youtube" ? (
+                    <Video className="h-4 w-4 text-red-500 flex-shrink-0" />
                   ) : (
                     <Link2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                   )}
@@ -321,6 +376,55 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </Button>
             <p className="text-sm text-muted-foreground">
               Ange webbadresser för att extrahera innehåll från webbsidor
+            </p>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                {t("or")}
+              </span>
+            </div>
+          </div>
+
+          {/* YouTube Video URL */}
+          <div className="space-y-3">
+            <Label htmlFor="youtube-url">
+              Video URL (YouTube)
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                id="youtube-url"
+                type="url"
+                placeholder="https://youtube.com/watch?v=..."
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                disabled={isProcessing}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && youtubeUrl.trim()) {
+                    e.preventDefault()
+                    handleYoutubeSubmit()
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={handleYoutubeSubmit}
+                disabled={isProcessing || !youtubeUrl.trim()}
+                size="icon"
+              >
+                {isProcessing ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Video className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Klistra in YouTube-video URL för att extrahera transkription. Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. <strong>Framtida uppdatering:</strong> Stöd för direktuppladdning av videofiler och andra videoplattformar kommer snart.
             </p>
           </div>
         </div>
