@@ -236,7 +236,7 @@ export const translations: Record<Language, Translations> = {
 
     // Content Upload
     uploadDocument: "Ladda upp dokument (valfritt)",
-    uploadDocumentHelp: "Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar. PDF-stöd tillfälligt inaktiverat.",
+    uploadDocumentHelp: "PDF, Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar.",
     or: "eller",
     fetchFromUrls: "Hämta från webbadresser (valfritt)",
     addMoreUrls: "Lägg till fler URL:er",
@@ -409,7 +409,7 @@ export const translations: Record<Language, Translations> = {
 
     // Content Upload
     uploadDocument: "Upload Document (Optional)",
-    uploadDocumentHelp: "Word (.docx) or PowerPoint (.pptx). Select multiple files at once. No file size limitations. PDF support temporarily disabled.",
+    uploadDocumentHelp: "PDF, Word (.docx), or PowerPoint (.pptx). Select multiple files at once. No file size limitations.",
     or: "or",
     fetchFromUrls: "Fetch from URLs (Optional)",
     addMoreUrls: "Add More URLs",

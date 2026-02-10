@@ -11,6 +11,7 @@ import { useConvex, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { Id } from "../../convex/_generated/dataModel"
 import { useTranslation } from "@/lib/language-context"
+import { extractTextFromPDF } from "@/lib/pdf-utils"
 
 interface ContentUploadProps {
   onContentExtracted: (content: string, source: string) => void
@@ -37,8 +38,9 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
-    // Check file types - PDF disabled due to Vercel build issues
+    // Check file types - PDF now supported via client-side extraction
     const validTypes = [
+      "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ]
@@ -46,7 +48,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     for (const file of files) {
       if (!validTypes.includes(file.type)) {
         toast.error("Ogiltigt filformat", {
-          description: `${file.name}: Endast Word (.docx) och PowerPoint (.pptx) stöds. PDF-stöd är tillfälligt inaktiverat.`,
+          description: `${file.name}: Endast PDF, Word (.docx) och PowerPoint (.pptx) stöds.`,
         })
         continue
       }
@@ -57,6 +59,20 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
       setIsProcessing(true)
 
       try {
+        let extractedContent = ""
+
+        // For PDFs, extract client-side FIRST (faster, no API costs, no crashes)
+        if (file.type === "application/pdf") {
+          try {
+            extractedContent = await extractTextFromPDF(file)
+            // Limit to 50,000 characters
+            extractedContent = extractedContent.slice(0, 50000)
+          } catch (pdfError) {
+            console.error("PDF extraction failed:", pdfError)
+            throw new Error("Kunde inte extrahera text från PDF. Filen kan vara skadad eller lösenordsskyddad.")
+          }
+        }
+
         // Step 1: Get upload URL from Convex
         const uploadUrl = await generateUploadUrl()
 
@@ -73,21 +89,25 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
         const { storageId } = await uploadResult.json()
 
-        // Step 3: Extract content from the uploaded file for backward compatibility
-        const extractResponse = await fetch("/api/extract-from-storage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ storageId, fileName: file.name, fileType: file.type }),
-        })
+        // Step 3: Extract content (skip API call for PDFs - already extracted)
+        if (file.type !== "application/pdf") {
+          const extractResponse = await fetch("/api/extract-from-storage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ storageId, fileName: file.name, fileType: file.type }),
+          })
 
-        const extractData = await extractResponse.json()
+          const extractData = await extractResponse.json()
 
-        if (!extractResponse.ok) {
-          throw new Error(extractData.error || "Failed to extract content from storage")
+          if (!extractResponse.ok) {
+            throw new Error(extractData.error || "Failed to extract content from storage")
+          }
+
+          extractedContent = extractData.content
         }
 
-        // Notify parent with extracted content (keeps existing flow working)
-        onContentExtracted(extractData.content, `Fil: ${file.name}`)
+        // Notify parent with extracted content
+        onContentExtracted(extractedContent, `Fil: ${file.name}`)
 
         // Also notify parent about storageId for future use
         if (onFileUploaded) {
