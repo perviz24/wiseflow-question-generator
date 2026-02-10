@@ -558,18 +558,20 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Question Text */}
-              <div className="text-lg leading-relaxed">
-                {isEditing ? (
-                  <Textarea
-                    value={editedQuestion?.stimulus || ""}
-                    onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, stimulus: e.target.value } : null)}
-                    className="text-lg leading-relaxed min-h-[80px]"
-                  />
-                ) : (
-                  <p>{question.stimulus}</p>
-                )}
-              </div>
+              {/* Question Text - Skip for fill_blank as it has special formatting below */}
+              {displayQuestion.type !== "fill_blank" && (
+                <div className="text-lg leading-relaxed">
+                  {isEditing ? (
+                    <Textarea
+                      value={editedQuestion?.stimulus || ""}
+                      onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, stimulus: e.target.value } : null)}
+                      className="text-lg leading-relaxed min-h-[80px]"
+                    />
+                  ) : (
+                    <p>{question.stimulus}</p>
+                  )}
+                </div>
+              )}
 
               {/* MCQ and True/False options */}
               {(displayQuestion.type === "mcq" || displayQuestion.type === "true_false") && displayQuestion.options && (
@@ -715,7 +717,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-2">
-                    <p className="text-sm font-medium mb-3">Match the following pairs:</p>
+                    {/* No redundant instruction - stimulus already explains matching task */}
                     <div className="grid grid-cols-1 gap-3">
                       {displayQuestion.options.map((option, optionIndex) => (
                         <Card key={optionIndex} className="p-3 bg-muted/50">
@@ -927,15 +929,16 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-3">
+                    {/* Show formatted stimulus with numbered blanks */}
                     <Card className="p-4 bg-muted/50">
                       <p className="text-sm whitespace-pre-wrap">
                         {displayQuestion.stimulus.split("[___]").map((part, index, array) => (
                           <span key={index}>
                             {part}
                             {index < array.length - 1 && (
-                              <span className="inline-block mx-1 px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded text-blue-700 dark:text-blue-300 font-medium">
+                              <Badge variant="outline" className="mx-1 bg-background">
                                 [{index + 1}]
-                              </span>
+                              </Badge>
                             )}
                           </span>
                         ))}
