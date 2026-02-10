@@ -521,15 +521,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     )}
                     <span className="text-sm text-muted-foreground">Question {index + 1}</span>
                   </div>
-                  {isEditing ? (
-                    <Textarea
-                      value={editedQuestion?.stimulus || ""}
-                      onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, stimulus: e.target.value } : null)}
-                      className="text-lg leading-relaxed min-h-[80px]"
-                    />
-                  ) : (
-                    <CardTitle className="text-lg leading-relaxed">{question.stimulus}</CardTitle>
-                  )}
+                  {/* No CardTitle here - question will appear in CardContent */}
                 </div>
                 <div className="ml-4">
                   {isEditing ? (
@@ -566,6 +558,19 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Question Text */}
+              <div className="text-lg leading-relaxed">
+                {isEditing ? (
+                  <Textarea
+                    value={editedQuestion?.stimulus || ""}
+                    onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, stimulus: e.target.value } : null)}
+                    className="text-lg leading-relaxed min-h-[80px]"
+                  />
+                ) : (
+                  <p>{question.stimulus}</p>
+                )}
+              </div>
+
               {/* MCQ and True/False options */}
               {(displayQuestion.type === "mcq" || displayQuestion.type === "true_false") && displayQuestion.options && (
                 <div className="space-y-2">
