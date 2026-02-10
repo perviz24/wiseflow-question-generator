@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { exec } from "child_process"
-import { promisify } from "util"
-
-const execAsync = promisify(exec)
+import { YoutubeTranscript } from "youtube-transcript"
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,47 +21,53 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Try requested language first, then fallback to English
-    const lang = language || "sv"
-    let command = `python C:/Users/pervi/tools/yt_transcript.py "${url}" ${lang}`
-
-    let { stdout, stderr } = await execAsync(command, {
-      timeout: 30000, // 30 second timeout
-    })
-
-    // If requested language failed and it wasn't English, try English as fallback
-    if (stderr && !stdout && lang !== "en") {
-      console.log(`No transcript in ${lang}, trying English fallback...`)
-      command = `python C:/Users/pervi/tools/yt_transcript.py "${url}" en`
-      const fallbackResult = await execAsync(command, {
-        timeout: 30000,
-      })
-      stdout = fallbackResult.stdout
-      stderr = fallbackResult.stderr
-    }
-
-    if (stderr && !stdout) {
-      console.error("Python script error:", stderr)
-
-      // Check if error mentions available languages
-      if (stderr.includes("transcripts are available in the following languages")) {
-        return NextResponse.json(
-          { error: "No captions available in the requested language. The video may not have Swedish subtitles. Try a video with Swedish captions or the system will use English if available." },
-          { status: 404 }
-        )
-      }
-
+    // Extract video ID from URL
+    const videoId = extractVideoId(url)
+    if (!videoId) {
       return NextResponse.json(
-        { error: "Failed to extract transcript. Please check if the video has captions available." },
-        { status: 500 }
+        { error: "Could not extract video ID from URL" },
+        { status: 400 }
       )
     }
 
-    const transcript = stdout.trim()
+    // Try requested language first, then fallback to English
+    const lang = language || "sv"
+
+    let transcriptData
+    try {
+      // Try to fetch transcript in requested language
+      transcriptData = await YoutubeTranscript.fetchTranscript(videoId, {
+        lang: lang,
+      })
+    } catch (error) {
+      // If requested language failed and it wasn't English, try English as fallback
+      if (lang !== "en") {
+        console.log(`No transcript in ${lang}, trying English fallback...`)
+        try {
+          transcriptData = await YoutubeTranscript.fetchTranscript(videoId, {
+            lang: "en",
+          })
+        } catch (fallbackError) {
+          throw fallbackError
+        }
+      } else {
+        throw error
+      }
+    }
+
+    if (!transcriptData || transcriptData.length === 0) {
+      return NextResponse.json(
+        { error: "No transcript found. Please ensure the video has captions enabled." },
+        { status: 404 }
+      )
+    }
+
+    // Combine all transcript segments into a single text
+    const transcript = transcriptData.map(item => item.text).join(" ")
 
     if (!transcript) {
       return NextResponse.json(
-        { error: "No transcript found. Please ensure the video has captions enabled." },
+        { error: "No transcript content found. Please ensure the video has captions available." },
         { status: 404 }
       )
     }
@@ -79,7 +82,15 @@ export async function POST(request: NextRequest) {
 
     const errorMessage = error instanceof Error ? error.message : "Unknown error"
 
-    if (errorMessage.includes("timeout")) {
+    // Check for specific error messages from youtube-transcript
+    if (errorMessage.includes("Could not find captions") || errorMessage.includes("Transcript is disabled")) {
+      return NextResponse.json(
+        { error: "No captions available for this video. Please ensure the video has captions enabled." },
+        { status: 404 }
+      )
+    }
+
+    if (errorMessage.includes("timeout") || errorMessage.includes("ETIMEDOUT")) {
       return NextResponse.json(
         { error: "Request timeout. Video might be too long or transcript extraction is taking longer than expected." },
         { status: 504 }
@@ -91,4 +102,22 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+// Helper function to extract video ID from YouTube URL
+function extractVideoId(url: string): string | null {
+  // Handle different YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+    /^([^&\n?#]+)$/, // Direct video ID
+  ]
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern)
+    if (match && match[1]) {
+      return match[1]
+    }
+  }
+
+  return null
 }
