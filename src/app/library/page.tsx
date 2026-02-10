@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, Home, Settings as SettingsIcon, CheckCircle2, Circle, Trash2, Filter } from "lucide-react"
+import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, Home, Settings, Library, CheckCircle2, Circle, Trash2, Filter } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
 import Link from "next/link"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
@@ -393,35 +393,66 @@ export default function LibraryPage() {
       {/* Header */}
       <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-7 w-7 text-primary" />
-            <h1 className="text-xl font-semibold tracking-tight">{t("appTitle")}</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/">
-              <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Hem">
-                <Home className="h-7 w-7" />
+          <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
+            {t("appTitle")}
+          </h1>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Link href="/docs">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-11 w-11"
+                aria-label={t("documentation")}
+              >
+                <BookOpen className="h-7 w-7" />
+                <span className="sr-only">{t("documentation")}</span>
               </Button>
             </Link>
-            <Link href="/settings">
-              <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Inställningar">
-                <SettingsIcon className="h-7 w-7" />
-              </Button>
-            </Link>
-            <UserButton afterSignOutUrl="/">
-              <UserButton.MenuItems>
-                <UserButton.Link
-                  label="Mitt bibliotek"
-                  labelIcon={<BookOpen className="h-4 w-4" />}
-                  href="/library"
-                />
-              </UserButton.MenuItems>
-            </UserButton>
+            <SignedIn>
+              <Link href="/library">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-11 w-11"
+                  aria-label={t("myLibrary")}
+                >
+                  <Library className="h-7 w-7" />
+                  <span className="sr-only">{t("myLibrary")}</span>
+                </Button>
+              </Link>
+              <Link href="/settings">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-11 w-11"
+                  aria-label={t("settings")}
+                >
+                  <Settings className="h-7 w-7" />
+                  <span className="sr-only">{t("settings")}</span>
+                </Button>
+              </Link>
+              <UserButton afterSignOutUrl="/">
+                <UserButton.MenuItems>
+                  <UserButton.Link
+                    label={t("myLibrary")}
+                    labelIcon={<Library className="h-4 w-4" />}
+                    href="/library"
+                  />
+                </UserButton.MenuItems>
+              </UserButton>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                  {t("signIn")}
+                </button>
+              </SignInButton>
+            </SignedOut>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-6xl py-8 px-4">
+      <main className="container mx-auto max-w-6xl py-8 px-3 sm:px-4">
         <SignedOut>
           <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
             <BookOpen className="h-16 w-16 text-muted-foreground" />
@@ -443,9 +474,7 @@ export default function LibraryPage() {
                 {t("questionLibrary")}
               </h2>
               <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-                {t("language") === "sv"
-                  ? "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i Wiseflow eller andra LMS-plattformar."
-                  : "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in Wiseflow or other LMS platforms."}
+                {t("librarySubtitle")}
               </p>
             </div>
 

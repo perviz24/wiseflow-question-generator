@@ -169,6 +169,9 @@ export interface Translations {
   heroSaveTime: string
   heroReviewEdit: string
   heroMultipleFormats: string
+
+  // Library Page
+  librarySubtitle: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -339,6 +342,9 @@ export const translations: Record<Language, Translations> = {
     heroSaveTime: "Spara tid med AI",
     heroReviewEdit: "Granska och redigera",
     heroMultipleFormats: "Flera exportformat",
+
+    // Library Page
+    librarySubtitle: "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i Wiseflow eller andra LMS-plattformar.",
   },
   en: {
     // Header & Navigation
@@ -507,6 +513,9 @@ export const translations: Record<Language, Translations> = {
     heroSaveTime: "Save time with AI",
     heroReviewEdit: "Review and edit",
     heroMultipleFormats: "Multiple export formats",
+
+    // Library Page
+    librarySubtitle: "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in Wiseflow or other LMS platforms.",
   },
 }
 
