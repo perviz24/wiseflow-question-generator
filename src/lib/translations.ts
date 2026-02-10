@@ -12,6 +12,7 @@ export interface Translations {
   myLibrary: string
   questionLibrary: string
   selectAll: string
+  documentation: string
 
   // Home Page
   welcomeTitle: string
@@ -176,6 +177,7 @@ export const translations: Record<Language, Translations> = {
     myLibrary: "Mitt bibliotek",
     questionLibrary: "Frågebibliotek",
     selectAll: "Markera alla",
+    documentation: "Dokumentation",
 
     // Home Page
     welcomeTitle: "Välkommen till Wiseflow Frågegenerator",
@@ -338,6 +340,7 @@ export const translations: Record<Language, Translations> = {
     myLibrary: "My Library",
     questionLibrary: "Question Library",
     selectAll: "Select All",
+    documentation: "Documentation",
 
     // Home Page
     welcomeTitle: "Welcome to Wiseflow Question Generator",
