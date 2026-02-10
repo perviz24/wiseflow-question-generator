@@ -767,20 +767,23 @@ export default function LibraryPage() {
                                     {question.tutorInitials}
                                   </Badge>
                                 )}
-                                {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
-                                    {tag}
-                                    {isEditing && (
-                                      <button
-                                        type="button"
-                                        onClick={() => removeTag(question._id, tag)}
-                                        className="ml-1 hover:text-destructive"
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </button>
-                                    )}
-                                  </Badge>
-                                ))}
+                                {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => {
+                                  const isAITag = tag === "AI-genererad" || tag === "AI-generated"
+                                  return (
+                                    <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
+                                      {tag}
+                                      {(isEditing || isAITag) && (
+                                        <button
+                                          type="button"
+                                          onClick={() => removeTag(question._id, tag)}
+                                          className="ml-1 hover:text-destructive"
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </button>
+                                      )}
+                                    </Badge>
+                                  )
+                                })}
                               </div>
                               {isEditing && (
                                 <div className="flex items-center gap-2">
