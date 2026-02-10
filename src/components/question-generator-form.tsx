@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 // Calculate default score based on difficulty
 function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
@@ -120,6 +120,23 @@ export function QuestionGeneratorForm() {
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
   const userProfile = useQuery(api.profiles.getUserProfile)
 
+  // Load persisted preview session on mount
+  useEffect(() => {
+    const savedPreview = localStorage.getItem("wiseflow-preview-session")
+    if (savedPreview) {
+      try {
+        const { questions, metadata: savedMetadata } = JSON.parse(savedPreview)
+        if (questions && savedMetadata) {
+          setGeneratedQuestions(questions)
+          setMetadata(savedMetadata)
+        }
+      } catch (error) {
+        console.error("Failed to load preview session:", error)
+        localStorage.removeItem("wiseflow-preview-session")
+      }
+    }
+  }, [])
+
   const handleContentExtracted = (content: string, source: string) => {
     // Store uploaded content separately from manual context
     setFormData((prev) => ({
@@ -154,6 +171,9 @@ export function QuestionGeneratorForm() {
     e.preventDefault()
     setIsGenerating(true)
 
+    // Clear previous preview session when generating new questions
+    localStorage.removeItem("wiseflow-preview-session")
+
     try {
       // Combine manual context and uploaded context for API submission
       const combinedContext = [formData.uploadedContext, formData.context]
@@ -177,6 +197,12 @@ export function QuestionGeneratorForm() {
 
       setGeneratedQuestions(data.questions)
       setMetadata(data.metadata)
+
+      // Persist preview session to localStorage
+      localStorage.setItem("wiseflow-preview-session", JSON.stringify({
+        questions: data.questions,
+        metadata: data.metadata
+      }))
 
       toast.success(t("questionsGenerated"), {
         description: t("questionsGeneratedDesc", { count: data.questions.length }),
@@ -310,6 +336,8 @@ export function QuestionGeneratorForm() {
       contextPriority: "subject_topic"
     }))
     setUploadedContentSource("")
+    // Clear persisted preview session
+    localStorage.removeItem("wiseflow-preview-session")
   }
 
   const handleUpdateQuestions = (updatedQuestions: Question[]) => {
