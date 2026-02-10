@@ -37,9 +37,8 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
-    // Check file types
+    // Check file types - PDF disabled due to Vercel build issues
     const validTypes = [
-      "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ]
@@ -47,7 +46,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     for (const file of files) {
       if (!validTypes.includes(file.type)) {
         toast.error("Ogiltigt filformat", {
-          description: `${file.name}: Endast PDF, Word (.docx) och PowerPoint (.pptx) stöds.`,
+          description: `${file.name}: Endast Word (.docx) och PowerPoint (.pptx) stöds. PDF-stöd är tillfälligt inaktiverat.`,
         })
         continue
       }
