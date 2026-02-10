@@ -44,6 +44,7 @@ interface Question {
   }>
   correctAnswer?: string[]
   instructorStimulus?: string
+  points?: number
 }
 
 interface QuestionPreviewProps {
@@ -80,6 +81,8 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [showMoreTypes, setShowMoreTypes] = useState(false)
   const [newAnswerInput, setNewAnswerInput] = useState("")
   const [isExportingFormat, setIsExportingFormat] = useState(false)
+  const [editingPointsIndex, setEditingPointsIndex] = useState<number | null>(null)
+  const [tempPoints, setTempPoints] = useState<string>("")
 
   const getQuestionTypeLabel = (type: string) => {
     const translationKeys: Record<string, keyof Translations> = {
@@ -115,6 +118,40 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const handleCancelEdit = () => {
     setEditingIndex(null)
     setEditedQuestion(null)
+  }
+
+  const handlePointsEditClick = (index: number) => {
+    const question = questions[index]
+    const currentPoints = question.points ?? getPointsForDifficulty(metadata.difficulty)
+    setEditingPointsIndex(index)
+    setTempPoints(currentPoints.toString())
+  }
+
+  const handlePointsSave = (index: number) => {
+    const parsedPoints = parseFloat(tempPoints)
+    if (isNaN(parsedPoints) || parsedPoints <= 0) {
+      toast.error("Invalid points", {
+        description: "Please enter a valid positive number for points."
+      })
+      return
+    }
+
+    if (onUpdateQuestions) {
+      const updatedQuestions = [...questions]
+      updatedQuestions[index] = {
+        ...questions[index],
+        points: parsedPoints
+      }
+      onUpdateQuestions(updatedQuestions)
+    }
+
+    setEditingPointsIndex(null)
+    setTempPoints("")
+  }
+
+  const handlePointsCancel = () => {
+    setEditingPointsIndex(null)
+    setTempPoints("")
   }
 
   const handleSaveEdit = () => {
@@ -448,9 +485,40 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
-                    <Badge variant="outline" className="bg-purple-100 dark:bg-purple-950">
-                      {getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
-                    </Badge>
+                    {editingPointsIndex === index ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          step="0.5"
+                          min="0.5"
+                          value={tempPoints}
+                          onChange={(e) => setTempPoints(e.target.value)}
+                          className="h-6 w-16 text-xs px-2"
+                          autoFocus
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handlePointsSave(index)
+                            } else if (e.key === "Escape") {
+                              handlePointsCancel()
+                            }
+                          }}
+                        />
+                        <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => handlePointsSave(index)}>
+                          <Check className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={handlePointsCancel}>
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <Badge
+                        variant="outline"
+                        className="bg-purple-100 dark:bg-purple-950 cursor-pointer hover:bg-purple-200 dark:hover:bg-purple-900"
+                        onClick={() => handlePointsEditClick(index)}
+                      >
+                        {question.points ?? getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
+                      </Badge>
+                    )}
                     <span className="text-sm text-muted-foreground">Question {index + 1}</span>
                   </div>
                   {isEditing ? (
