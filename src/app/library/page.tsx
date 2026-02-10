@@ -843,12 +843,14 @@ export default function LibraryPage() {
                                     </Badge>
                                   )
                                 )}
-                                {(isEditing ? editState?.tags : question.tags)?.map((tag, idx) => {
+                                {(isEditing ? editState?.tags : question.tags)
+                                  ?.filter(tag => tag && tag.trim().length > 0) // Hide empty tags
+                                  .map((tag, idx) => {
                                   const isAITag = tag === "AI-genererad" || tag === "AI-generated"
                                   return (
                                     <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
                                       {tag}
-                                      {(isEditing || isAITag) && (
+                                      {isEditing && (
                                         <button
                                           type="button"
                                           onClick={() => removeTag(question._id, tag)}
@@ -962,7 +964,7 @@ export default function LibraryPage() {
                         )}
 
                         {/* Metadata */}
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                           <span className="inline-flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             {new Date(question.createdAt).toLocaleDateString("sv-SE", {
