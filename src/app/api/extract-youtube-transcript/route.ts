@@ -24,16 +24,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Call the Python script
+    // Try requested language first, then fallback to English
     const lang = language || "sv"
-    const command = `python C:/Users/pervi/tools/yt_transcript.py "${url}" ${lang}`
+    let command = `python C:/Users/pervi/tools/yt_transcript.py "${url}" ${lang}`
 
-    const { stdout, stderr } = await execAsync(command, {
+    let { stdout, stderr } = await execAsync(command, {
       timeout: 30000, // 30 second timeout
     })
 
+    // If requested language failed and it wasn't English, try English as fallback
+    if (stderr && !stdout && lang !== "en") {
+      console.log(`No transcript in ${lang}, trying English fallback...`)
+      command = `python C:/Users/pervi/tools/yt_transcript.py "${url}" en`
+      const fallbackResult = await execAsync(command, {
+        timeout: 30000,
+      })
+      stdout = fallbackResult.stdout
+      stderr = fallbackResult.stderr
+    }
+
     if (stderr && !stdout) {
       console.error("Python script error:", stderr)
+
+      // Check if error mentions available languages
+      if (stderr.includes("transcripts are available in the following languages")) {
+        return NextResponse.json(
+          { error: "No captions available in the requested language. The video may not have Swedish subtitles. Try a video with Swedish captions or the system will use English if available." },
+          { status: 404 }
+        )
+      }
+
       return NextResponse.json(
         { error: "Failed to extract transcript. Please check if the video has captions available." },
         { status: 500 }
