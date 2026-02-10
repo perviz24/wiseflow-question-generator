@@ -405,33 +405,33 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               </CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button onClick={onSave} variant="default" disabled={isSaving || isExportingFormat}>
+              <Button onClick={onSave} variant="default" disabled={isSaving || isExportingFormat} size="sm" className="h-9">
                 {isSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
+                    <span className="hidden sm:inline">Saving...</span>
                   </>
                 ) : (
                   <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Save to Library
+                    <Save className="h-4 w-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Save to Library</span>
                   </>
                 )}
               </Button>
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" disabled={isSaving || isExportingFormat}>
+                  <Button variant="outline" disabled={isSaving || isExportingFormat} size="sm" className="h-9">
                     {isExportingFormat ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Exporting...
+                        <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
+                        <span className="hidden sm:inline">Exporting...</span>
                       </>
                     ) : (
                       <>
-                        <Download className="mr-2 h-4 w-4" />
-                        Export
-                        <ChevronDown className="ml-2 h-4 w-4" />
+                        <Download className="h-4 w-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Export</span>
+                        <ChevronDown className="ml-2 h-4 w-4 hidden sm:inline" />
                       </>
                     )}
                   </Button>
