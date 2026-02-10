@@ -194,15 +194,17 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   }
 
   const removeItem = (id: string) => {
-    setUploadedItems(prev => prev.filter(item => item.id !== id))
+    // Filter out the removed item
+    const newItems = uploadedItems.filter(item => item.id !== id)
+    setUploadedItems(newItems)
 
     // Notify parent to clear uploaded context if all items removed
-    if (uploadedItems.length === 1 && onContentRemoved) {
+    if (newItems.length === 0 && onContentRemoved) {
       onContentRemoved()
     }
 
     toast.info("Borttagen", {
-      description: "Innehåll borttaget. Generera nya frågor för att uppdatera.",
+      description: "Innehåll borttaget.",
     })
   }
 
@@ -412,7 +414,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           {/* YouTube Video URL */}
           <div className="space-y-3">
             <Label htmlFor="youtube-url">
-              Video URL med text (YouTube)
+              Video URL med text
             </Label>
             <div className="flex gap-2">
               <Input
