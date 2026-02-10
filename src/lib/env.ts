@@ -20,5 +20,8 @@ export const CLERK_SECRET_KEY = getEnvVar("CLERK_SECRET_KEY")
 // Anthropic
 export const ANTHROPIC_API_KEY = getEnvVar("ANTHROPIC_API_KEY")
 
+// AssemblyAI (optional - for YouTube and video transcription)
+export const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY || ""
+
 // Optional: Convex HTTP Actions URL
 export const NEXT_PUBLIC_CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || ""
