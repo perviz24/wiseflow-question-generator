@@ -54,6 +54,122 @@ export default function DocsPage() {
 
           <Separator />
 
+          {/* Key Benefits */}
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold tracking-tight text-center">
+              {isSv ? "Varför Wiseflow Fr\u00e5gegenerator?" : "Why Wiseflow Question Generator?"}
+            </h2>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <Zap className="h-8 w-8 text-primary mb-2" />
+                  <CardTitle className="text-lg">
+                    {isSv ? "Spara tid" : "Save Time"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {isSv
+                      ? "Generera pedagogiskt genomt\u00e4nkta tentafr\u00e5gor p\u00e5 sekunder ist\u00e4llet för timmar. AI hanterar det tidsrevan arbetet med att skapa varierade och v\u00e4lformulerade fr\u00e5gor."
+                      : "Generate pedagogically sound exam questions in seconds instead of hours. AI handles the time-consuming work of creating varied and well-formulated questions."}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <CheckCircle2 className="h-8 w-8 text-primary mb-2" />
+                  <CardTitle className="text-lg">
+                    {isSv ? "H\u00f6g kvalitet" : "High Quality"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {isSv
+                      ? "AI-genererade fr\u00e5gor baserade p\u00e5 ditt specifika kursmaterial. Granska och redigera alla fr\u00e5gor innan export f\u00f6r att s\u00e4kerst\u00e4lla perfekt anpassning till dina behov."
+                      : "AI-generated questions based on your specific course material. Review and edit all questions before export to ensure perfect alignment with your needs."}
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <FileJson className="h-8 w-8 text-primary mb-2" />
+                  <CardTitle className="text-lg">
+                    {isSv ? "Flexibel export" : "Flexible Export"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    {isSv
+                      ? "St\u00f6d f\u00f6r flera exportformat: Wiseflow JSON (Legacy/Utg\u00e5ende), QTI 2.1 och QTI 2.2 Inspera. Fungerar med de flesta LMS-plattformar."
+                      : "Support for multiple export formats: Wiseflow JSON (Legacy/Outgoing), QTI 2.1, and QTI 2.2 Inspera. Works with most LMS platforms."}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">{isSv ? "Ytterligare f\u00f6rdelar" : "Additional Benefits"}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-3 sm:grid-cols-2 text-sm">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint eller URL:er f\u00f6r fr\u00e5gor baserade p\u00e5 specifikt material</>
+                        : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, or URLs for questions based on specific material</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>10+ fr\u00e5getyper:</strong> Flerval, Sant/Falskt, Essay, Kort svar, Matchning, Ifyllnad, och mer</>
+                        : <><strong>10+ question types:</strong> Multiple Choice, True/False, Essay, Short Answer, Matching, Fill Blank, and more</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>Fullst\u00e4ndig kontroll:</strong> Redigera fr\u00e5getext, svarsalternativ, po\u00e4ng och sv\u00e5righetsgrad innan export</>
+                        : <><strong>Complete control:</strong> Edit question text, answer options, points, and difficulty before export</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>Fr\u00e5gebibliotek:</strong> Spara och organisera alla dina fr\u00e5gor med taggar f\u00f6r enkel \u00e5teranv\u00e4ndning</>
+                        : <><strong>Question library:</strong> Save and organize all your questions with tags for easy reuse</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>Kontextprioritet:</strong> V\u00e4lj hur AI balanserar mellan \u00e4mne och uppladdad kontext</>
+                        : <><strong>Context priority:</strong> Choose how AI balances between subject and uploaded context</>}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                    <span>
+                      {isSv
+                        ? <><strong>Generera fler:</strong> L\u00e4gg till nya fr\u00e5gor till befintligt set utan att starta om</>
+                        : <><strong>Generate more:</strong> Add new questions to existing set without starting over</>}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Separator />
+
           {/* Quick Start */}
           <Card>
             <CardHeader>
@@ -433,6 +549,14 @@ export default function DocsPage() {
                           {isSv
                             ? "Universellt LMS-format som fungerar med de flesta lärplattformar (Canvas, Moodle, Blackboard)."
                             : "Universal LMS format that works with most learning platforms (Canvas, Moodle, Blackboard)."}
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Badge variant="outline">QTI 2.2 Inspera</Badge>
+                        <span>
+                          {isSv
+                            ? "Optimerat QTI 2.2-format specifikt för Inspera tentamensplattform med förbättrad kompatibilitet."
+                            : "Optimized QTI 2.2 format specifically for Inspera exam platform with improved compatibility."}
                         </span>
                       </li>
                     </ul>
