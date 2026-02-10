@@ -976,9 +976,6 @@ export default function LibraryPage() {
                             })}
                           </span>
                           <span>
-                            {question.generatedBy === "ai" ? "AI-genererad" : "Manuell"}
-                          </span>
-                          <span>
                             Poäng: {question.score} ({question.minScore}-{question.maxScore})
                           </span>
                         </div>

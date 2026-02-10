@@ -15,11 +15,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate YouTube URL
+    // Validate YouTube URL (must be actual video URL, not search results)
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+/
     if (!youtubeRegex.test(url)) {
       return NextResponse.json(
-        { error: "Invalid YouTube URL" },
+        { error: "Invalid YouTube URL. Please provide a direct video link (e.g., youtube.com/watch?v=VIDEO_ID), not a search results page." },
         { status: 400 }
       )
     }

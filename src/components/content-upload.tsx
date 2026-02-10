@@ -393,7 +393,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           {/* YouTube Video URL */}
           <div className="space-y-3">
             <Label htmlFor="youtube-url">
-              Video URL (YouTube)
+              Video URL med text (YouTube)
             </Label>
             <div className="flex gap-2">
               <Input
@@ -424,7 +424,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Klistra in YouTube-video URL för att extrahera transkription. Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. <strong>Framtida uppdatering:</strong> Stöd för direktuppladdning av videofiler och andra videoplattformar kommer snart.
+              <strong>Just nu stödjer funktionen endast YouTube-videor.</strong> Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. Stöd för direktuppladdning av videofiler och andra videoplattformar kommer snart.
             </p>
           </div>
         </div>
