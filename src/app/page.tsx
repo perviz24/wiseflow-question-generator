@@ -129,6 +129,17 @@ export default function Home() {
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t("generateQuestions")}
               </Button>
+              {/* Instruction Manual Button */}
+              <Link href="/docs">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="mt-2"
+                >
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  {t("instructionManual")}
+                </Button>
+              </Link>
             </div>
             <QuestionGeneratorForm />
           </div>
