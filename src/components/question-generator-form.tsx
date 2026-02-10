@@ -8,9 +8,9 @@ function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
     case "easy":
       return 1
     case "medium":
-      return 1.5
-    case "hard":
       return 2
+    case "hard":
+      return 3
     default:
       return 1
   }
