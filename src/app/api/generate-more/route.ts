@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { subject, topic, difficulty, language, count, questionTypes } = body
+    const { subject, topic, difficulty, language, count, questionTypes, additionalContext } = body
 
     // Validation
     if (!subject || !topic || !difficulty || !language || !count || !questionTypes) {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
     const languageText = language === "sv" ? "Swedish" : "English"
 
-    const prompt = `You are a pedagogical expert creating exam questions for ${subject}, specifically about ${topic}.
+    let prompt = `You are a pedagogical expert creating exam questions for ${subject}, specifically about ${topic}.
 
 Generate exactly ${count} ${difficulty} difficulty question(s) in ${languageText}.
 
@@ -114,6 +114,11 @@ CRITICAL: User specifically selected these question types: ${questionTypesText}
 - For Matching: provide pairs with labels and values in options array
 - For Ordering: list items with correct sequence in correctAnswer
 - For Fill-in-blank: use [___] for blanks, provide answers in correctAnswer`
+
+    // Add additional context if provided
+    if (additionalContext && additionalContext.trim()) {
+      prompt += `\n\nAdditional context to guide question generation:\n${additionalContext.trim()}`
+    }
 
     const result = await generateObject({
       model: anthropic("claude-3-7-sonnet-20250219"),

@@ -77,6 +77,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
   const [additionalCount, setAdditionalCount] = useState(5)
   const [additionalTypes, setAdditionalTypes] = useState<string[]>([])
+  const [additionalContext, setAdditionalContext] = useState("")
   const [isGeneratingMore, setIsGeneratingMore] = useState(false)
   const [showMoreTypes, setShowMoreTypes] = useState(false)
   const [newAnswerInput, setNewAnswerInput] = useState("")
@@ -321,6 +322,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
           language: metadata.language,
           count: additionalCount,
           questionTypes: additionalTypes,
+          additionalContext: additionalContext,
         }),
       })
 
@@ -1258,6 +1260,24 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
 
               <p className="text-xs text-muted-foreground">{t("selectOneOrMore")}</p>
             </div>
+          </div>
+
+          {/* Additional context for generating more questions */}
+          <div className="space-y-2">
+            <label htmlFor="additional-context-more" className="text-sm font-medium">
+              {t("additionalContext")}
+            </label>
+            <Textarea
+              id="additional-context-more"
+              placeholder={t("additionalContextPlaceholder")}
+              value={additionalContext}
+              onChange={(e) => setAdditionalContext(e.target.value)}
+              className="min-h-[100px] resize-none"
+              maxLength={2000}
+            />
+            <p className="text-xs text-muted-foreground">
+              {additionalContext.length} / 2000 {t("charactersCount")}
+            </p>
           </div>
 
           <Button
