@@ -932,7 +932,7 @@ export default function LibraryPage() {
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="px-3 sm:px-6">
                         {/* Options */}
                         {displayQuestion.options && displayQuestion.options.length > 0 && (
                           <div className="space-y-2 mb-4">

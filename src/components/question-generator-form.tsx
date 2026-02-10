@@ -824,9 +824,10 @@ export function QuestionGeneratorForm() {
               {formData.context?.length || 0} / 2000 {t("charactersCount")}
             </p>
             {formData.uploadedContext && (
-              <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-900">
-                💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"
-              </p>
+              <p
+                className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-900"
+                dangerouslySetInnerHTML={{ __html: t("contextGuidanceTip") }}
+              />
             )}
           </div>
 

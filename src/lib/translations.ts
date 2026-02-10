@@ -65,6 +65,7 @@ export interface Translations {
   or: string
   fetchFromUrls: string
   addMoreUrls: string
+  contextGuidanceTip: string
 
   // Tagging Section
   tagsOrganization: string
@@ -239,6 +240,7 @@ export const translations: Record<Language, Translations> = {
     or: "eller",
     fetchFromUrls: "Hämta från webbadresser (valfritt)",
     addMoreUrls: "Lägg till fler URL:er",
+    contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
 
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
@@ -411,6 +413,7 @@ export const translations: Record<Language, Translations> = {
     or: "or",
     fetchFromUrls: "Fetch from URLs (Optional)",
     addMoreUrls: "Add More URLs",
+    contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",
