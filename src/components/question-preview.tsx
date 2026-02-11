@@ -515,7 +515,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     ) : (
                       <Badge
                         variant="outline"
-                        className="bg-purple-100 dark:bg-purple-950 cursor-pointer hover:bg-purple-200 dark:hover:bg-purple-900"
+                        className="bg-primary/10 dark:bg-primary/20 cursor-pointer hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => handlePointsEditClick(index)}
                       >
                         {question.points ?? getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
@@ -630,18 +630,18 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               {displayQuestion.type === "longtextV2" && displayQuestion.instructorStimulus && (
                 <>
                   <Separator />
-                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30">
-                    <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 dark:border-primary/30 dark:bg-primary/10">
+                    <div className="text-sm font-medium text-foreground mb-2">
                       Instructor Guidance
                     </div>
                     {isEditing ? (
                       <Textarea
                         value={editedQuestion?.instructorStimulus || ""}
                         onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, instructorStimulus: e.target.value } : null)}
-                        className="text-sm bg-white dark:bg-blue-950"
+                        className="text-sm bg-white dark:bg-card"
                       />
                     ) : (
-                      <p className="text-sm text-blue-800 dark:text-blue-200">
+                      <p className="text-sm text-foreground/80">
                         {question.instructorStimulus}
                       </p>
                     )}
@@ -817,7 +817,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                                 className="w-16 shrink-0"
                               />
                             ) : (
-                              <Badge variant="default" className="shrink-0 bg-blue-600">
+                              <Badge variant="default" className="shrink-0 bg-primary">
                                 {correctPosition !== undefined && correctPosition !== -1 ? correctPosition + 1 : "?"}
                               </Badge>
                             )}

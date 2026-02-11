@@ -20,7 +20,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
+    <header className="border-b border-border bg-white/50 backdrop-blur-sm dark:bg-black/50 sticky top-0 z-10">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div
           onClick={handleTitleClick}

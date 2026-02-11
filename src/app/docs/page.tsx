@@ -17,7 +17,7 @@ export default function DocsPage() {
   const isSv = language === "sv"
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary dark:from-background dark:to-background flex flex-col">
       <AppHeader />
 
       {/* Main Content */}

@@ -6,17 +6,17 @@ export function AppFooter() {
   const { t } = useTranslation()
 
   return (
-    <footer className="border-t border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 mt-auto">
+    <footer className="border-t border-border bg-white/50 backdrop-blur-sm dark:bg-black/50 mt-auto">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-base">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
             <p className="text-center sm:text-left text-foreground">
-              {t("footerDeveloper")} <span className="font-semibold text-blue-600 dark:text-blue-400">Parviz Mammadzada, MD, PhD</span>
+              {t("footerDeveloper")} <span className="font-semibold text-primary">Parviz Mammadzada, MD, PhD</span>
             </p>
             <span className="hidden sm:inline text-muted-foreground">•</span>
             <a
               href={`mailto:${t("footerEmail")}`}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium"
+              className="text-primary hover:text-primary/80 transition-colors font-medium"
             >
               {t("footerEmail")}
             </a>

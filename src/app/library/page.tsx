@@ -392,7 +392,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-background to-secondary dark:from-background dark:to-background flex flex-col">
       <AppHeader />
 
       <main className="container mx-auto max-w-6xl py-8 px-3 sm:px-4">
@@ -413,7 +413,7 @@ export default function LibraryPage() {
           <div className="space-y-6">
             {/* Page Title and Subtitle */}
             <div className="text-center space-y-2">
-              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-zinc-900 to-zinc-700 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent">
+              <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 {t("questionLibrary")}
               </h2>
               <p className="text-base text-muted-foreground max-w-2xl mx-auto">
@@ -768,7 +768,7 @@ export default function LibraryPage() {
                                 ) : (
                                   <Badge
                                     variant="outline"
-                                    className="cursor-pointer hover:opacity-80 bg-purple-100 dark:bg-purple-950"
+                                    className="cursor-pointer hover:opacity-80 bg-primary/10 dark:bg-primary/20"
                                     onClick={() => {
                                       setEditingPointsId(question._id)
                                       setPointsInput(String(question.score))
@@ -816,7 +816,7 @@ export default function LibraryPage() {
                                   question.tutorInitials && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-blue-100 dark:bg-blue-950 cursor-pointer hover:bg-blue-200 dark:hover:bg-blue-900"
+                                      className="bg-primary/10 dark:bg-primary/20 cursor-pointer hover:bg-primary/20 dark:hover:bg-primary/30"
                                       onClick={() => {
                                         setEditingInitialsId(question._id)
                                         setInitialsInput(question.tutorInitials || "")
@@ -929,18 +929,18 @@ export default function LibraryPage() {
 
                         {/* Instructor guidance */}
                         {displayQuestion.instructorStimulus && (
-                          <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/30 mb-4">
-                            <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-2">
+                          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 dark:border-primary/30 dark:bg-primary/10 mb-4">
+                            <div className="text-sm font-medium text-foreground mb-2">
                               Lärarhandledning
                             </div>
                             {isEditing ? (
                               <Textarea
                                 value={editState?.instructorStimulus || ""}
                                 onChange={(e) => setEditState(editState ? { ...editState, instructorStimulus: e.target.value } : null)}
-                                className="text-sm bg-white dark:bg-blue-950"
+                                className="text-sm bg-white dark:bg-card"
                               />
                             ) : (
-                              <p className="text-sm text-blue-800 dark:text-blue-200">
+                              <p className="text-sm text-foreground/80">
                                 {question.instructorStimulus}
                               </p>
                             )}
