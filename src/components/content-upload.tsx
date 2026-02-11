@@ -31,6 +31,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
   const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [videoFile, setVideoFile] = useState<File | null>(null)
 
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
 
@@ -220,6 +221,77 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     const newUrls = [...urlInputs]
     newUrls[index] = value
     setUrlInputs(newUrls)
+  }
+
+  const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setVideoFile(file)
+    }
+  }
+
+  const handleVideoFileSubmit = async () => {
+    if (!videoFile) return
+
+    setIsProcessing(true)
+
+    try {
+      // Step 1: Upload video to Convex storage
+      const uploadUrl = await generateUploadUrl()
+
+      const uploadResult = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": videoFile.type },
+        body: videoFile,
+      })
+
+      if (!uploadResult.ok) {
+        throw new Error("Failed to upload video file to storage")
+      }
+
+      const { storageId } = await uploadResult.json()
+
+      // Step 2: Extract transcript from uploaded video via Bunny.net
+      const response = await fetch("/api/extract-video-transcript", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storageId,
+          fileName: videoFile.name,
+          language: "sv"
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to extract transcript from video")
+      }
+
+      onContentExtracted(data.transcript, `Video: ${videoFile.name}`)
+
+      // Add to uploaded items list
+      setUploadedItems(prev => [
+        ...prev,
+        { id: storageId, name: videoFile.name, type: "file" },
+      ])
+
+      toast.success("Videotranskription klar!", {
+        description: `Extraherade ${data.characterCount} tecken från ${videoFile.name}`,
+      })
+
+      // Clear video file
+      setVideoFile(null)
+      const videoInput = document.getElementById("video-upload") as HTMLInputElement
+      if (videoInput) videoInput.value = ""
+    } catch (error) {
+      console.error("Video file transcript extraction failed:", error)
+      toast.error("Videobearbetning misslyckades", {
+        description: error instanceof Error ? error.message : "Kunde inte bearbeta videofilen.",
+      })
+    } finally {
+      setIsProcessing(false)
+    }
   }
 
   const handleYoutubeSubmit = async () => {
@@ -425,13 +497,35 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               <Label htmlFor="video-upload">
                 {t("uploadVideoFile")}
               </Label>
-              <Input
-                id="video-upload"
-                type="file"
-                accept="video/*"
-                disabled={isProcessing}
-                className="cursor-pointer"
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="video-upload"
+                  type="file"
+                  accept="video/*"
+                  onChange={handleVideoFileChange}
+                  disabled={isProcessing}
+                  className="cursor-pointer flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={handleVideoFileSubmit}
+                  disabled={isProcessing || !videoFile}
+                  size="default"
+                  className="whitespace-nowrap"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Bearbetar...
+                    </>
+                  ) : (
+                    <>
+                      <Video className="h-4 w-4 mr-2" />
+                      Bearbeta video
+                    </>
+                  )}
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground">
                 {t("videoSupportNote")}
               </p>
