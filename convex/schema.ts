@@ -62,4 +62,24 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user", ["userId"]),
+
+  transcriptionJobs: defineTable({
+    userId: v.string(), // Clerk user ID
+    videoUrl: v.string(), // Original video URL
+    videoGuid: v.string(), // Bunny.net video GUID
+    language: v.union(v.literal("sv"), v.literal("en")),
+    status: v.union(
+      v.literal("processing"), // Video is being transcribed
+      v.literal("completed"), // Transcript is ready
+      v.literal("failed") // Transcription failed
+    ),
+    transcript: v.optional(v.string()), // Plain text transcript (available when status = completed)
+    characterCount: v.optional(v.number()),
+    errorMessage: v.optional(v.string()), // Error details if failed
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_user", ["userId"])
+    .index("by_video_guid", ["videoGuid"])
+    .index("by_status", ["status"]),
 })

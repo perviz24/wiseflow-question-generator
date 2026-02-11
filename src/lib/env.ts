@@ -27,6 +27,7 @@ export const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY || ""
 export const BUNNY_STREAM_API_KEY = process.env.BUNNY_STREAM_API_KEY || ""
 export const BUNNY_ACCOUNT_API_KEY = process.env.BUNNY_ACCOUNT_API_KEY || ""
 export const BUNNY_VIDEO_LIBRARY_ID = process.env.BUNNY_VIDEO_LIBRARY_ID || ""
+export const BUNNY_WEBHOOK_SECRET = process.env.BUNNY_WEBHOOK_SECRET || ""
 
 // Optional: Convex HTTP Actions URL
 export const NEXT_PUBLIC_CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || ""

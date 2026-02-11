@@ -6,6 +6,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/extract-video-transcript',
+  '/api/bunny-webhook',
 ])
 
 export default clerkMiddleware(async (auth, req) => {

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { BUNNY_STREAM_API_KEY, BUNNY_ACCOUNT_API_KEY, BUNNY_VIDEO_LIBRARY_ID } from "@/lib/env"
+import { BUNNY_STREAM_API_KEY, BUNNY_ACCOUNT_API_KEY, BUNNY_VIDEO_LIBRARY_ID, NEXT_PUBLIC_CONVEX_URL } from "@/lib/env"
+import { ConvexHttpClient } from "convex/browser"
+import { api } from "@/convex/_generated/api"
 
 // Bunny.net API base URLs
 const BUNNY_CORE_API = "https://api.bunny.net"
@@ -63,11 +65,18 @@ function vttToPlainText(vtt: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { url, language } = await request.json()
+    const { url, language, userId } = await request.json()
 
     if (!url) {
       return NextResponse.json(
         { error: "Video URL is required" },
+        { status: 400 }
+      )
+    }
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User ID is required" },
         { status: 400 }
       )
     }
@@ -163,6 +172,15 @@ export async function POST(request: NextRequest) {
     const videoData = await createVideoResponse.json() as BunnyVideoModel
     const videoId = videoData.guid
 
+    // Step 2.5: Create Convex transcription job
+    const convex = new ConvexHttpClient(NEXT_PUBLIC_CONVEX_URL)
+    await convex.mutation(api.transcriptions.createTranscriptionJob, {
+      userId,
+      videoUrl: url,
+      videoGuid: videoId,
+      language: language === "sv" ? "sv" : "en",
+    })
+
     // Step 3: Fetch video from URL
     const fetchResponse = await fetch(
       `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/fetch`,
@@ -199,120 +217,37 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Step 4: Return immediately with job ID - webhook will update when ready
+    return NextResponse.json({
+      message: "Video transcription started",
+      videoGuid: videoId,
+      status: "processing",
+      note: "Transcription is processing. Check status using the videoGuid or wait for webhook notification."
+    })
+
+    // OLD CODE - Removed synchronous polling
     // Step 4: Wait for video to be processed and transcribed
-    let attempts = 0
-    const maxAttempts = 120 // 2 minutes max (video processing + transcription takes time)
-    let videoInfo: BunnyVideoModel | null = null
+    // let attempts = 0
+    // const maxAttempts = 120 // 2 minutes max (video processing + transcription takes time)
+    // let videoInfo: BunnyVideoModel | null = null
 
+    /* OLD SYNCHRONOUS CODE - Now handled by webhook
     while (attempts < maxAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 2 seconds
-
-      const statusResponse = await fetch(
-        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-        {
-          method: "GET",
-          headers: {
-            "AccessKey": BUNNY_STREAM_API_KEY,
-          },
-        }
-      )
-
-      if (statusResponse.ok) {
-        videoInfo = await statusResponse.json() as BunnyVideoModel
-
-        // Check if video is processed (status 4 = Finished) and has captions
-        if (videoInfo.status === 4 && videoInfo.captions && videoInfo.captions.length > 0) {
-          break
-        }
-
-        // Check for error status
-        if (videoInfo.status === 5) {
-          await fetch(
-            `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-            {
-              method: "DELETE",
-              headers: {
-                "AccessKey": BUNNY_STREAM_API_KEY,
-              },
-            }
-          ).catch(() => {})
-
-          return NextResponse.json(
-            { error: "Video processing failed. The video format might not be supported." },
-            { status: 400 }
-          )
-        }
-      }
-
-      attempts++
+      await new Promise(resolve => setTimeout(resolve, 2000))
+      const statusResponse = await fetch(...)
+      // ... rest of polling logic
     }
-
-    if (!videoInfo || !videoInfo.captions || videoInfo.captions.length === 0) {
-      // Clean up
-      await fetch(
-        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "AccessKey": BUNNY_STREAM_API_KEY,
-          },
-        }
-      ).catch(() => {})
-
-      return NextResponse.json(
-        { error: "Transcription timeout or no speech detected. The video might be too long or contain no audio." },
-        { status: 504 }
-      )
-    }
-
-    // Step 5: Download the caption file
+    if (!videoInfo || !videoInfo.captions || videoInfo.captions.length === 0) { ... }
     const targetLanguage = language === "sv" ? "sv" : "en"
     const caption = videoInfo.captions.find(c => c.srclang === targetLanguage) || videoInfo.captions[0]
-
     const captionUrl = `https://${systemHostname.Value}/${videoId}/captions/${caption.srclang}.vtt`
-
     const captionResponse = await fetch(captionUrl)
-    if (!captionResponse.ok) {
-      console.error("Failed to fetch caption file:", await captionResponse.text())
-
-      // Clean up
-      await fetch(
-        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "AccessKey": BUNNY_STREAM_API_KEY,
-          },
-        }
-      ).catch(() => {})
-
-      return NextResponse.json(
-        { error: "Failed to download transcript file" },
-        { status: 500 }
-      )
-    }
-
+    if (!captionResponse.ok) { ... }
     const vttContent = await captionResponse.text()
     const plainTextTranscript = vttToPlainText(vttContent)
-
-    // Step 6: Clean up - delete video from Bunny Stream to save storage
-    await fetch(
-      `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "AccessKey": BUNNY_STREAM_API_KEY,
-        },
-      }
-    ).catch(err => console.error("Failed to delete video from Bunny:", err))
-
-    return NextResponse.json({
-      transcript: plainTextTranscript,
-      characterCount: plainTextTranscript.length,
-      url: url,
-      videoId,
-      language: caption.srclang,
-    })
+    await fetch(...DELETE video...)
+    return NextResponse.json({ transcript, characterCount, url, videoId, language })
+    END OLD CODE */
   } catch (error: unknown) {
     console.error("Error extracting video transcript:", error)
 
