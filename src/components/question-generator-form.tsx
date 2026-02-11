@@ -311,7 +311,7 @@ export function QuestionGeneratorForm() {
         downloadWiseflowJSON(generatedQuestions, exportMetadata)
       }
 
-      const formatLabel = formData.exportFormat === "legacy" ? "Legacy" : formData.exportFormat === "utgaende" ? "Utgående" : "QTI 2.1"
+      const formatLabel = formData.exportFormat === "legacy" ? "New Wiseflow JSON" : formData.exportFormat === "utgaende" ? "Legacy JSON" : "QTI 2.1"
       toast.success(t("exportSuccessful"), {
         description: t("exportSuccessfulDesc", { format: formatLabel }),
       })

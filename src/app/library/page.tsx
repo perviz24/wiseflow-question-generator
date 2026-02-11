@@ -448,7 +448,7 @@ export default function LibraryPage() {
                         ) : (
                           <Download className="mr-2 h-4 w-4" />
                         )}
-                        Legacy JSON
+                        New Wiseflow JSON
                       </Button>
                       <Button
                         onClick={() => exportSelected("utg")}
@@ -457,7 +457,7 @@ export default function LibraryPage() {
                         size="sm"
                       >
                         <Download className="mr-2 h-4 w-4" />
-                        Utgående JSON
+                        Legacy JSON
                       </Button>
                       <Button
                         onClick={() => exportSelected("qti21")}

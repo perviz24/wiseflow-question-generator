@@ -377,8 +377,8 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
           ...metadata,
           exportFormat
         })
-        const formatName = exportFormat === "legacy" ? "Legacy" : "Utgående"
-        toast.success(`Wiseflow JSON (${formatName}) exported!`, {
+        const formatName = exportFormat === "legacy" ? "New Wiseflow JSON" : "Legacy JSON"
+        toast.success(`${formatName} exported!`, {
           description: "Questions exported in Wiseflow innehållsbank format."
         })
       }
@@ -440,10 +440,10 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleExport("wiseflow-legacy")}>
-                    Wiseflow JSON (Legacy)
+                    New Wiseflow JSON
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("wiseflow-utgaende")}>
-                    Wiseflow JSON (Utgående)
+                    Legacy JSON
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("qti21")}>
                     QTI 2.1 (ZIP)
