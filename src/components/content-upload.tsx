@@ -347,6 +347,20 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     }
   }
 
+  // Check if a URL is a YouTube URL
+  const isYouTubeUrl = (url: string): boolean => {
+    try {
+      const parsed = new URL(url)
+      return (
+        parsed.hostname.includes("youtube.com") ||
+        parsed.hostname.includes("youtu.be") ||
+        parsed.hostname.includes("youtube-nocookie.com")
+      )
+    } catch {
+      return false
+    }
+  }
+
   const handleVideoUrlSubmit = async () => {
     const url = youtubeUrl.trim()
     if (!url) return
@@ -364,34 +378,62 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     setIsProcessing(true)
 
     try {
-      // All video URLs (YouTube + non-YouTube) → AssemblyAI
-      setTranscriptionProgress("Skickar till transkribering...")
+      if (isYouTubeUrl(url)) {
+        // YouTube URLs → use youtube-transcript package (AssemblyAI can't fetch YouTube pages)
+        setTranscriptionProgress("Hämtar YouTube-transkription...")
 
-      const response = await fetch("/api/extract-video-transcript", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, language: "sv" }),
-      })
+        const response = await fetch("/api/extract-youtube-transcript", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, language: "sv" }),
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to submit video for transcription")
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to extract YouTube transcript")
+        }
+
+        onContentExtracted(data.transcript, `Video: ${url}`)
+
+        setUploadedItems(prev => [
+          ...prev,
+          { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
+        ])
+
+        toast.success("YouTube-transkription klar!", {
+          description: `Extraherade ${data.characterCount} tecken`,
+        })
+      } else {
+        // Non-YouTube video URLs → AssemblyAI (can fetch direct audio/video URLs)
+        setTranscriptionProgress("Skickar till transkribering...")
+
+        const response = await fetch("/api/extract-video-transcript", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, language: "sv" }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to submit video for transcription")
+        }
+
+        // Poll for completion
+        const result = await pollTranscription(data.transcriptId)
+
+        onContentExtracted(result.transcript, `Video: ${url}`)
+
+        setUploadedItems(prev => [
+          ...prev,
+          { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
+        ])
+
+        toast.success("Videotranskription klar!", {
+          description: `Extraherade ${result.characterCount} tecken`,
+        })
       }
-
-      // Poll for completion
-      const result = await pollTranscription(data.transcriptId)
-
-      onContentExtracted(result.transcript, `Video: ${url}`)
-
-      setUploadedItems(prev => [
-        ...prev,
-        { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
-      ])
-
-      toast.success("Videotranskription klar!", {
-        description: `Extraherade ${result.characterCount} tecken`,
-      })
 
       setYoutubeUrl("")
     } catch (error) {
