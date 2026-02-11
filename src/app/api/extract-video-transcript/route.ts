@@ -26,8 +26,11 @@ export async function POST(request: NextRequest) {
     const client = new AssemblyAI({ apiKey: assemblyKey })
 
     // Submit to AssemblyAI (non-blocking — returns immediately with transcript ID)
+    // speech_models is required by the API — use universal-2 for 99-language support (incl. Swedish)
+    // universal-3-pro only supports 6 languages so we fall back to universal-2
     const transcript = await client.transcripts.submit({
       audio: url,
+      speech_models: ["universal-2"],
       language_code: language === "sv" ? "sv" : "en",
     })
 
