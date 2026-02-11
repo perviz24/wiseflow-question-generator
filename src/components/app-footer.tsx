@@ -7,21 +7,21 @@ export function AppFooter() {
 
   return (
     <footer className="border-t border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 mt-auto">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4">
-            <p className="text-center sm:text-left">
-              {t("footerDeveloper")} <span className="font-medium">Parviz Mammadzada, MD, PhD</span>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-base">
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <p className="text-center sm:text-left text-foreground">
+              {t("footerDeveloper")} <span className="font-semibold text-blue-600 dark:text-blue-400">Parviz Mammadzada, MD, PhD</span>
             </p>
-            <span className="hidden sm:inline">•</span>
+            <span className="hidden sm:inline text-muted-foreground">•</span>
             <a
               href={`mailto:${t("footerEmail")}`}
-              className="hover:text-foreground transition-colors"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors font-medium"
             >
               {t("footerEmail")}
             </a>
           </div>
-          <p className="text-center">
+          <p className="text-center text-muted-foreground text-sm">
             {t("footerBeta")}
           </p>
         </div>
