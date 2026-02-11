@@ -14,6 +14,7 @@ export interface Translations {
   questionLibrary: string
   selectAll: string
   documentation: string
+  cancel: string
 
   // Home Page
   welcomeTitle: string
@@ -185,6 +186,23 @@ export interface Translations {
   footerDeveloper: string
   footerEmail: string
   footerBeta: string
+
+  // Feedback
+  feedbackTitle: string
+  feedbackDescription: string
+  feedbackType: string
+  feedbackTypeBug: string
+  feedbackTypeImprovement: string
+  feedbackTypeOther: string
+  feedbackMessage: string
+  feedbackMessagePlaceholder: string
+  feedbackEmail: string
+  feedbackEmailPlaceholder: string
+  feedbackSubmit: string
+  feedbackSuccess: string
+  feedbackSuccessDesc: string
+  feedbackError: string
+  feedbackErrorDesc: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -200,6 +218,7 @@ export const translations: Record<Language, Translations> = {
     questionLibrary: "Frågebibliotek",
     selectAll: "Markera alla",
     documentation: "Dokumentation",
+    cancel: "Avbryt",
 
     // Home Page
     welcomeTitle: "Välkommen till TentaGen",
@@ -371,6 +390,23 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Utvecklad av",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta-version - Funktioner under utveckling",
+
+    // Feedback
+    feedbackTitle: "Skicka feedback",
+    feedbackDescription: "Hjälp oss förbättra TentaGen genom att rapportera buggar, föreslå funktioner eller dela dina tankar.",
+    feedbackType: "Typ av feedback",
+    feedbackTypeBug: "🐛 Buggrapport",
+    feedbackTypeImprovement: "💡 Förbättringsförslag",
+    feedbackTypeOther: "💬 Övrigt",
+    feedbackMessage: "Ditt meddelande",
+    feedbackMessagePlaceholder: "Beskriv din feedback...",
+    feedbackEmail: "Din e-post (valfritt)",
+    feedbackEmailPlaceholder: "om du vill bli kontaktad",
+    feedbackSubmit: "Skicka feedback",
+    feedbackSuccess: "Feedback skickad!",
+    feedbackSuccessDesc: "Tack för din feedback. Vi uppskattar ditt bidrag.",
+    feedbackError: "Misslyckades att skicka",
+    feedbackErrorDesc: "Kunde inte skicka feedback. Försök igen.",
   },
   en: {
     // Header & Navigation
@@ -384,6 +420,7 @@ export const translations: Record<Language, Translations> = {
     questionLibrary: "Question Library",
     selectAll: "Select All",
     documentation: "Documentation",
+    cancel: "Cancel",
 
     // Home Page
     welcomeTitle: "Welcome to TentaGen",
@@ -555,6 +592,23 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Developed by",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta version - Features under development",
+
+    // Feedback
+    feedbackTitle: "Send feedback",
+    feedbackDescription: "Help us improve TentaGen by reporting bugs, suggesting features, or sharing your thoughts.",
+    feedbackType: "Feedback type",
+    feedbackTypeBug: "🐛 Bug report",
+    feedbackTypeImprovement: "💡 Improvement suggestion",
+    feedbackTypeOther: "💬 Other",
+    feedbackMessage: "Your message",
+    feedbackMessagePlaceholder: "Describe your feedback...",
+    feedbackEmail: "Your email (optional)",
+    feedbackEmailPlaceholder: "if you want to be contacted",
+    feedbackSubmit: "Send feedback",
+    feedbackSuccess: "Feedback sent!",
+    feedbackSuccessDesc: "Thank you for your feedback. We appreciate your input.",
+    feedbackError: "Failed to send",
+    feedbackErrorDesc: "Could not send feedback. Please try again.",
   },
 }
 

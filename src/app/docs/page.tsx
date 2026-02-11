@@ -3,6 +3,7 @@
 import { useTranslation } from "@/lib/language-context"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
+import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
 import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -681,6 +682,7 @@ export default function DocsPage() {
         </div>
       </main>
       <AppFooter />
+      <FeedbackButton />
     </div>
   )
 }

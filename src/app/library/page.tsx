@@ -15,6 +15,7 @@ import { useTranslation } from "@/lib/language-context"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
+import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
 import { toast } from "sonner"
 import { Id } from "../../../convex/_generated/dataModel"
@@ -972,6 +973,7 @@ export default function LibraryPage() {
         </SignedIn>
       </main>
       <AppFooter />
+      <FeedbackButton />
     </div>
   )
 }

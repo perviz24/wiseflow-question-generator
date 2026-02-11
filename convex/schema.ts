@@ -82,4 +82,19 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_video_guid", ["videoGuid"])
     .index("by_status", ["status"]),
+
+  feedback: defineTable({
+    userId: v.string(), // Clerk user ID
+    type: v.union(
+      v.literal("bug"), // Bug report
+      v.literal("improvement"), // Feature request/improvement
+      v.literal("other") // General feedback
+    ),
+    message: v.string(), // Feedback message
+    userEmail: v.optional(v.string()), // Optional email for follow-up
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_type", ["type"])
+    .index("by_created_at", ["createdAt"]),
 })

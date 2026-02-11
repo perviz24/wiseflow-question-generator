@@ -3,6 +3,7 @@
 import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
+import { FeedbackButton } from "@/components/feedback-button"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import { Sparkles, BookOpen } from "lucide-react"
@@ -114,6 +115,7 @@ export default function Home() {
         </SignedOut>
       </main>
       <AppFooter />
+      <FeedbackButton />
     </div>
   )
 }
