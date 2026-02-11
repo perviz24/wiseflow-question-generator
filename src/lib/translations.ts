@@ -180,6 +180,11 @@ export interface Translations {
 
   // Library Page
   librarySubtitle: string
+
+  // Footer
+  footerDeveloper: string
+  footerEmail: string
+  footerBeta: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -361,6 +366,11 @@ export const translations: Record<Language, Translations> = {
 
     // Library Page
     librarySubtitle: "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i Wiseflow eller andra LMS-plattformar.",
+
+    // Footer
+    footerDeveloper: "Utvecklad av",
+    footerEmail: "parviz.mammadzada@oru.se",
+    footerBeta: "Beta-version - Funktioner under utveckling",
   },
   en: {
     // Header & Navigation
@@ -540,6 +550,11 @@ export const translations: Record<Language, Translations> = {
 
     // Library Page
     librarySubtitle: "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in Wiseflow or other LMS platforms.",
+
+    // Footer
+    footerDeveloper: "Developed by",
+    footerEmail: "parviz.mammadzada@oru.se",
+    footerBeta: "Beta version - Features under development",
   },
 }
 

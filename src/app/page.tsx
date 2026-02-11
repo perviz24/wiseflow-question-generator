@@ -2,6 +2,7 @@
 
 import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { AppHeader } from "@/components/app-header"
+import { AppFooter } from "@/components/app-footer"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import { Sparkles, BookOpen } from "lucide-react"
@@ -12,7 +13,7 @@ export default function Home() {
   const { t } = useTranslation()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black flex flex-col">
       <AppHeader />
 
       {/* Main Content */}
@@ -112,6 +113,7 @@ export default function Home() {
           </div>
         </SignedOut>
       </main>
+      <AppFooter />
     </div>
   )
 }

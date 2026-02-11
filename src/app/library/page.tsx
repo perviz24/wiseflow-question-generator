@@ -14,6 +14,7 @@ import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, CheckCircl
 import { useTranslation } from "@/lib/language-context"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import { AppHeader } from "@/components/app-header"
+import { AppFooter } from "@/components/app-footer"
 import Link from "next/link"
 import { toast } from "sonner"
 import { Id } from "../../../convex/_generated/dataModel"
@@ -390,7 +391,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black flex flex-col">
       <AppHeader />
 
       <main className="container mx-auto max-w-6xl py-8 px-3 sm:px-4">
@@ -970,6 +971,7 @@ export default function LibraryPage() {
           </div>
         </SignedIn>
       </main>
+      <AppFooter />
     </div>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/lib/language-context"
 import { AppHeader } from "@/components/app-header"
+import { AppFooter } from "@/components/app-footer"
 import Link from "next/link"
 import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -15,7 +16,7 @@ export default function DocsPage() {
   const isSv = language === "sv"
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-zinc-100 dark:from-zinc-950 dark:to-black flex flex-col">
       <AppHeader />
 
       {/* Main Content */}
@@ -679,6 +680,7 @@ export default function DocsPage() {
           </div>
         </div>
       </main>
+      <AppFooter />
     </div>
   )
 }
