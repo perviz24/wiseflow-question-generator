@@ -21,8 +21,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { Settings, Loader2 } from "lucide-react"
+import { Settings, Loader2, User, Languages, Save } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
 
 export function SettingsSheet() {
@@ -84,28 +85,35 @@ export function SettingsSheet() {
           <span className="sr-only">{t("settings")}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent>
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-3">
-            <Settings className="h-6 w-6 text-primary" />
+      <SheetContent className="sm:max-w-md">
+        <SheetHeader className="pb-2">
+          <SheetTitle className="flex items-center gap-3 text-xl">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Settings className="h-5 w-5 text-primary" />
+            </div>
             {t("profileSettings")}
           </SheetTitle>
-          <SheetDescription>
+          <SheetDescription className="text-sm">
             {t("profileSettingsDescription")}
           </SheetDescription>
         </SheetHeader>
+
+        <Separator className="my-4" />
 
         {profile === undefined ? (
           <div className="flex h-64 items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <form onSubmit={handleSave} className="space-y-6 mt-6">
-            {/* Tutor Initials */}
-            <div className="space-y-2">
-              <Label htmlFor="tutorInitials">
-                {t("tutorInitials")} *
-              </Label>
+          <form onSubmit={handleSave} className="space-y-6">
+            {/* Tutor Initials Section */}
+            <div className="rounded-lg border bg-card p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <Label htmlFor="tutorInitials" className="text-sm font-semibold">
+                  {t("tutorInitials")} *
+                </Label>
+              </div>
               <Input
                 id="tutorInitials"
                 placeholder={t("tutorInitialsPlaceholder")}
@@ -114,28 +122,34 @@ export function SettingsSheet() {
                 maxLength={20}
                 autoComplete="off"
                 required
+                className="h-11 text-base"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {t("tutorInitialsHelp")}
               </p>
             </div>
 
-            {/* UI Language */}
-            <div className="space-y-2">
-              <Label htmlFor="uiLanguage">{t("uiLanguage")}</Label>
+            {/* UI Language Section */}
+            <div className="rounded-lg border bg-card p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Languages className="h-4 w-4 text-muted-foreground" />
+                <Label htmlFor="uiLanguage" className="text-sm font-semibold">
+                  {t("uiLanguage")}
+                </Label>
+              </div>
               <Select
                 value={uiLanguage}
                 onValueChange={(value: "sv" | "en") => setUiLanguage(value)}
               >
-                <SelectTrigger id="uiLanguage">
+                <SelectTrigger id="uiLanguage" className="h-11 text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sv">{t("swedish")}</SelectItem>
-                  <SelectItem value="en">{t("english")}</SelectItem>
+                  <SelectItem value="sv" className="py-3">{t("swedish")}</SelectItem>
+                  <SelectItem value="en" className="py-3">{t("english")}</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {t("uiLanguageHelp")}
               </p>
             </div>
@@ -143,16 +157,20 @@ export function SettingsSheet() {
             {/* Save Button */}
             <Button
               type="submit"
-              className="w-full"
+              size="lg"
+              className="w-full h-12 text-base font-medium"
               disabled={isSaving || !tutorInitials.trim()}
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   {t("saving")}
                 </>
               ) : (
-                <>{t("saveSettings")}</>
+                <>
+                  <Save className="mr-2 h-5 w-5" />
+                  {t("saveSettings")}
+                </>
               )}
             </Button>
           </form>
