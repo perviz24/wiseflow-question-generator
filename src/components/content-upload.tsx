@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { FileText, Loader2, X, Link2, Plus, Video } from "lucide-react"
+import { FileText, Loader2, X, Link2, Plus, Video, Upload, Globe } from "lucide-react"
 import { toast } from "sonner"
 import { useConvex, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
@@ -451,11 +451,14 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     <Card className="border-dashed">
       <CardContent className="pt-6">
         <div className="space-y-4">
-          {/* File Upload */}
-          <div className="space-y-2">
-            <Label htmlFor="file-upload">
-              {t("uploadDocument")}
-            </Label>
+          {/* File Upload Section */}
+          <div className="space-y-3 rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
+            <div className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-blue-500" />
+              <Label className="text-base font-semibold">
+                {t("uploadDocument")}
+              </Label>
+            </div>
             <Input
               id="file-upload"
               type="file"
@@ -465,7 +468,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               multiple
               className="cursor-pointer"
             />
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {t("uploadDocumentHelp")}
             </p>
           </div>
@@ -514,9 +517,14 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </div>
           </div>
 
-          {/* URL Inputs */}
-          <div className="space-y-3">
-            <Label>{t("fetchFromUrls")}</Label>
+          {/* URL Inputs Section */}
+          <div className="space-y-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+            <div className="flex items-center gap-2">
+              <Globe className="h-5 w-5 text-emerald-500" />
+              <Label className="text-base font-semibold">
+                {t("fetchFromUrls")}
+              </Label>
+            </div>
             {urlInputs.map((url, index) => (
               <div key={index} className="flex gap-2">
                 <Input
@@ -568,7 +576,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               <Plus className="h-4 w-4 mr-2" />
               {t("addMoreUrls")}
             </Button>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Ange webbadresser för att extrahera innehåll från webbsidor
             </p>
           </div>
