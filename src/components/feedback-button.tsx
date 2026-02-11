@@ -14,10 +14,11 @@ export function FeedbackButton() {
       <Button
         onClick={() => setOpen(true)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50"
+        className="fixed bottom-6 right-6 rounded-full shadow-lg hover:shadow-xl transition-shadow z-50 bg-blue-600 hover:bg-blue-700 text-white gap-2 px-6"
         aria-label="Send feedback"
       >
-        <MessageCircle className="h-6 w-6" />
+        <MessageCircle className="h-5 w-5" />
+        <span className="font-medium">Skicka feedback</span>
       </Button>
       <FeedbackModal open={open} onOpenChange={setOpen} />
     </SignedIn>
