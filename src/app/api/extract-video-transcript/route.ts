@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 import { AssemblyAI } from "assemblyai"
-import { ConvexHttpClient } from "convex/browser"
-import { api } from "@convex/_generated/api"
-import { Id } from "@convex/_generated/dataModel"
 
 // Submit a video/audio for transcription via AssemblyAI
 // Returns a transcriptId that the client polls via /api/check-transcription
 export async function POST(request: NextRequest) {
   try {
-    const { storageId, url, language } = await request.json()
+    const { url, language } = await request.json()
 
-    if (!storageId && !url) {
+    if (!url) {
       return NextResponse.json(
-        { error: "Either storageId or url is required" },
+        { error: "Audio/video URL is required" },
         { status: 400 }
       )
     }
@@ -28,40 +25,9 @@ export async function POST(request: NextRequest) {
 
     const client = new AssemblyAI({ apiKey: assemblyKey })
 
-    // Determine the audio URL to send to AssemblyAI
-    let audioUrl: string
-
-    if (storageId) {
-      // File uploaded to Convex storage — get the public URL
-      const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
-      if (!convexUrl) {
-        return NextResponse.json(
-          { error: "Convex URL not configured" },
-          { status: 500 }
-        )
-      }
-
-      const convex = new ConvexHttpClient(convexUrl)
-      const fileUrl = await convex.query(api.fileStorage.getFileUrl, {
-        storageId: storageId as Id<"_storage">,
-      })
-
-      if (!fileUrl) {
-        return NextResponse.json(
-          { error: "Could not get file URL from storage" },
-          { status: 400 }
-        )
-      }
-
-      audioUrl = fileUrl
-    } else {
-      // Direct video URL provided
-      audioUrl = url
-    }
-
     // Submit to AssemblyAI (non-blocking — returns immediately with transcript ID)
     const transcript = await client.transcripts.submit({
-      audio: audioUrl,
+      audio: url,
       language_code: language === "sv" ? "sv" : "en",
     })
 
@@ -82,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: "Failed to submit video for transcription" },
+      { error: `Transcription failed: ${errorMessage}` },
       { status: 500 }
     )
   }

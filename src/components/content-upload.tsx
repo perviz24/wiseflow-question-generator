@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { FileText, Loader2, X, Link2, Plus, Video } from "lucide-react"
 import { toast } from "sonner"
-import { useMutation } from "convex/react"
+import { useConvex, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { useTranslation } from "@/lib/language-context"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
@@ -32,6 +32,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [videoFile, setVideoFile] = useState<File | null>(null)
 
+  const convex = useConvex()
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
   const [transcriptionProgress, setTranscriptionProgress] = useState("")
 
@@ -288,12 +289,21 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
       const { storageId } = await uploadResult.json()
 
-      // Step 2: Submit to AssemblyAI for transcription
+      // Step 2: Get the public URL for the uploaded file
+      const fileUrl = await convex.query(api.fileStorage.getFileUrl, {
+        storageId,
+      })
+
+      if (!fileUrl) {
+        throw new Error("Could not get file URL from storage")
+      }
+
+      // Step 3: Submit URL to AssemblyAI for transcription
       setTranscriptionProgress("Skickar till transkribering...")
       const response = await fetch("/api/extract-video-transcript", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ storageId, language: "sv" }),
+        body: JSON.stringify({ url: fileUrl, language: "sv" }),
       })
 
       const data = await response.json()
@@ -302,7 +312,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         throw new Error(data.error || "Failed to submit video for transcription")
       }
 
-      // Step 3: Poll for completion
+      // Step 4: Poll for completion
       const result = await pollTranscription(data.transcriptId)
 
       onContentExtracted(result.transcript, `Video: ${videoFile.name}`)
