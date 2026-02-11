@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { BUNNY_API_KEY, BUNNY_VIDEO_LIBRARY_ID } from "@/lib/env"
+import { BUNNY_STREAM_API_KEY, BUNNY_ACCOUNT_API_KEY, BUNNY_VIDEO_LIBRARY_ID } from "@/lib/env"
 
 // Bunny.net API base URLs
 const BUNNY_CORE_API = "https://api.bunny.net"
@@ -73,19 +73,19 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if Bunny.net credentials are configured
-    if (!BUNNY_API_KEY || !BUNNY_VIDEO_LIBRARY_ID) {
+    if (!BUNNY_STREAM_API_KEY || !BUNNY_ACCOUNT_API_KEY || !BUNNY_VIDEO_LIBRARY_ID) {
       return NextResponse.json(
-        { error: "Bunny.net credentials not configured. Please set BUNNY_API_KEY and BUNNY_VIDEO_LIBRARY_ID environment variables." },
+        { error: "Bunny.net credentials not configured. Please set BUNNY_STREAM_API_KEY, BUNNY_ACCOUNT_API_KEY and BUNNY_VIDEO_LIBRARY_ID environment variables." },
         { status: 500 }
       )
     }
 
-    // Step 1: Get Video Library details
+    // Step 1: Get Video Library details (uses Account API Key)
     const libraryResponse = await fetch(
       `${BUNNY_CORE_API}/videolibrary/${BUNNY_VIDEO_LIBRARY_ID}`,
       {
         headers: {
-          "AccessKey": BUNNY_API_KEY,
+          "AccessKey": BUNNY_ACCOUNT_API_KEY,
         },
       }
     )
@@ -107,12 +107,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1b: Get Pull Zone to find CDN hostname
+    // Step 1b: Get Pull Zone to find CDN hostname (uses Account API Key)
     const pullZoneResponse = await fetch(
       `${BUNNY_CORE_API}/pullzone/${library.PullZoneId}`,
       {
         headers: {
-          "AccessKey": BUNNY_API_KEY,
+          "AccessKey": BUNNY_ACCOUNT_API_KEY,
         },
       }
     )
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
       {
         method: "POST",
         headers: {
-          "AccessKey": BUNNY_API_KEY,
+          "AccessKey": BUNNY_STREAM_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
       {
         method: "POST",
         headers: {
-          "AccessKey": BUNNY_API_KEY,
+          "AccessKey": BUNNY_STREAM_API_KEY,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
         {
           method: "DELETE",
           headers: {
-            "AccessKey": BUNNY_API_KEY,
+            "AccessKey": BUNNY_STREAM_API_KEY,
           },
         }
       ).catch(() => {})
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
         {
           method: "GET",
           headers: {
-            "AccessKey": BUNNY_API_KEY,
+            "AccessKey": BUNNY_STREAM_API_KEY,
           },
         }
       )
@@ -232,7 +232,7 @@ export async function POST(request: NextRequest) {
             {
               method: "DELETE",
               headers: {
-                "AccessKey": BUNNY_API_KEY,
+                "AccessKey": BUNNY_STREAM_API_KEY,
               },
             }
           ).catch(() => {})
@@ -254,7 +254,7 @@ export async function POST(request: NextRequest) {
         {
           method: "DELETE",
           headers: {
-            "AccessKey": BUNNY_API_KEY,
+            "AccessKey": BUNNY_STREAM_API_KEY,
           },
         }
       ).catch(() => {})
@@ -281,7 +281,7 @@ export async function POST(request: NextRequest) {
         {
           method: "DELETE",
           headers: {
-            "AccessKey": BUNNY_API_KEY,
+            "AccessKey": BUNNY_STREAM_API_KEY,
           },
         }
       ).catch(() => {})
@@ -301,7 +301,7 @@ export async function POST(request: NextRequest) {
       {
         method: "DELETE",
         headers: {
-          "AccessKey": BUNNY_API_KEY,
+          "AccessKey": BUNNY_STREAM_API_KEY,
         },
       }
     ).catch(err => console.error("Failed to delete video from Bunny:", err))

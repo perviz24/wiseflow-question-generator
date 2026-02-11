@@ -24,7 +24,8 @@ export const ANTHROPIC_API_KEY = getEnvVar("ANTHROPIC_API_KEY")
 export const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY || ""
 
 // Bunny.net (optional - for video transcription)
-export const BUNNY_API_KEY = process.env.BUNNY_API_KEY || ""
+export const BUNNY_STREAM_API_KEY = process.env.BUNNY_STREAM_API_KEY || ""
+export const BUNNY_ACCOUNT_API_KEY = process.env.BUNNY_ACCOUNT_API_KEY || ""
 export const BUNNY_VIDEO_LIBRARY_ID = process.env.BUNNY_VIDEO_LIBRARY_ID || ""
 
 // Optional: Convex HTTP Actions URL
