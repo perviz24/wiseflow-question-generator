@@ -8,8 +8,16 @@ const BUNNY_STREAM_API = "https://video.bunnycdn.com"
 interface BunnyVideoLibrary {
   Id: number
   Name: string
-  PullZoneUrl: string
+  PullZoneId: number
   EnableTranscribing: boolean
+}
+
+interface BunnyPullZone {
+  Id: number
+  Hostnames: Array<{
+    Value: string
+    IsSystemHostname: boolean
+  }>
 }
 
 interface CaptionModel {
@@ -72,7 +80,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1: Get Video Library details to find pull zone URL
+    // Step 1: Get Video Library details
     const libraryResponse = await fetch(
       `${BUNNY_CORE_API}/videolibrary/${BUNNY_VIDEO_LIBRARY_ID}`,
       {
@@ -95,6 +103,35 @@ export async function POST(request: NextRequest) {
     if (!library.EnableTranscribing) {
       return NextResponse.json(
         { error: "Transcription is not enabled for this video library. Please enable it in Bunny.net dashboard." },
+        { status: 500 }
+      )
+    }
+
+    // Step 1b: Get Pull Zone to find CDN hostname
+    const pullZoneResponse = await fetch(
+      `${BUNNY_CORE_API}/pullzone/${library.PullZoneId}`,
+      {
+        headers: {
+          "AccessKey": BUNNY_API_KEY,
+        },
+      }
+    )
+
+    if (!pullZoneResponse.ok) {
+      console.error("Failed to fetch pull zone:", await pullZoneResponse.text())
+      return NextResponse.json(
+        { error: "Failed to access Bunny.net pull zone" },
+        { status: 500 }
+      )
+    }
+
+    const pullZone = await pullZoneResponse.json() as BunnyPullZone
+
+    // Find the system hostname (CDN domain like xxx.b-cdn.net)
+    const systemHostname = pullZone.Hostnames.find(h => h.IsSystemHostname)
+    if (!systemHostname) {
+      return NextResponse.json(
+        { error: "No CDN hostname found for this video library" },
         { status: 500 }
       )
     }
@@ -232,7 +269,7 @@ export async function POST(request: NextRequest) {
     const targetLanguage = language === "sv" ? "sv" : "en"
     const caption = videoInfo.captions.find(c => c.srclang === targetLanguage) || videoInfo.captions[0]
 
-    const captionUrl = `https://${library.PullZoneUrl}.b-cdn.net/${videoId}/captions/${caption.srclang}.vtt`
+    const captionUrl = `https://${systemHostname.Value}/${videoId}/captions/${caption.srclang}.vtt`
 
     const captionResponse = await fetch(captionUrl)
     if (!captionResponse.ok) {
