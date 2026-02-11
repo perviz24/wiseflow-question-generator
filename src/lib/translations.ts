@@ -251,8 +251,8 @@ export const translations: Record<Language, Translations> = {
     videoSectionTitle: "Skapa frågor från en videoföreläsning",
     uploadVideoFile: "Ladda upp videofil",
     videoUrlLabel: "eller klistra in video-URL",
-    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
-    videoSupportNote: "Just nu stödjer funktionen endast YouTube-videor. Du kan ladda upp dina videor till YouTube som privata eller icke-listade och använda dem här. Stöd för direktuppladdning av videofiler kommer snart.",
+    videoUrlPlaceholder: "https://exempel.se/video-länk",
+    videoSupportNote: "⏱️ Transkriberingen tar cirka 3-5 minuter för en 30 minuters video. Funktionen är under utveckling för att göra den ännu snabbare.",
 
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
@@ -430,8 +430,8 @@ export const translations: Record<Language, Translations> = {
     videoSectionTitle: "Create questions from a video lecture",
     uploadVideoFile: "Upload video file",
     videoUrlLabel: "or paste video URL",
-    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
-    videoSupportNote: "Currently only YouTube videos are supported. You can upload your videos to YouTube as private or unlisted and use them here. Support for direct video file uploads coming soon.",
+    videoUrlPlaceholder: "https://example.com/video-link",
+    videoSupportNote: "⏱️ Transcription takes approximately 3-5 minutes for a 30-minute video. This feature is under improvement to make it even faster.",
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",

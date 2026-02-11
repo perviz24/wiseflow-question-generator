@@ -226,11 +226,12 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     const url = youtubeUrl.trim()
     if (!url) return
 
-    // Validate YouTube URL
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+/
-    if (!youtubeRegex.test(url)) {
-      toast.error("Ogiltig YouTube URL", {
-        description: "Ange en giltig YouTube-video URL.",
+    // Basic URL validation
+    try {
+      new URL(url)
+    } catch {
+      toast.error("Ogiltig video-URL", {
+        description: "Ange en giltig video-URL.",
       })
       return
     }
@@ -250,7 +251,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         throw new Error(data.error || "Failed to extract transcript")
       }
 
-      onContentExtracted(data.transcript, `YouTube Video: ${url}`)
+      onContentExtracted(data.transcript, `Video: ${url}`)
 
       // Add to uploaded items list
       setUploadedItems(prev => [
@@ -259,15 +260,15 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
       ])
 
       toast.success("Transkription extraherad!", {
-        description: `Extraherade ${data.characterCount} tecken från YouTube-video`,
+        description: `Extraherade ${data.characterCount} tecken från video`,
       })
 
-      // Clear YouTube input
+      // Clear video URL input
       setYoutubeUrl("")
     } catch (error) {
-      console.error("YouTube transcript extraction failed:", error)
+      console.error("Video transcript extraction failed:", error)
       toast.error("Extraktion misslyckades", {
-        description: error instanceof Error ? error.message : "Kunde inte hämta transkription från YouTube-video.",
+        description: error instanceof Error ? error.message : "Kunde inte hämta transkription från video.",
       })
     } finally {
       setIsProcessing(false)
@@ -428,8 +429,8 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
                 id="video-upload"
                 type="file"
                 accept="video/*"
-                disabled={true}
-                className="cursor-not-allowed opacity-50"
+                disabled={isProcessing}
+                className="cursor-pointer"
               />
               <p className="text-xs text-muted-foreground">
                 {t("videoSupportNote")}
