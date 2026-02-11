@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Wiseflow Question Generator",
-  description: "AI-powered exam question generator for Wiseflow platform",
+  title: "TentaGen",
+  description: "AI-powered exam question generator",
 };
 
 export default function RootLayout({

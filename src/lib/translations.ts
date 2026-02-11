@@ -185,7 +185,7 @@ export interface Translations {
 export const translations: Record<Language, Translations> = {
   sv: {
     // Header & Navigation
-    appTitle: "Wiseflow Frågegenerator",
+    appTitle: "TentaGen",
     signIn: "Logga in",
     signOut: "Logga ut",
     settings: "Inställningar",
@@ -197,7 +197,7 @@ export const translations: Record<Language, Translations> = {
     documentation: "Dokumentation",
 
     // Home Page
-    welcomeTitle: "Välkommen till Wiseflow Frågegenerator",
+    welcomeTitle: "Välkommen till TentaGen",
     welcomeSubtitle: "Generera högkvalitativa tentafrågor med AI. Logga in för att komma igång.",
     signInToContinue: "Logga in för att fortsätta",
     createQuestionsTitle: "Skapa tentafrågor",
@@ -364,7 +364,7 @@ export const translations: Record<Language, Translations> = {
   },
   en: {
     // Header & Navigation
-    appTitle: "Wiseflow Question Generator",
+    appTitle: "TentaGen",
     signIn: "Sign In",
     signOut: "Sign Out",
     settings: "Settings",
@@ -376,7 +376,7 @@ export const translations: Record<Language, Translations> = {
     documentation: "Documentation",
 
     // Home Page
-    welcomeTitle: "Welcome to Wiseflow Question Generator",
+    welcomeTitle: "Welcome to TentaGen",
     welcomeSubtitle: "Generate high-quality exam questions using AI. Sign in to get started.",
     signInToContinue: "Sign In to Continue",
     createQuestionsTitle: "Create Exam Questions",
