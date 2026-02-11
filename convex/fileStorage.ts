@@ -39,3 +39,20 @@ export const getFileMetadata = query({
     return await ctx.storage.getMetadata(args.storageId)
   },
 })
+
+/**
+ * Delete a file from storage after content extraction
+ * Frees up storage space — files are only needed temporarily
+ * Requires authentication
+ */
+export const deleteFile = mutation({
+  args: { storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Not authenticated")
+    }
+
+    await ctx.storage.delete(args.storageId)
+  },
+})
