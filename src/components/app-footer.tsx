@@ -11,7 +11,15 @@ export function AppFooter() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-base">
           <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
             <p className="text-center sm:text-left text-foreground">
-              {t("footerDeveloper")} <span className="font-semibold text-primary">Parviz Mammadzada, MD, PhD</span>
+              {t("footerDeveloper")}{" "}
+              <a
+                href="https://www.linkedin.com/in/parvizmammadzada/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-primary hover:text-primary/80 transition-colors underline-offset-4 hover:underline"
+              >
+                Parviz Mammadzada, MD, PhD
+              </a>
             </p>
             <span className="hidden sm:inline text-muted-foreground">•</span>
             <a
