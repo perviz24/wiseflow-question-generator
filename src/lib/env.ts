@@ -20,14 +20,5 @@ export const CLERK_SECRET_KEY = getEnvVar("CLERK_SECRET_KEY")
 // Anthropic
 export const ANTHROPIC_API_KEY = getEnvVar("ANTHROPIC_API_KEY")
 
-// AssemblyAI (optional - for YouTube and video transcription)
-export const ASSEMBLYAI_API_KEY = process.env.ASSEMBLYAI_API_KEY || ""
-
-// Bunny.net (optional - for video transcription)
-export const BUNNY_STREAM_API_KEY = process.env.BUNNY_STREAM_API_KEY || ""
-export const BUNNY_ACCOUNT_API_KEY = process.env.BUNNY_ACCOUNT_API_KEY || ""
-export const BUNNY_VIDEO_LIBRARY_ID = process.env.BUNNY_VIDEO_LIBRARY_ID || ""
-export const BUNNY_WEBHOOK_SECRET = process.env.BUNNY_WEBHOOK_SECRET || ""
-
-// Optional: Convex HTTP Actions URL
-export const NEXT_PUBLIC_CONVEX_SITE_URL = process.env.NEXT_PUBLIC_CONVEX_SITE_URL || ""
+// Note: ASSEMBLYAI_API_KEY is read directly via process.env in API routes
+// to avoid triggering eager validation of all vars during Next.js build

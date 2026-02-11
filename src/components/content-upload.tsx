@@ -1,15 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
-import { Upload, FileText, Loader2, X, Link2, Plus, Video } from "lucide-react"
+import { FileText, Loader2, X, Link2, Plus, Video } from "lucide-react"
 import { toast } from "sonner"
-import { useConvex, useMutation } from "convex/react"
+import { useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
-import { Id } from "../../convex/_generated/dataModel"
 import { useTranslation } from "@/lib/language-context"
 import { extractTextFromPDF } from "@/lib/pdf-utils"
 
@@ -34,6 +33,43 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   const [videoFile, setVideoFile] = useState<File | null>(null)
 
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl)
+  const [transcriptionProgress, setTranscriptionProgress] = useState("")
+
+  // Helper: detect YouTube URLs
+  const isYoutubeUrl = (url: string) => {
+    return /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+/.test(url)
+  }
+
+  // Helper: poll AssemblyAI transcription until complete
+  const pollTranscription = useCallback(async (transcriptId: string): Promise<{ transcript: string; characterCount: number }> => {
+    const maxAttempts = 180 // 15 minutes max (5s interval)
+    for (let i = 0; i < maxAttempts; i++) {
+      const res = await fetch(`/api/check-transcription?id=${transcriptId}`)
+      const data = await res.json()
+
+      if (data.status === "completed") {
+        setTranscriptionProgress("")
+        return { transcript: data.transcript, characterCount: data.characterCount }
+      }
+
+      if (data.status === "error") {
+        setTranscriptionProgress("")
+        throw new Error(data.error || "Transcription failed")
+      }
+
+      // Update progress message
+      const minutes = Math.floor((i * 5) / 60)
+      const seconds = (i * 5) % 60
+      setTranscriptionProgress(
+        `Transkriberar... ${minutes > 0 ? `${minutes}m ` : ""}${seconds}s`
+      )
+
+      await new Promise(resolve => setTimeout(resolve, 5000))
+    }
+
+    setTranscriptionProgress("")
+    throw new Error("Transcription timed out after 15 minutes")
+  }, [])
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -237,6 +273,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
     try {
       // Step 1: Upload video to Convex storage
+      setTranscriptionProgress("Laddar upp video...")
       const uploadUrl = await generateUploadUrl()
 
       const uploadResult = await fetch(uploadUrl, {
@@ -251,36 +288,34 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
       const { storageId } = await uploadResult.json()
 
-      // Step 2: Extract transcript from uploaded video via Bunny.net
+      // Step 2: Submit to AssemblyAI for transcription
+      setTranscriptionProgress("Skickar till transkribering...")
       const response = await fetch("/api/extract-video-transcript", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          storageId,
-          fileName: videoFile.name,
-          language: "sv"
-        }),
+        body: JSON.stringify({ storageId, language: "sv" }),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to extract transcript from video")
+        throw new Error(data.error || "Failed to submit video for transcription")
       }
 
-      onContentExtracted(data.transcript, `Video: ${videoFile.name}`)
+      // Step 3: Poll for completion
+      const result = await pollTranscription(data.transcriptId)
 
-      // Add to uploaded items list
+      onContentExtracted(result.transcript, `Video: ${videoFile.name}`)
+
       setUploadedItems(prev => [
         ...prev,
         { id: storageId, name: videoFile.name, type: "file" },
       ])
 
       toast.success("Videotranskription klar!", {
-        description: `Extraherade ${data.characterCount} tecken från ${videoFile.name}`,
+        description: `Extraherade ${result.characterCount} tecken från ${videoFile.name}`,
       })
 
-      // Clear video file
       setVideoFile(null)
       const videoInput = document.getElementById("video-upload") as HTMLInputElement
       if (videoInput) videoInput.value = ""
@@ -291,10 +326,11 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
       })
     } finally {
       setIsProcessing(false)
+      setTranscriptionProgress("")
     }
   }
 
-  const handleYoutubeSubmit = async () => {
+  const handleVideoUrlSubmit = async () => {
     const url = youtubeUrl.trim()
     if (!url) return
 
@@ -311,31 +347,61 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     setIsProcessing(true)
 
     try {
-      const response = await fetch("/api/extract-video-transcript", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, language: "sv" }),
-      })
+      if (isYoutubeUrl(url)) {
+        // YouTube URLs → use free youtube-transcript package (instant, no API cost)
+        const response = await fetch("/api/extract-youtube-transcript", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, language: "sv" }),
+        })
 
-      const data = await response.json()
+        const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to extract transcript")
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to extract YouTube transcript")
+        }
+
+        onContentExtracted(data.transcript, `YouTube: ${url}`)
+
+        setUploadedItems(prev => [
+          ...prev,
+          { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
+        ])
+
+        toast.success("YouTube-transkription klar!", {
+          description: `Extraherade ${data.characterCount} tecken`,
+        })
+      } else {
+        // Non-YouTube video URLs → AssemblyAI (async with polling)
+        setTranscriptionProgress("Skickar till transkribering...")
+
+        const response = await fetch("/api/extract-video-transcript", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url, language: "sv" }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to submit video for transcription")
+        }
+
+        // Poll for completion
+        const result = await pollTranscription(data.transcriptId)
+
+        onContentExtracted(result.transcript, `Video: ${url}`)
+
+        setUploadedItems(prev => [
+          ...prev,
+          { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
+        ])
+
+        toast.success("Videotranskription klar!", {
+          description: `Extraherade ${result.characterCount} tecken`,
+        })
       }
 
-      onContentExtracted(data.transcript, `Video: ${url}`)
-
-      // Add to uploaded items list
-      setUploadedItems(prev => [
-        ...prev,
-        { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
-      ])
-
-      toast.success("Transkription extraherad!", {
-        description: `Extraherade ${data.characterCount} tecken från video`,
-      })
-
-      // Clear video URL input
       setYoutubeUrl("")
     } catch (error) {
       console.error("Video transcript extraction failed:", error)
@@ -344,6 +410,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
       })
     } finally {
       setIsProcessing(false)
+      setTranscriptionProgress("")
     }
   }
 
@@ -531,6 +598,16 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
               </p>
             </div>
 
+            {/* Transcription Progress */}
+            {transcriptionProgress && (
+              <div className="flex items-center gap-2 rounded-md bg-muted p-3">
+                <Loader2 className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
+                <span className="text-sm text-muted-foreground">
+                  {transcriptionProgress}
+                </span>
+              </div>
+            )}
+
             {/* Video URL Input */}
             <div className="space-y-2">
               <Label htmlFor="youtube-url">
@@ -547,13 +624,13 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && youtubeUrl.trim()) {
                       e.preventDefault()
-                      handleYoutubeSubmit()
+                      handleVideoUrlSubmit()
                     }
                   }}
                 />
                 <Button
                   type="button"
-                  onClick={handleYoutubeSubmit}
+                  onClick={handleVideoUrlSubmit}
                   disabled={isProcessing || !youtubeUrl.trim()}
                   size="icon"
                 >
