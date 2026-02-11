@@ -392,7 +392,7 @@ export const translations: Record<Language, Translations> = {
     // Footer
     footerDeveloper: "Utvecklad av",
     footerEmail: "parviz.mammadzada@oru.se",
-    footerBeta: "Beta-version - Funktioner under utveckling",
+    footerBeta: "Beta-version",
 
     // Feedback
     feedbackTitle: "Skicka feedback",
@@ -595,7 +595,7 @@ export const translations: Record<Language, Translations> = {
     // Footer
     footerDeveloper: "Developed by",
     footerEmail: "parviz.mammadzada@oru.se",
-    footerBeta: "Beta version - Features under development",
+    footerBeta: "Beta version",
 
     // Feedback
     feedbackTitle: "Send feedback",
