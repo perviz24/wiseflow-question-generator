@@ -13,17 +13,17 @@ export function AppHeader() {
   const { t } = useTranslation()
   const router = useRouter()
 
-  const handleTitleClick = () => {
-    // Clear preview session when clicking title
+  const handleHomeNavigation = () => {
+    // Clear preview session and force full page reload to reset all state
     localStorage.removeItem("wiseflow-preview-session")
-    router.push("/")
+    window.location.href = "/"
   }
 
   return (
     <header className="border-b border-border bg-white/50 backdrop-blur-sm dark:bg-black/50 sticky top-0 z-10">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div
-          onClick={handleTitleClick}
+          onClick={handleHomeNavigation}
           className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
           <Image
@@ -38,17 +38,16 @@ export function AppHeader() {
           </h1>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <Link href="/">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-11 w-11"
-              aria-label={t("home")}
-            >
-              <Home className="h-7 w-7" />
-              <span className="sr-only">{t("home")}</span>
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11"
+            aria-label={t("home")}
+            onClick={handleHomeNavigation}
+          >
+            <Home className="h-7 w-7" />
+            <span className="sr-only">{t("home")}</span>
+          </Button>
           <Link href="/docs">
             <Button
               variant="ghost"

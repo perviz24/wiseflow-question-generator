@@ -16,6 +16,8 @@ export interface Translations {
   documentation: string
   cancel: string
 
+  startOver: string
+
   // Home Page
   welcomeTitle: string
   welcomeSubtitle: string
@@ -219,6 +221,7 @@ export const translations: Record<Language, Translations> = {
     selectAll: "Markera alla",
     documentation: "Dokumentation",
     cancel: "Avbryt",
+    startOver: "Börja om",
 
     // Home Page
     welcomeTitle: "Välkommen till TentaGen",
@@ -421,6 +424,7 @@ export const translations: Record<Language, Translations> = {
     selectAll: "Select All",
     documentation: "Documentation",
     cancel: "Cancel",
+    startOver: "Start Over",
 
     // Home Page
     welcomeTitle: "Welcome to TentaGen",

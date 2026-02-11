@@ -6,7 +6,7 @@ import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
-import { Sparkles, BookOpen } from "lucide-react"
+import { Sparkles, BookOpen, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -49,17 +49,24 @@ export default function Home() {
                   <span>{t("heroMultipleFormats")}</span>
                 </div>
               </div>
-              {/* Generate Button at Top */}
+              {/* Start Over / Scroll to Form Button */}
               <Button
                 size="lg"
                 onClick={() => {
+                  // If a form exists, scroll to it; otherwise reload to reset preview state
                   const form = document.querySelector('form')
-                  form?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  if (form) {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  } else {
+                    // Questions are showing (preview mode) — reset everything
+                    localStorage.removeItem("wiseflow-preview-session")
+                    window.location.href = "/"
+                  }
                 }}
                 className="mt-2"
               >
-                <Sparkles className="mr-2 h-4 w-4" />
-                {t("generateQuestions")}
+                <RotateCcw className="mr-2 h-4 w-4" />
+                {t("startOver")}
               </Button>
               {/* Instruction Manual Button */}
               <Link href="/docs">
