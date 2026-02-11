@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { BUNNY_STREAM_API_KEY, BUNNY_ACCOUNT_API_KEY, BUNNY_VIDEO_LIBRARY_ID, NEXT_PUBLIC_CONVEX_URL } from "@/lib/env"
 import { ConvexHttpClient } from "convex/browser"
-import { api } from "../../../convex/_generated/api"
+import { api } from "@convex/_generated/api"
 
 // Bunny.net API base URLs
 const BUNNY_CORE_API = "https://api.bunny.net"
