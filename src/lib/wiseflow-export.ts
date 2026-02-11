@@ -147,7 +147,26 @@ interface ExportMetadata {
   includeAITag?: boolean // Whether to include "AI-generated" tag
 }
 
-function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>): string[] {
+// Get the display name for a question type
+function getQuestionTypeTag(type: string, isSv: boolean): string {
+  const typeMap: Record<string, [string, string]> = {
+    mcq: ["MCQ", "Flervalsfråga"],
+    true_false: ["True/False", "Sant/Falskt"],
+    longtextV2: ["Essay", "Essä"],
+    short_answer: ["Short Answer", "Kort svar"],
+    fill_blank: ["Fill in the Blank", "Ifyllnad"],
+    multiple_response: ["Multiple Response", "Flera rätt"],
+    matching: ["Matching", "Matchning"],
+    ordering: ["Ordering", "Ordningsföljd"],
+    hotspot: ["Image Hotspot", "Bildmarkering"],
+    rating_scale: ["Rating Scale", "Betygsskala"],
+  }
+  const entry = typeMap[type]
+  return entry ? (isSv ? entry[1] : entry[0]) : type
+}
+
+// Generate tags for a SINGLE question (per-question type, not all types)
+function generateAutoTags(metadata: ExportMetadata, questionType: string): string[] {
   const autoTags: string[] = []
   const isSv = metadata.language === "sv"
 
@@ -155,36 +174,20 @@ function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>):
   autoTags.push(metadata.subject)
   autoTags.push(metadata.topic)
 
-  // Add all unique question types from the set (in correct language)
-  questionTypes.forEach((type) => {
-    if (type === "mcq") autoTags.push(isSv ? "Flervalsfråga" : "MCQ")
-    else if (type === "true_false") autoTags.push(isSv ? "Sant/Falskt" : "True/False")
-    else if (type === "longtextV2") autoTags.push(isSv ? "Essä" : "Essay")
-    else if (type === "short_answer") autoTags.push(isSv ? "Kort svar" : "Short Answer")
-    else if (type === "fill_blank") autoTags.push(isSv ? "Ifyllnad" : "Fill in the Blank")
-    else if (type === "multiple_response") autoTags.push(isSv ? "Flera rätt" : "Multiple Response")
-    else if (type === "matching") autoTags.push(isSv ? "Matchning" : "Matching")
-    else if (type === "ordering") autoTags.push(isSv ? "Ordningsföljd" : "Ordering")
-    else if (type === "hotspot") autoTags.push(isSv ? "Bildmarkering" : "Image Hotspot")
-    else if (type === "rating_scale") autoTags.push(isSv ? "Betygsskala" : "Rating Scale")
-  })
+  // Add THIS question's type only (not all types from the set)
+  autoTags.push(getQuestionTypeTag(questionType, isSv))
 
   // Add difficulty (in correct language)
   if (metadata.difficulty === "easy") autoTags.push(isSv ? "Lätt" : "Easy")
   else if (metadata.difficulty === "medium") autoTags.push(isSv ? "Medium" : "Medium")
   else if (metadata.difficulty === "hard") autoTags.push(isSv ? "Svår" : "Hard")
-  else autoTags.push(metadata.difficulty) // Fallback if unexpected value
+  else autoTags.push(metadata.difficulty)
 
-  // Add language tag (in correct language)
+  // Add language tag
   autoTags.push(isSv ? "Svenska" : "English")
 
-  // Add timestamp
-  const timestamp = new Date().toLocaleString("sv-SE")
-  autoTags.push(timestamp)
-
-  // Add AI-generated marker (only if enabled, in correct language)
-  if (metadata.includeAITag !== false) {
-    // Default to true if not specified
+  // Add AI-generated marker only if explicitly enabled
+  if (metadata.includeAITag === true) {
     autoTags.push(isSv ? "AI-genererad" : "AI-generated")
   }
 
@@ -194,6 +197,25 @@ function generateAutoTags(metadata: ExportMetadata, questionTypes: Set<string>):
   }
 
   return autoTags
+}
+
+// Convert AI-generated options {label: "A", value: "Mucin"} to Wiseflow format {label: "Mucin", value: "0"}
+function convertOptionsToWiseflow(options: Array<{ label: string; value: string }>): Array<{ label: string; value: string }> {
+  return options.map((opt, index) => ({
+    label: opt.value, // Answer text becomes the label
+    value: index.toString(), // Index as string becomes the value
+  }))
+}
+
+// Map correctAnswer labels (e.g. ["A"]) to Wiseflow index values (e.g. ["1"])
+function mapCorrectAnswersToIndices(
+  correctAnswer: string[],
+  originalOptions: Array<{ label: string; value: string }>
+): string[] {
+  return correctAnswer.map((label) => {
+    const index = originalOptions.findIndex((opt) => opt.label === label)
+    return index >= 0 ? index.toString() : "0"
+  })
 }
 
 function generateManualTags(metadata: ExportMetadata): string[] {
@@ -238,14 +260,8 @@ function hashString(str: string): number {
 }
 
 export function exportToWiseflowJSON(questions: Question[], metadata: ExportMetadata): string {
-  // Collect all unique question types from questions
-  const questionTypes = new Set<string>()
-  questions.forEach((q) => questionTypes.add(q.type))
-
-  // Generate tags
-  const autoTags = generateAutoTags(metadata, questionTypes)
+  // Manual tags are shared across all questions
   const manualTags = generateManualTags(metadata)
-  const allTags = [...autoTags, ...manualTags]
 
   if (metadata.exportFormat === "legacy") {
     // LEGACY FORMAT (nya versionen) - Learnosity JSON structure
@@ -258,6 +274,10 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       // Strip HTML tags from stimulus for title
       const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
       const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
+
+      // Per-question tags (only THIS question's type, not all types)
+      const autoTags = generateAutoTags(metadata, question.type)
+      const allTags = [...autoTags, ...manualTags]
 
       const wiseflowQuestion: WiseflowLegacyQuestion = {
         type: question.type,
@@ -274,7 +294,8 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
       // Add MCQ/True-False specific fields
       if ((question.type === "mcq" || question.type === "true_false") && question.options) {
-        wiseflowQuestion.data.options = question.options
+        // Convert options: {label: "A", value: "Mucin"} → {label: "Mucin", value: "0"}
+        wiseflowQuestion.data.options = convertOptionsToWiseflow(question.options)
         wiseflowQuestion.data.shuffle_options = true
         wiseflowQuestion.data.ui_style = {
           choice_label: "upper-alpha",
@@ -283,16 +304,11 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
         // Map correct answers to index-based values
         if (question.correctAnswer) {
-          const validResponseValues = question.correctAnswer.map((label) => {
-            const index = question.options!.findIndex((opt) => opt.label === label)
-            return index.toString()
-          })
-
           wiseflowQuestion.data.validation = {
             scoring_type: "exactMatch",
             valid_response: {
               score: 1,
-              value: validResponseValues,
+              value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
             },
           }
         }
@@ -344,6 +360,10 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
       const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
 
+      // Per-question tags (only THIS question's type)
+      const autoTags = generateAutoTags(metadata, question.type)
+      const allTags = [...autoTags, ...manualTags]
+
       const utgaendeQuestion: WiseflowUtgaendeQuestion = {
         id: questionId,
         data: {
@@ -360,7 +380,8 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
       // Add MCQ/True-False specific fields
       if ((question.type === "mcq" || question.type === "true_false") && question.options) {
-        utgaendeQuestion.data.options = question.options
+        // Convert options: {label: "A", value: "Mucin"} → {label: "Mucin", value: "0"}
+        utgaendeQuestion.data.options = convertOptionsToWiseflow(question.options)
         utgaendeQuestion.data.ui_style = {
           choice_label: "upper-alpha",
           type: "block",
@@ -368,16 +389,11 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
         // Map correct answers to index-based values
         if (question.correctAnswer) {
-          const validResponseValues = question.correctAnswer.map((label) => {
-            const index = question.options!.findIndex((opt) => opt.label === label)
-            return index.toString()
-          })
-
           utgaendeQuestion.data.validation = {
             scoring_type: "exactMatch",
             valid_response: {
               score: 1,
-              value: validResponseValues,
+              value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
             },
           }
         }
@@ -395,20 +411,20 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         extras: [],
         features: `<span class='learnosity-response question-${baseId}q${questionId}'></span>`,
         reference,
-        shared: false,
+        shared: false as const,
         tools: [],
         questions: [utgaendeQuestion],
         lastChanged: timestamp.toString(),
-        shareType: -1,
+        shareType: -1 as const,
         shareFirstName: userProfile.firstName,
         shareLastName: userProfile.lastName,
-        showAsItem: 1,
+        showAsItem: 1 as const,
         maxScore: 1,
         tags: allTags,
-        type: 0,
+        type: 0 as const,
         questionCount: 1,
-        extraCount: 0,
-        hidden: false,
+        extraCount: 0 as const,
+        hidden: false as const,
         shareObj: null,
       }
     })
