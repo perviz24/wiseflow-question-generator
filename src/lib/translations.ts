@@ -272,11 +272,11 @@ export const translations: Record<Language, Translations> = {
     fetchFromUrls: "Hämta från webbadresser (valfritt)",
     addMoreUrls: "Lägg till fler URL:er",
     contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
-    videoSectionTitle: "Skapa frågor från en videoföreläsning",
+    videoSectionTitle: "🎬 Förvandla video till tentafrågor",
     uploadVideoFile: "Ladda upp videofil",
-    videoUrlLabel: "eller klistra in video-URL",
-    videoUrlPlaceholder: "https://exempel.se/video-länk",
-    videoSupportNote: "⏱️ Transkriberingen tar cirka 3-5 minuter för en 30 minuters video. Funktionen är under utveckling för att göra den ännu snabbare.",
+    videoUrlLabel: "Eller klistra in en video-URL (YouTube, Vimeo m.fl.)",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=... eller annan video-URL",
+    videoSupportNote: "AI transkriberar och analyserar hela videon — vanligtvis klart inom 3–5 min för en 30 min föreläsning.",
 
     // Tagging Section
     tagsOrganization: "Taggar & Organisation",
@@ -474,11 +474,11 @@ export const translations: Record<Language, Translations> = {
     fetchFromUrls: "Fetch from URLs (Optional)",
     addMoreUrls: "Add More URLs",
     contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
-    videoSectionTitle: "Create questions from a video lecture",
+    videoSectionTitle: "🎬 Turn any video into exam questions",
     uploadVideoFile: "Upload video file",
-    videoUrlLabel: "or paste video URL",
-    videoUrlPlaceholder: "https://example.com/video-link",
-    videoSupportNote: "⏱️ Transcription takes approximately 3-5 minutes for a 30-minute video. This feature is under improvement to make it even faster.",
+    videoUrlLabel: "Or paste a video URL (YouTube, Vimeo, etc.)",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=... or any video URL",
+    videoSupportNote: "AI transcribes and analyzes the full video — typically done in 3–5 min for a 30 min lecture.",
 
     // Tagging Section
     tagsOrganization: "Tags & Organization",
