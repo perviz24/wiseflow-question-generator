@@ -90,8 +90,8 @@ export default function DocsPage() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     {isSv
-                      ? "St\u00f6d f\u00f6r flera exportformat: Wiseflow JSON (Legacy/Utg\u00e5ende), QTI 2.1 och QTI 2.2 Inspera. Fungerar med de flesta LMS-plattformar."
-                      : "Support for multiple export formats: Wiseflow JSON (Legacy/Outgoing), QTI 2.1, and QTI 2.2 Inspera. Works with most LMS platforms."}
+                      ? "Stöd för flera exportformat: Wiseflow JSON (Ny/Legacy), QTI 2.1 och QTI 2.2 Inspera. Fungerar med de flesta LMS-plattformar."
+                      : "Support for multiple export formats: Wiseflow JSON (New/Legacy), QTI 2.1, and QTI 2.2 Inspera. Works with most LMS platforms."}
                   </p>
                 </CardContent>
               </Card>
@@ -107,8 +107,8 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint eller URL:er för frågor baserade på specifikt material</>
-                        : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, or URLs for questions based on specific material</>}
+                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint, video/YouTube eller URL:er för frågor baserade på specifikt material</>
+                        : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, video/YouTube, or URLs for questions based on specific material</>}
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -200,8 +200,8 @@ export default function DocsPage() {
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {isSv
-                      ? "Ladda upp dokument eller URL:er för att generera frågor från specifikt material"
-                      : "Upload documents or URLs to generate questions from specific material"}
+                      ? "Ladda upp dokument, video/YouTube eller URL:er för frågor från specifikt material"
+                      : "Upload documents, video/YouTube, or URLs for questions from specific material"}
                   </p>
                 </div>
 
@@ -326,6 +326,12 @@ export default function DocsPage() {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                         <span>
+                          <strong>Video:</strong> {isSv ? "Ladda upp videofiler eller klistra in YouTube-URL:er för automatisk transkription" : "Upload video files or paste YouTube URLs for automatic transcription"}
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>
                           <strong>Web:</strong> {isSv ? "Valfri URL (webbsidor, Wikipedia, etc.)" : "Any URL (web pages, Wikipedia, etc.)"}
                         </span>
                       </li>
@@ -408,8 +414,8 @@ export default function DocsPage() {
                         <span className="text-muted-foreground">{isSv ? "T.ex. Svenska" : "E.g., Swedish"}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge>Tidsstämpel</Badge>
-                        <span className="text-muted-foreground">{isSv ? "T.ex. 2024-02-10" : "E.g., 2024-02-10"}</span>
+                        <Badge>{isSv ? "Lärarinitialer" : "Tutor Initials"}</Badge>
+                        <span className="text-muted-foreground">{isSv ? "T.ex. AB, JD" : "E.g., AB, JD"}</span>
                       </div>
                     </div>
                   </div>
@@ -516,19 +522,19 @@ export default function DocsPage() {
                     <h4 className="font-semibold mb-2">{isSv ? "Wiseflow JSON-format" : "Wiseflow JSON Formats"}</h4>
                     <ul className="space-y-3 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
-                        <Badge variant="outline">Legacy</Badge>
+                        <Badge variant="outline">{isSv ? "Ny Wiseflow JSON" : "New Wiseflow JSON"}</Badge>
                         <span>
                           {isSv
-                            ? "Utgående format med labels som har ID-fält. Används av äldre tentacenter."
-                            : "Outgoing format with labels that have ID fields. Used by older exam centers."}
+                            ? "Aktuellt format med labels som har ID-fält. Rekommenderas för de flesta tentacenter."
+                            : "Current format with labels that have ID fields. Recommended for most exam centers."}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
-                        <Badge variant="outline">Utgående</Badge>
+                        <Badge variant="outline">Legacy JSON</Badge>
                         <span>
                           {isSv
-                            ? "Nyare format med tags-array istället för labels. Används av modernare tentacenter."
-                            : "Newer format with tags array instead of labels. Used by modern exam centers."}
+                            ? "Äldre format med tags-array istället för labels. Används av äldre tentacenter."
+                            : "Older format with tags array instead of labels. Used by older exam centers."}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">
@@ -626,8 +632,8 @@ export default function DocsPage() {
                           <span>•</span>
                           <span>
                             {isSv
-                              ? "Ladda upp relevanta dokument eller URL:er för mer fokuserade frågor"
-                              : "Upload relevant documents or URLs for more focused questions"}
+                              ? "Ladda upp dokument, video eller URL:er för mer fokuserade frågor"
+                              : "Upload documents, videos, or URLs for more focused questions"}
                           </span>
                         </li>
                         <li className="flex items-start gap-2">
