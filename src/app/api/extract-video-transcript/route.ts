@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server"
-import { AssemblyAI } from "assemblyai"
-import ytdl from "ytdl-core"
+import { BUNNY_API_KEY, BUNNY_VIDEO_LIBRARY_ID } from "@/lib/env"
 
-// Initialize AssemblyAI client
-const client = new AssemblyAI({
-  apiKey: process.env.ASSEMBLYAI_API_KEY || "",
-})
+// Bunny.net API base URLs
+const BUNNY_API_BASE = "https://video.bunnycdn.com"
+const BUNNY_STREAM_BASE = "https://video.bunnycdn.com/library"
+
+interface BunnyVideo {
+  guid: string
+  videoLibraryId: number
+  title: string
+  availableResolutions: string
+  transcriptUrl?: string
+  hasMP4Fallback: boolean
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,59 +20,112 @@ export async function POST(request: NextRequest) {
 
     if (!url && !videoFile) {
       return NextResponse.json(
-        { error: "YouTube URL or video file is required" },
+        { error: "Video URL or video file is required" },
         { status: 400 }
       )
     }
 
-    // Check if API key is configured
-    if (!process.env.ASSEMBLYAI_API_KEY) {
+    // Check if Bunny.net credentials are configured
+    if (!BUNNY_API_KEY || !BUNNY_VIDEO_LIBRARY_ID) {
       return NextResponse.json(
-        { error: "AssemblyAI API key not configured" },
+        { error: "Bunny.net credentials not configured. Please set BUNNY_API_KEY and BUNNY_VIDEO_LIBRARY_ID environment variables." },
         { status: 500 }
       )
     }
 
-    let audioUrl: string
+    let videoId: string
 
-    // If YouTube URL is provided, extract audio URL
+    // Step 1: Upload video to Bunny Stream
     if (url) {
-      // Validate YouTube URL
-      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)[\w-]+/
-      if (!youtubeRegex.test(url)) {
+      // Fetch video from URL
+      const createVideoResponse = await fetch(
+        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos`,
+        {
+          method: "POST",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: `Transcript-${Date.now()}`,
+            collectionId: "", // Optional: specify collection if needed
+          }),
+        }
+      )
+
+      if (!createVideoResponse.ok) {
+        const errorText = await createVideoResponse.text()
+        console.error("Bunny.net create video error:", errorText)
         return NextResponse.json(
-          { error: "Invalid YouTube URL. Please provide a direct video link (e.g., youtube.com/watch?v=VIDEO_ID)." },
+          { error: "Failed to create video in Bunny Stream" },
+          { status: 500 }
+        )
+      }
+
+      const videoData = await createVideoResponse.json() as BunnyVideo
+      videoId = videoData.guid
+
+      // Fetch video from URL
+      const fetchResponse = await fetch(
+        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/fetch`,
+        {
+          method: "POST",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            url: url,
+            headers: {},
+          }),
+        }
+      )
+
+      if (!fetchResponse.ok) {
+        const errorText = await fetchResponse.text()
+        console.error("Bunny.net fetch video error:", errorText)
+        return NextResponse.json(
+          { error: "Failed to fetch video from URL. Please check if the URL is accessible." },
           { status: 400 }
         )
       }
 
-      // Extract audio stream URL from YouTube using ytdl-core
-      try {
-        const info = await ytdl.getInfo(url)
-        const audioFormats = ytdl.filterFormats(info.formats, "audioonly")
+      // Wait for video to be processed (polling)
+      let attempts = 0
+      const maxAttempts = 30 // 30 seconds max
+      while (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second
 
-        if (audioFormats.length === 0) {
-          return NextResponse.json(
-            { error: "No audio stream available for this video." },
-            { status: 404 }
-          )
+        const statusResponse = await fetch(
+          `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+          {
+            method: "GET",
+            headers: {
+              "AccessKey": BUNNY_API_KEY,
+            },
+          }
+        )
+
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json() as BunnyVideo
+          if (statusData.availableResolutions && statusData.availableResolutions.length > 0) {
+            break // Video is processed
+          }
         }
 
-        // Get the best quality audio format
-        audioUrl = audioFormats[0].url
-      } catch (ytdlError) {
-        console.error("YouTube audio extraction error:", ytdlError)
+        attempts++
+      }
+
+      if (attempts >= maxAttempts) {
         return NextResponse.json(
-          { error: "Failed to extract audio from YouTube video. Please check if the video is accessible." },
-          { status: 400 }
+          { error: "Video processing timeout. Please try again later." },
+          { status: 504 }
         )
       }
     } else if (videoFile) {
-      // For uploaded video files, we'll need to upload to AssemblyAI first
-      // This requires the file to be sent as base64 or FormData
-      // For now, return error asking for direct upload implementation
+      // Direct file upload to Bunny Stream
       return NextResponse.json(
-        { error: "Video file upload not yet implemented. Please use YouTube URLs for now." },
+        { error: "Video file upload not yet implemented. Please use video URLs for now." },
         { status: 501 }
       )
     } else {
@@ -75,35 +135,93 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Request transcription from AssemblyAI
-    const transcript = await client.transcripts.transcribe({
-      audio: audioUrl,
-      language_code: language === "sv" ? "sv" : "en",
-    })
+    // Step 2: Request transcription
+    const transcribeResponse = await fetch(
+      `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/transcribe`,
+      {
+        method: "POST",
+        headers: {
+          "AccessKey": BUNNY_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language: language === "sv" ? "sv" : "en",
+        }),
+      }
+    )
 
-    // Check for errors in transcription
-    if (transcript.status === "error") {
-      console.error("AssemblyAI transcription error:", transcript.error)
+    if (!transcribeResponse.ok) {
+      const errorText = await transcribeResponse.text()
+      console.error("Bunny.net transcribe error:", errorText)
       return NextResponse.json(
-        { error: transcript.error || "Failed to transcribe video" },
+        { error: "Failed to start video transcription" },
         { status: 500 }
       )
     }
 
-    // Check if transcript text is available
-    if (!transcript.text) {
+    // Wait for transcription to complete (polling)
+    let transcriptAttempts = 0
+    const maxTranscriptAttempts = 60 // 60 seconds max
+    let transcriptUrl: string | undefined
+
+    while (transcriptAttempts < maxTranscriptAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second
+
+      const videoInfoResponse = await fetch(
+        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+        {
+          method: "GET",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+          },
+        }
+      )
+
+      if (videoInfoResponse.ok) {
+        const videoInfo = await videoInfoResponse.json() as BunnyVideo
+        if (videoInfo.transcriptUrl) {
+          transcriptUrl = videoInfo.transcriptUrl
+          break
+        }
+      }
+
+      transcriptAttempts++
+    }
+
+    if (!transcriptUrl) {
       return NextResponse.json(
-        { error: "No transcript text generated. The video might not contain speech or audio." },
-        { status: 404 }
+        { error: "Transcription timeout. The video might be too long or contain no speech." },
+        { status: 504 }
       )
     }
 
+    // Step 3: Fetch transcript content
+    const transcriptResponse = await fetch(transcriptUrl)
+    if (!transcriptResponse.ok) {
+      return NextResponse.json(
+        { error: "Failed to fetch transcript content" },
+        { status: 500 }
+      )
+    }
+
+    const transcriptText = await transcriptResponse.text()
+
+    // Step 4: Clean up - delete video from Bunny Stream (optional, to save storage)
+    await fetch(
+      `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "AccessKey": BUNNY_API_KEY,
+        },
+      }
+    ).catch(err => console.error("Failed to delete video from Bunny:", err))
+
     return NextResponse.json({
-      transcript: transcript.text,
-      characterCount: transcript.text.length,
+      transcript: transcriptText,
+      characterCount: transcriptText.length,
       url: url || "uploaded-file",
-      confidence: transcript.confidence,
-      audioUrl,
+      videoId,
     })
   } catch (error: unknown) {
     console.error("Error extracting video transcript:", error)
