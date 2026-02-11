@@ -238,7 +238,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     setIsProcessing(true)
 
     try {
-      const response = await fetch("/api/extract-youtube-transcript", {
+      const response = await fetch("/api/extract-video-transcript", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, language: "sv" }),

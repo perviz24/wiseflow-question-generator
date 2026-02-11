@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { AssemblyAI } from "assemblyai"
+import ytdl from "ytdl-core"
 
 // Initialize AssemblyAI client
 const client = new AssemblyAI({
@@ -38,8 +39,27 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      // For YouTube, AssemblyAI can directly transcribe from the URL
-      audioUrl = url
+      // Extract audio stream URL from YouTube using ytdl-core
+      try {
+        const info = await ytdl.getInfo(url)
+        const audioFormats = ytdl.filterFormats(info.formats, "audioonly")
+
+        if (audioFormats.length === 0) {
+          return NextResponse.json(
+            { error: "No audio stream available for this video." },
+            { status: 404 }
+          )
+        }
+
+        // Get the best quality audio format
+        audioUrl = audioFormats[0].url
+      } catch (ytdlError) {
+        console.error("YouTube audio extraction error:", ytdlError)
+        return NextResponse.json(
+          { error: "Failed to extract audio from YouTube video. Please check if the video is accessible." },
+          { status: 400 }
+        )
+      }
     } else if (videoFile) {
       // For uploaded video files, we'll need to upload to AssemblyAI first
       // This requires the file to be sent as base64 or FormData
