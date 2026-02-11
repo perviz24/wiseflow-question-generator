@@ -7,6 +7,7 @@ import { Library, BookOpen, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 import { SettingsSheet } from "@/components/settings-sheet"
+import Image from "next/image"
 
 export function AppHeader() {
   const { t } = useTranslation()
@@ -21,12 +22,21 @@ export function AppHeader() {
   return (
     <header className="border-b border-zinc-200 bg-white/50 backdrop-blur-sm dark:border-zinc-800 dark:bg-black/50 sticky top-0 z-10">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <h1
+        <div
           onClick={handleTitleClick}
-          className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          {t("appTitle")}
-        </h1>
+          <Image
+            src="/logo.svg"
+            alt="TentaGen"
+            width={32}
+            height={32}
+            className="text-foreground"
+          />
+          <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
+            {t("appTitle")}
+          </h1>
+        </div>
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link href="/">
             <Button

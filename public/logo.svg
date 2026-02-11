@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- T letter with integrated question mark -->
+  <g stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Top horizontal bar of T -->
+    <line x1="20" y1="20" x2="80" y2="20" />
+    <!-- Vertical stem of T -->
+    <line x1="50" y1="20" x2="50" y2="55" />
+    <!-- Question mark curve (integrated with T stem) -->
+    <path d="M 50 55 Q 65 60 65 70 Q 65 80 50 82" fill="none" />
+    <!-- Question mark dot -->
+    <circle cx="50" cy="92" r="3" fill="currentColor" stroke="none" />
+  </g>
+</svg>
