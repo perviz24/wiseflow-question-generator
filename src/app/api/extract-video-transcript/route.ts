@@ -2,25 +2,64 @@ import { NextRequest, NextResponse } from "next/server"
 import { BUNNY_API_KEY, BUNNY_VIDEO_LIBRARY_ID } from "@/lib/env"
 
 // Bunny.net API base URLs
-const BUNNY_API_BASE = "https://video.bunnycdn.com"
-const BUNNY_STREAM_BASE = "https://video.bunnycdn.com/library"
+const BUNNY_CORE_API = "https://api.bunny.net"
+const BUNNY_STREAM_API = "https://video.bunnycdn.com"
 
-interface BunnyVideo {
+interface BunnyVideoLibrary {
+  Id: number
+  Name: string
+  PullZoneUrl: string
+  EnableTranscribing: boolean
+}
+
+interface CaptionModel {
+  srclang: string
+  label: string
+  version: number
+}
+
+interface BunnyVideoModel {
   guid: string
   videoLibraryId: number
   title: string
-  availableResolutions: string
-  transcriptUrl?: string
+  dateUploaded: string
+  views: number
+  isPublic: boolean
+  length: number
+  status: number // 0=Created, 1=Uploaded, 2=Processing, 3=Transcoding, 4=Finished, 5=Error
+  availableResolutions: string | null
+  captions: CaptionModel[] | null
   hasMP4Fallback: boolean
+  collectionId: string | null
+}
+
+// Convert VTT format to plain text
+function vttToPlainText(vtt: string): string {
+  // Remove VTT header
+  let text = vtt.replace(/WEBVTT\s*\n/g, "")
+
+  // Remove timestamps (format: 00:00:00.000 --> 00:00:05.000)
+  text = text.replace(/\d{2}:\d{2}:\d{2}\.\d{3}\s*-->\s*\d{2}:\d{2}:\d{2}\.\d{3}\s*\n/g, "")
+
+  // Remove cue identifiers (numbers before timestamps)
+  text = text.replace(/^\d+\s*\n/gm, "")
+
+  // Remove HTML tags
+  text = text.replace(/<[^>]*>/g, "")
+
+  // Remove extra whitespace and newlines
+  text = text.replace(/\n{3,}/g, "\n\n").trim()
+
+  return text
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const { url, language, videoFile } = await request.json()
+    const { url, language } = await request.json()
 
-    if (!url && !videoFile) {
+    if (!url) {
       return NextResponse.json(
-        { error: "Video URL or video file is required" },
+        { error: "Video URL is required" },
         { status: 400 }
       )
     }
@@ -33,111 +72,36 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let videoId: string
-
-    // Step 1: Upload video to Bunny Stream
-    if (url) {
-      // Fetch video from URL
-      const createVideoResponse = await fetch(
-        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos`,
-        {
-          method: "POST",
-          headers: {
-            "AccessKey": BUNNY_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: `Transcript-${Date.now()}`,
-            collectionId: "", // Optional: specify collection if needed
-          }),
-        }
-      )
-
-      if (!createVideoResponse.ok) {
-        const errorText = await createVideoResponse.text()
-        console.error("Bunny.net create video error:", errorText)
-        return NextResponse.json(
-          { error: "Failed to create video in Bunny Stream" },
-          { status: 500 }
-        )
+    // Step 1: Get Video Library details to find pull zone URL
+    const libraryResponse = await fetch(
+      `${BUNNY_CORE_API}/videolibrary/${BUNNY_VIDEO_LIBRARY_ID}`,
+      {
+        headers: {
+          "AccessKey": BUNNY_API_KEY,
+        },
       }
+    )
 
-      const videoData = await createVideoResponse.json() as BunnyVideo
-      videoId = videoData.guid
-
-      // Fetch video from URL
-      const fetchResponse = await fetch(
-        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/fetch`,
-        {
-          method: "POST",
-          headers: {
-            "AccessKey": BUNNY_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            url: url,
-            headers: {},
-          }),
-        }
-      )
-
-      if (!fetchResponse.ok) {
-        const errorText = await fetchResponse.text()
-        console.error("Bunny.net fetch video error:", errorText)
-        return NextResponse.json(
-          { error: "Failed to fetch video from URL. Please check if the URL is accessible." },
-          { status: 400 }
-        )
-      }
-
-      // Wait for video to be processed (polling)
-      let attempts = 0
-      const maxAttempts = 30 // 30 seconds max
-      while (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second
-
-        const statusResponse = await fetch(
-          `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
-          {
-            method: "GET",
-            headers: {
-              "AccessKey": BUNNY_API_KEY,
-            },
-          }
-        )
-
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json() as BunnyVideo
-          if (statusData.availableResolutions && statusData.availableResolutions.length > 0) {
-            break // Video is processed
-          }
-        }
-
-        attempts++
-      }
-
-      if (attempts >= maxAttempts) {
-        return NextResponse.json(
-          { error: "Video processing timeout. Please try again later." },
-          { status: 504 }
-        )
-      }
-    } else if (videoFile) {
-      // Direct file upload to Bunny Stream
+    if (!libraryResponse.ok) {
+      console.error("Failed to fetch video library:", await libraryResponse.text())
       return NextResponse.json(
-        { error: "Video file upload not yet implemented. Please use video URLs for now." },
-        { status: 501 }
-      )
-    } else {
-      return NextResponse.json(
-        { error: "No valid input provided" },
-        { status: 400 }
+        { error: "Failed to access Bunny.net video library" },
+        { status: 500 }
       )
     }
 
-    // Step 2: Request transcription
-    const transcribeResponse = await fetch(
-      `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/transcribe`,
+    const library = await libraryResponse.json() as BunnyVideoLibrary
+
+    if (!library.EnableTranscribing) {
+      return NextResponse.json(
+        { error: "Transcription is not enabled for this video library. Please enable it in Bunny.net dashboard." },
+        { status: 500 }
+      )
+    }
+
+    // Step 2: Create video object
+    const createVideoResponse = await fetch(
+      `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos`,
       {
         method: "POST",
         headers: {
@@ -145,30 +109,69 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          language: language === "sv" ? "sv" : "en",
+          title: `Transcript-${Date.now()}`,
         }),
       }
     )
 
-    if (!transcribeResponse.ok) {
-      const errorText = await transcribeResponse.text()
-      console.error("Bunny.net transcribe error:", errorText)
+    if (!createVideoResponse.ok) {
+      const errorText = await createVideoResponse.text()
+      console.error("Bunny.net create video error:", errorText)
       return NextResponse.json(
-        { error: "Failed to start video transcription" },
+        { error: "Failed to create video in Bunny Stream" },
         { status: 500 }
       )
     }
 
-    // Wait for transcription to complete (polling)
-    let transcriptAttempts = 0
-    const maxTranscriptAttempts = 60 // 60 seconds max
-    let transcriptUrl: string | undefined
+    const videoData = await createVideoResponse.json() as BunnyVideoModel
+    const videoId = videoData.guid
 
-    while (transcriptAttempts < maxTranscriptAttempts) {
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second
+    // Step 3: Fetch video from URL
+    const fetchResponse = await fetch(
+      `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}/fetch`,
+      {
+        method: "POST",
+        headers: {
+          "AccessKey": BUNNY_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: url,
+        }),
+      }
+    )
 
-      const videoInfoResponse = await fetch(
-        `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+    if (!fetchResponse.ok) {
+      const errorText = await fetchResponse.text()
+      console.error("Bunny.net fetch video error:", errorText)
+
+      // Clean up - delete the created video
+      await fetch(
+        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+          },
+        }
+      ).catch(() => {})
+
+      return NextResponse.json(
+        { error: "Failed to fetch video from URL. Please check if the URL is accessible and public." },
+        { status: 400 }
+      )
+    }
+
+    // Step 4: Wait for video to be processed and transcribed
+    let attempts = 0
+    const maxAttempts = 120 // 2 minutes max (video processing + transcription takes time)
+    let videoInfo: BunnyVideoModel | null = null
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 2 seconds
+
+      const statusResponse = await fetch(
+        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
         {
           method: "GET",
           headers: {
@@ -177,38 +180,87 @@ export async function POST(request: NextRequest) {
         }
       )
 
-      if (videoInfoResponse.ok) {
-        const videoInfo = await videoInfoResponse.json() as BunnyVideo
-        if (videoInfo.transcriptUrl) {
-          transcriptUrl = videoInfo.transcriptUrl
+      if (statusResponse.ok) {
+        videoInfo = await statusResponse.json() as BunnyVideoModel
+
+        // Check if video is processed (status 4 = Finished) and has captions
+        if (videoInfo.status === 4 && videoInfo.captions && videoInfo.captions.length > 0) {
           break
+        }
+
+        // Check for error status
+        if (videoInfo.status === 5) {
+          await fetch(
+            `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+            {
+              method: "DELETE",
+              headers: {
+                "AccessKey": BUNNY_API_KEY,
+              },
+            }
+          ).catch(() => {})
+
+          return NextResponse.json(
+            { error: "Video processing failed. The video format might not be supported." },
+            { status: 400 }
+          )
         }
       }
 
-      transcriptAttempts++
+      attempts++
     }
 
-    if (!transcriptUrl) {
+    if (!videoInfo || !videoInfo.captions || videoInfo.captions.length === 0) {
+      // Clean up
+      await fetch(
+        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+          },
+        }
+      ).catch(() => {})
+
       return NextResponse.json(
-        { error: "Transcription timeout. The video might be too long or contain no speech." },
+        { error: "Transcription timeout or no speech detected. The video might be too long or contain no audio." },
         { status: 504 }
       )
     }
 
-    // Step 3: Fetch transcript content
-    const transcriptResponse = await fetch(transcriptUrl)
-    if (!transcriptResponse.ok) {
+    // Step 5: Download the caption file
+    const targetLanguage = language === "sv" ? "sv" : "en"
+    const caption = videoInfo.captions.find(c => c.srclang === targetLanguage) || videoInfo.captions[0]
+
+    const captionUrl = `https://${library.PullZoneUrl}.b-cdn.net/${videoId}/captions/${caption.srclang}.vtt`
+
+    const captionResponse = await fetch(captionUrl)
+    if (!captionResponse.ok) {
+      console.error("Failed to fetch caption file:", await captionResponse.text())
+
+      // Clean up
+      await fetch(
+        `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "AccessKey": BUNNY_API_KEY,
+          },
+        }
+      ).catch(() => {})
+
       return NextResponse.json(
-        { error: "Failed to fetch transcript content" },
+        { error: "Failed to download transcript file" },
         { status: 500 }
       )
     }
 
-    const transcriptText = await transcriptResponse.text()
+    const vttContent = await captionResponse.text()
+    const plainTextTranscript = vttToPlainText(vttContent)
 
-    // Step 4: Clean up - delete video from Bunny Stream (optional, to save storage)
+    // Step 6: Clean up - delete video from Bunny Stream to save storage
     await fetch(
-      `${BUNNY_STREAM_BASE}/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
+      `${BUNNY_STREAM_API}/library/${BUNNY_VIDEO_LIBRARY_ID}/videos/${videoId}`,
       {
         method: "DELETE",
         headers: {
@@ -218,10 +270,11 @@ export async function POST(request: NextRequest) {
     ).catch(err => console.error("Failed to delete video from Bunny:", err))
 
     return NextResponse.json({
-      transcript: transcriptText,
-      characterCount: transcriptText.length,
-      url: url || "uploaded-file",
+      transcript: plainTextTranscript,
+      characterCount: plainTextTranscript.length,
+      url: url,
       videoId,
+      language: caption.srclang,
     })
   } catch (error: unknown) {
     console.error("Error extracting video transcript:", error)
