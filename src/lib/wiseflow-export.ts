@@ -1,4 +1,5 @@
 // Export questions to Wiseflow "innehållsbank" JSON format
+// Formats aligned with real WISEflow BEL.json reference structure
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
@@ -9,6 +10,12 @@ interface Question {
   }>
   correctAnswer?: string[]
   instructorStimulus?: string
+  // Score fields from Convex (based on difficulty: easy=1, medium=2, hard=3)
+  score?: number
+  maxScore?: number
+  minScore?: number
+  // Short keyword title from Convex (e.g. "Celldelning", "Presbyopi")
+  title?: string
 }
 
 // Legacy format (nya versionen) - Learnosity structure
@@ -16,25 +23,8 @@ interface WiseflowLegacyQuestion {
   type: string
   widget_type: "response"
   reference: string
-  data: {
-    minScore: number
-    options?: Array<{ label: string; value: string }>
-    score: number
-    shuffle_options?: boolean
-    stimulus: string
-    type: string
-    ui_style?: {
-      choice_label: "upper-alpha"
-      type: "horizontal" | "block"
-    }
-    validation?: {
-      scoring_type: "exactMatch"
-      valid_response: {
-        score: number
-        value: string[]
-      }
-    }
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: Record<string, any>
   metadata: null
 }
 
@@ -78,28 +68,11 @@ interface WiseflowLabel {
   type: "personal"
 }
 
-// Utgående format (gamla versionen) - array structure
+// Utgående format (gamla versionen) - matches real WISEflow BEL.json structure
 interface WiseflowUtgaendeQuestion {
   id: number
-  data: {
-    options?: Array<{ label: string; value: string }>
-    ui_style?: {
-      choice_label: "upper-alpha"
-      type: "block"
-    }
-    stimulus: string
-    type: string
-    validation?: {
-      scoring_type: "exactMatch"
-      valid_response: {
-        score: number
-        value: string[]
-      }
-    }
-    shuffle_options?: boolean
-    score: number
-    minScore: number
-  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: Record<string, any>
   itemId: number
   maxScore: number
   minScore: number
@@ -144,10 +117,10 @@ interface ExportMetadata {
   courseCode?: string
   additionalTags?: string
   tutorInitials?: string
-  includeAITag?: boolean // Whether to include "AI-generated" tag
+  includeAITag?: boolean
 }
 
-// Get the display name for a question type
+// Get the display name for a question type (single language only)
 function getQuestionTypeTag(type: string, isSv: boolean): string {
   const typeMap: Record<string, [string, string]> = {
     mcq: ["MCQ", "Flervalsfråga"],
@@ -165,33 +138,53 @@ function getQuestionTypeTag(type: string, isSv: boolean): string {
   return entry ? (isSv ? entry[1] : entry[0]) : type
 }
 
-// Generate tags for a SINGLE question (per-question type, not all types)
+// Get difficulty display name (single language only)
+function getDifficultyTag(difficulty: string, isSv: boolean): string {
+  const diffMap: Record<string, [string, string]> = {
+    easy: ["Easy", "Lätt"],
+    medium: ["Medium", "Medium"],
+    hard: ["Hard", "Svår"],
+  }
+  const entry = diffMap[difficulty]
+  return entry ? (isSv ? entry[1] : entry[0]) : difficulty
+}
+
+// Get score from question data, fallback to difficulty-based default
+function getScore(question: Question, metadata: ExportMetadata): number {
+  if (question.score && question.score > 0) return question.score
+  if (question.maxScore && question.maxScore > 0) return question.maxScore
+  // Fallback based on difficulty
+  switch (metadata.difficulty) {
+    case "easy": return 1
+    case "medium": return 2
+    case "hard": return 3
+    default: return 1
+  }
+}
+
+// Generate tags for a SINGLE question (single language, no raw internal values)
 function generateAutoTags(metadata: ExportMetadata, questionType: string): string[] {
   const autoTags: string[] = []
   const isSv = metadata.language === "sv"
 
-  // Add subject and topic
   autoTags.push(metadata.subject)
-  autoTags.push(metadata.topic)
+  if (metadata.topic) autoTags.push(metadata.topic)
 
-  // Add THIS question's type only (not all types from the set)
+  // Translated question type (e.g. "Flervalsfråga" not "mcq")
   autoTags.push(getQuestionTypeTag(questionType, isSv))
 
-  // Add difficulty (in correct language)
-  if (metadata.difficulty === "easy") autoTags.push(isSv ? "Lätt" : "Easy")
-  else if (metadata.difficulty === "medium") autoTags.push(isSv ? "Medium" : "Medium")
-  else if (metadata.difficulty === "hard") autoTags.push(isSv ? "Svår" : "Hard")
-  else autoTags.push(metadata.difficulty)
+  // Translated difficulty (e.g. "Svår" not "hard")
+  autoTags.push(getDifficultyTag(metadata.difficulty, isSv))
 
-  // Add language tag
+  // Language tag
   autoTags.push(isSv ? "Svenska" : "English")
 
-  // Add AI-generated marker only if explicitly enabled
+  // AI-generated marker only if explicitly enabled
   if (metadata.includeAITag === true) {
     autoTags.push(isSv ? "AI-genererad" : "AI-generated")
   }
 
-  // Add tutor initials if provided
+  // Tutor initials if provided
   if (metadata.tutorInitials && metadata.tutorInitials.trim()) {
     autoTags.push(metadata.tutorInitials.trim())
   }
@@ -199,15 +192,15 @@ function generateAutoTags(metadata: ExportMetadata, questionType: string): strin
   return autoTags
 }
 
-// Convert AI-generated options {label: "A", value: "Mucin"} to Wiseflow format {label: "Mucin", value: "0"}
+// Convert options {label: "A", value: "Mucin"} → {label: "Mucin", value: "0"}
 function convertOptionsToWiseflow(options: Array<{ label: string; value: string }>): Array<{ label: string; value: string }> {
   return options.map((opt, index) => ({
-    label: opt.value, // Answer text becomes the label
-    value: index.toString(), // Index as string becomes the value
+    label: opt.value,
+    value: index.toString(),
   }))
 }
 
-// Map correctAnswer labels (e.g. ["A"]) to Wiseflow index values (e.g. ["1"])
+// Map correctAnswer labels (["A"]) → index values (["1"])
 function mapCorrectAnswersToIndices(
   correctAnswer: string[],
   originalOptions: Array<{ label: string; value: string }>
@@ -220,14 +213,11 @@ function mapCorrectAnswersToIndices(
 
 function generateManualTags(metadata: ExportMetadata): string[] {
   const manualTags: string[] = []
-
-  // Add exam center tags
   if (metadata.term) manualTags.push(metadata.term)
   if (metadata.semester) manualTags.push(metadata.semester)
   if (metadata.examType) manualTags.push(metadata.examType)
   if (metadata.courseCode) manualTags.push(metadata.courseCode)
 
-  // Add custom additional tags (comma-separated)
   if (metadata.additionalTags) {
     const customTags = metadata.additionalTags
       .split(",")
@@ -240,78 +230,146 @@ function generateManualTags(metadata: ExportMetadata): string[] {
 }
 
 function generateLabelsFromTags(tags: string[]): WiseflowLabel[] {
-  // Generate unique IDs for labels (simple hash-based approach)
-  return tags.map((tag, index) => ({
-    id: 900000 + Math.abs(hashString(tag)) % 100000, // Generate ID between 900000-999999
+  return tags.map((tag) => ({
+    id: 900000 + Math.abs(hashString(tag)) % 100000,
     name: tag,
     type: "personal" as const,
   }))
 }
 
-// Simple string hash function for consistent label IDs
 function hashString(str: string): number {
   let hash = 0
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i)
     hash = (hash << 5) - hash + char
-    hash = hash & hash // Convert to 32-bit integer
+    hash = hash & hash
   }
   return hash
 }
 
+// Get short title: use stored title if available, otherwise generate from stimulus
+function getShortTitle(question: Question): string {
+  // Use the stored short keyword title from Convex if available
+  if (question.title && question.title.length > 0 && question.title.length <= 80) {
+    return question.title
+  }
+  // Fallback: extract short title from stimulus (first few words)
+  const plainText = question.stimulus.replace(/<[^>]*>/g, "").replace(/&[^;]+;/g, " ").trim()
+  const words = plainText.split(/\s+/).filter(w => w.length > 0)
+  // Take first 3-5 meaningful words for a short title
+  const shortWords = words.slice(0, 5).join(" ")
+  return shortWords.length > 60 ? shortWords.substring(0, 57) + "..." : shortWords
+}
+
+// Build question data object for longtextV2 (essay) — matches real WISEflow format
+function buildEssayQuestionData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    submit_over_limit: true,
+    character_map: true,
+    stimulus: question.stimulus,
+    type: "longtextV2",
+    max_length: 75,
+    validation: {
+      max_score: score,
+    },
+    formatting_options: [
+      "bold", "italic", "underline", "|",
+      "unorderedList", "orderedList", "charactermap"
+    ],
+    score: score,
+    minScore: 0,
+  }
+  // Add instructor_stimulus (model answer/rubric) if available
+  if (question.instructorStimulus) {
+    data.instructor_stimulus = question.instructorStimulus
+  }
+  return data
+}
+
+// Build question data for MCQ — matches real WISEflow format
+function buildMcqQuestionData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "mcq",
+    shuffle_options: true,
+    score: score,
+    minScore: 0,
+  }
+  if (question.options) {
+    data.options = convertOptionsToWiseflow(question.options)
+    data.ui_style = {
+      choice_label: "upper-alpha",
+      type: "horizontal",
+    }
+    if (question.correctAnswer) {
+      data.validation = {
+        scoring_type: "exactMatch",
+        valid_response: {
+          score: score,
+          value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
+        },
+      }
+    }
+  }
+  return data
+}
+
+// Build question data for short_answer — uses longtextV2 with shorter max_length
+function buildShortAnswerData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    submit_over_limit: true,
+    stimulus: question.stimulus,
+    type: "longtextV2",
+    max_length: 25,
+    validation: {
+      max_score: score,
+    },
+    formatting_options: ["bold", "unorderedList", "orderedList"],
+    score: score,
+    minScore: 0,
+  }
+  if (question.instructorStimulus) {
+    data.instructor_stimulus = question.instructorStimulus
+  }
+  return data
+}
+
 export function exportToWiseflowJSON(questions: Question[], metadata: ExportMetadata): string {
-  // Manual tags are shared across all questions
   const manualTags = generateManualTags(metadata)
 
   if (metadata.exportFormat === "legacy") {
     // LEGACY FORMAT (nya versionen) - Learnosity JSON structure
     const timestamp = Date.now()
 
-    const items: WiseflowLegacyItem[] = questions.map((question, index) => {
+    const items: WiseflowLegacyItem[] = questions.map((question) => {
       const questionRef = generateUUID()
       const itemRef = generateUUID()
+      const title = getShortTitle(question)
+      const score = getScore(question, metadata)
 
-      // Strip HTML tags from stimulus for title
-      const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
-      const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
-
-      // Per-question tags (only THIS question's type, not all types)
       const autoTags = generateAutoTags(metadata, question.type)
       const allTags = [...autoTags, ...manualTags]
 
-      const wiseflowQuestion: WiseflowLegacyQuestion = {
-        type: question.type,
-        widget_type: "response",
-        reference: questionRef,
-        data: {
-          minScore: 0,
-          score: 1,
-          stimulus: question.stimulus,
-          type: question.type,
-        },
-        metadata: null,
+      // Build question data based on type
+      let questionData
+      const effectiveType = getEffectiveWiseflowType(question.type)
+
+      if (question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") {
+        questionData = buildMcqQuestionData(question, score)
+      } else {
+        // All text-based types → longtextV2
+        questionData = buildEssayQuestionData(question, score)
       }
 
-      // Add MCQ/True-False specific fields
-      if ((question.type === "mcq" || question.type === "true_false") && question.options) {
-        // Convert options: {label: "A", value: "Mucin"} → {label: "Mucin", value: "0"}
-        wiseflowQuestion.data.options = convertOptionsToWiseflow(question.options)
-        wiseflowQuestion.data.shuffle_options = true
-        wiseflowQuestion.data.ui_style = {
-          choice_label: "upper-alpha",
-          type: "horizontal",
-        }
-
-        // Map correct answers to index-based values
-        if (question.correctAnswer) {
-          wiseflowQuestion.data.validation = {
-            scoring_type: "exactMatch",
-            valid_response: {
-              score: 1,
-              value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
-            },
-          }
-        }
+      const wiseflowQuestion: WiseflowLegacyQuestion = {
+        type: effectiveType,
+        widget_type: "response",
+        reference: questionRef,
+        data: questionData,
+        metadata: null,
       }
 
       return {
@@ -347,7 +405,7 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
     return JSON.stringify(root, null, 2)
   } else {
-    // UTGÅENDE FORMAT (gamla versionen) - Array structure
+    // UTGÅENDE FORMAT — matches real WISEflow BEL.json structure
     const timestamp = Math.floor(Date.now() / 1000)
     const userProfile = getUserProfile(metadata)
 
@@ -355,51 +413,36 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       const baseId = 3500001 + index
       const itemId = 700001 + index
       const questionId = 6000001 + index
+      const title = getShortTitle(question)
+      const score = getScore(question, metadata)
 
-      // Strip HTML tags from stimulus for title
-      const plainTitle = question.stimulus.replace(/<[^>]*>/g, "").trim()
-      const title = plainTitle.length > 100 ? plainTitle.substring(0, 97) + "..." : plainTitle
-
-      // Per-question tags (only THIS question's type)
       const autoTags = generateAutoTags(metadata, question.type)
       const allTags = [...autoTags, ...manualTags]
 
+      // Build question data based on type (matching real WISEflow format)
+      let questionData
+      const effectiveType = getEffectiveWiseflowType(question.type)
+
+      if (question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") {
+        questionData = buildMcqQuestionData(question, score)
+      } else if (question.type === "short_answer") {
+        questionData = buildShortAnswerData(question, score)
+      } else {
+        // Essay, fill_blank, matching, ordering, hotspot, rating → longtextV2
+        questionData = buildEssayQuestionData(question, score)
+      }
+
       const utgaendeQuestion: WiseflowUtgaendeQuestion = {
         id: questionId,
-        data: {
-          stimulus: question.stimulus,
-          type: question.type,
-          shuffle_options: true,
-          score: 1,
-          minScore: 0,
-        },
+        data: questionData,
         itemId: baseId,
-        maxScore: 1,
+        maxScore: score,
         minScore: 0,
       }
 
-      // Add MCQ/True-False specific fields
-      if ((question.type === "mcq" || question.type === "true_false") && question.options) {
-        // Convert options: {label: "A", value: "Mucin"} → {label: "Mucin", value: "0"}
-        utgaendeQuestion.data.options = convertOptionsToWiseflow(question.options)
-        utgaendeQuestion.data.ui_style = {
-          choice_label: "upper-alpha",
-          type: "block",
-        }
-
-        // Map correct answers to index-based values
-        if (question.correctAnswer) {
-          utgaendeQuestion.data.validation = {
-            scoring_type: "exactMatch",
-            valid_response: {
-              score: 1,
-              value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
-            },
-          }
-        }
-      }
-
-      const reference = metadata.tutorInitials ? `${metadata.tutorInitials.toUpperCase()}${String(index + 1).padStart(2, "0")}` : `Q${String(index + 1).padStart(2, "0")}`
+      const reference = metadata.tutorInitials
+        ? `${metadata.tutorInitials.toUpperCase()}${String(index + 1).padStart(2, "0")}`
+        : `Q${String(index + 1).padStart(2, "0")}`
 
       return {
         id: itemId,
@@ -419,7 +462,7 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         shareFirstName: userProfile.firstName,
         shareLastName: userProfile.lastName,
         showAsItem: 1 as const,
-        maxScore: 1,
+        maxScore: score,
         tags: allTags,
         type: 0 as const,
         questionCount: 1,
@@ -433,7 +476,27 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
   }
 }
 
-// Helper to generate UUID for legacy format
+// Map TentaGen types to WISEflow-compatible types
+function getEffectiveWiseflowType(type: string): string {
+  // WISEflow only natively supports: longtextV2, mcq, choicematrix, association, classification
+  // Map our types to the closest WISEflow equivalent
+  switch (type) {
+    case "mcq":
+    case "true_false":
+    case "multiple_response":
+      return "mcq"
+    case "longtextV2":
+    case "short_answer":
+    case "fill_blank":
+    case "matching":
+    case "ordering":
+    case "hotspot":
+    case "rating_scale":
+    default:
+      return "longtextV2"
+  }
+}
+
 function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     const r = (Math.random() * 16) | 0
@@ -442,18 +505,13 @@ function generateUUID(): string {
   })
 }
 
-// Helper to extract user profile from metadata
 function getUserProfile(metadata: ExportMetadata): { firstName: string; lastName: string } {
-  // Parse tutor initials like "id:pma" or "JD"
   const initials = metadata.tutorInitials || ""
 
   if (initials.startsWith("id:")) {
-    // Format: id:pma → First: Parvis, Last: Assar
     const id = initials.substring(3).toLowerCase()
-    // Simple mapping - in real app this would come from user profile
     return { firstName: "Tutor", lastName: id.toUpperCase() }
   } else if (initials.length >= 2) {
-    // Format: JD → First: J, Last: D
     return { firstName: initials[0], lastName: initials.substring(1) }
   }
 
@@ -463,16 +521,13 @@ function getUserProfile(metadata: ExportMetadata): { firstName: string; lastName
 export function downloadWiseflowJSON(questions: Question[], metadata: ExportMetadata) {
   const jsonString = exportToWiseflowJSON(questions, metadata)
 
-  // Create blob and download
   const blob = new Blob([jsonString], { type: "application/json" })
   const url = URL.createObjectURL(blob)
 
-  // Generate filename with timestamp and format
-  const timestamp = new Date().toISOString().split("T")[0] // YYYY-MM-DD
+  const timestamp = new Date().toISOString().split("T")[0]
   const format = metadata.exportFormat === "legacy" ? "legacy" : "utgaende"
   const filename = `wiseflow_${metadata.subject.toLowerCase().replace(/\s+/g, "_")}_${format}_${timestamp}.json`
 
-  // Trigger download
   const link = document.createElement("a")
   link.href = url
   link.download = filename
@@ -480,6 +535,5 @@ export function downloadWiseflowJSON(questions: Question[], metadata: ExportMeta
   link.click()
   document.body.removeChild(link)
 
-  // Clean up
   URL.revokeObjectURL(url)
 }

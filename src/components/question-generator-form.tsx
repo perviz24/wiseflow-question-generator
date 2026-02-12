@@ -301,12 +301,30 @@ export function QuestionGeneratorForm() {
 
     setIsSaving(true)
     try {
-      // Build base auto-tags (same for all questions)
+      const isSv = metadata.language === "sv"
+
+      // Translate difficulty to display name (single language, not raw "hard"/"easy")
+      const difficultyMap: Record<string, [string, string]> = {
+        easy: ["Easy", "Lätt"], medium: ["Medium", "Medium"], hard: ["Hard", "Svår"],
+      }
+      const diffEntry = difficultyMap[metadata.difficulty]
+      const difficultyTag = diffEntry ? (isSv ? diffEntry[1] : diffEntry[0]) : metadata.difficulty
+
+      // Translate question type to display name (single language, not raw "true_false")
+      const typeMap: Record<string, [string, string]> = {
+        mcq: ["MCQ", "Flervalsfråga"], true_false: ["True/False", "Sant/Falskt"],
+        longtextV2: ["Essay", "Essä"], short_answer: ["Short Answer", "Kort svar"],
+        fill_blank: ["Fill in the Blank", "Ifyllnad"], multiple_response: ["Multiple Response", "Flera rätt"],
+        matching: ["Matching", "Matchning"], ordering: ["Ordering", "Ordningsföljd"],
+        hotspot: ["Image Hotspot", "Bildmarkering"], rating_scale: ["Rating Scale", "Betygsskala"],
+      }
+
+      // Build base auto-tags with TRANSLATED values (same for all questions)
       const baseAutoTags = [
         metadata.subject,
         metadata.topic,
-        metadata.difficulty,
-        metadata.language,
+        difficultyTag,
+        isSv ? "Svenska" : "English",
         formData.term,
         formData.semester,
         formData.examType,
@@ -319,12 +337,15 @@ export function QuestionGeneratorForm() {
         : []
 
       // Add AI-generated tag if requested
-      const aiTag = formData.includeAITag ? (metadata.language === 'sv' ? 'AI-genererad' : 'AI-generated') : null
+      const aiTag = formData.includeAITag ? (isSv ? 'AI-genererad' : 'AI-generated') : null
 
       // Transform questions to match Convex schema
       const questionsToSave = generatedQuestions.map((q) => {
-        // Combine all tags including question-specific type
-        const allTags = [...baseAutoTags, q.type, ...customTags, ...(aiTag ? [aiTag] : [])]
+        // Translate type to display name for tags (e.g., "Sant/Falskt" not "true_false")
+        const typeEntry = typeMap[q.type]
+        const typeTag = typeEntry ? (isSv ? typeEntry[1] : typeEntry[0]) : q.type
+        // Combine all tags with translated display names only
+        const allTags = [...baseAutoTags, typeTag, ...customTags, ...(aiTag ? [aiTag] : [])]
 
         return {
           title: generateQuestionTitle(q.stimulus, q.type),
