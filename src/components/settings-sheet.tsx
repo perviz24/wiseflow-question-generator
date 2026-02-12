@@ -85,11 +85,11 @@ export function SettingsSheet() {
           <span className="sr-only">{t("settings")}</span>
         </Button>
       </SheetTrigger>
-      <SheetContent className="sm:max-w-md">
-        <SheetHeader className="pb-2">
-          <SheetTitle className="flex items-center gap-3 text-xl">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <Settings className="h-5 w-5 text-primary" />
+      <SheetContent className="sm:max-w-sm">
+        <SheetHeader className="pb-1">
+          <SheetTitle className="flex items-center gap-2.5 text-lg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary/10">
+              <Settings className="h-4 w-4 text-primary" />
             </div>
             {t("profileSettings")}
           </SheetTitle>
@@ -98,19 +98,19 @@ export function SettingsSheet() {
           </SheetDescription>
         </SheetHeader>
 
-        <Separator className="my-4" />
+        <Separator className="my-3" />
 
         {profile === undefined ? (
-          <div className="flex h-64 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <div className="flex h-48 items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <form onSubmit={handleSave} className="space-y-6">
+          <form onSubmit={handleSave} className="space-y-4">
             {/* Tutor Initials Section */}
-            <div className="rounded-lg border bg-card p-4 space-y-3">
+            <div className="rounded-lg border bg-card p-3 space-y-2">
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="tutorInitials" className="text-sm font-semibold">
+                <User className="h-3.5 w-3.5 text-muted-foreground" />
+                <Label htmlFor="tutorInitials" className="text-sm font-medium">
                   {t("tutorInitials")} *
                 </Label>
               </div>
@@ -122,7 +122,7 @@ export function SettingsSheet() {
                 maxLength={20}
                 autoComplete="off"
                 required
-                className="h-11 text-base"
+                className="h-9 text-sm"
               />
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t("tutorInitialsHelp")}
@@ -130,10 +130,10 @@ export function SettingsSheet() {
             </div>
 
             {/* UI Language Section */}
-            <div className="rounded-lg border bg-card p-4 space-y-3">
+            <div className="rounded-lg border bg-card p-3 space-y-2">
               <div className="flex items-center gap-2">
-                <Languages className="h-4 w-4 text-muted-foreground" />
-                <Label htmlFor="uiLanguage" className="text-sm font-semibold">
+                <Languages className="h-3.5 w-3.5 text-muted-foreground" />
+                <Label htmlFor="uiLanguage" className="text-sm font-medium">
                   {t("uiLanguage")}
                 </Label>
               </div>
@@ -141,12 +141,12 @@ export function SettingsSheet() {
                 value={uiLanguage}
                 onValueChange={(value: "sv" | "en") => setUiLanguage(value)}
               >
-                <SelectTrigger id="uiLanguage" className="h-11 text-base">
+                <SelectTrigger id="uiLanguage" className="h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="sv" className="py-3">{t("swedish")}</SelectItem>
-                  <SelectItem value="en" className="py-3">{t("english")}</SelectItem>
+                  <SelectItem value="sv" className="py-2 text-sm">{t("swedish")}</SelectItem>
+                  <SelectItem value="en" className="py-2 text-sm">{t("english")}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -157,18 +157,18 @@ export function SettingsSheet() {
             {/* Save Button */}
             <Button
               type="submit"
-              size="lg"
-              className="w-full h-12 text-base font-medium"
+              size="default"
+              className="w-full h-9 text-sm font-medium"
               disabled={isSaving || !tutorInitials.trim()}
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                   {t("saving")}
                 </>
               ) : (
                 <>
-                  <Save className="mr-2 h-5 w-5" />
+                  <Save className="mr-1.5 h-4 w-4" />
                   {t("saveSettings")}
                 </>
               )}
