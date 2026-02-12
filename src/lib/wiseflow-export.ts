@@ -2,7 +2,7 @@
 // Formats aligned with real WISEflow BEL.json reference structure
 
 interface Question {
-  type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
+  type: string // Question type ID from question-types.ts registry
   stimulus: string
   options?: Array<{
     label: string

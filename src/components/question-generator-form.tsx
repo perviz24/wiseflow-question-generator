@@ -120,7 +120,7 @@ import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 import { downloadQti21 } from "@/lib/qti-export"
 import { useTranslation } from "@/lib/language-context"
 
-type QuestionType = "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
+type QuestionType = string // Question type ID from question-types.ts registry
 type Difficulty = "easy" | "medium" | "hard"
 type Language = "sv" | "en"
 type ExportFormat = "legacy" | "utgaende" | "qti21"
@@ -370,7 +370,8 @@ export function QuestionGeneratorForm() {
           difficulty: metadata.difficulty as "easy" | "medium" | "hard",
           language: metadata.language as "sv" | "en",
           tags: allTags,
-          type: q.type,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          type: q.type as any, // Type validated by question-types.ts registry
           stimulus: q.stimulus,
           options: q.options,
           correctAnswer: q.correctAnswer,

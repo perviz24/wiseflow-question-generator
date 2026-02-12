@@ -20,12 +20,14 @@ export const getUserProfile = query({
       return {
         tutorInitials: "",
         uiLanguage: "sv" as const,
+        enabledQuestionTypes: undefined,
       }
     }
 
     return {
       tutorInitials: profile.tutorInitials,
       uiLanguage: profile.uiLanguage,
+      enabledQuestionTypes: profile.enabledQuestionTypes,
     }
   },
 })
@@ -35,6 +37,7 @@ export const upsertProfile = mutation({
   args: {
     tutorInitials: v.string(),
     uiLanguage: v.union(v.literal("sv"), v.literal("en")),
+    enabledQuestionTypes: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()
@@ -54,6 +57,7 @@ export const upsertProfile = mutation({
       await ctx.db.patch(existing._id, {
         tutorInitials: args.tutorInitials,
         uiLanguage: args.uiLanguage,
+        enabledQuestionTypes: args.enabledQuestionTypes,
         updatedAt: now,
       })
       return { success: true, action: "updated" }
@@ -63,6 +67,7 @@ export const upsertProfile = mutation({
         userId: identity.subject,
         tutorInitials: args.tutorInitials,
         uiLanguage: args.uiLanguage,
+        enabledQuestionTypes: args.enabledQuestionTypes,
         createdAt: now,
         updatedAt: now,
       })
