@@ -359,8 +359,10 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
 
       if (question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") {
         questionData = buildMcqQuestionData(question, score)
+      } else if (question.type === "short_answer") {
+        questionData = buildShortAnswerData(question, score)
       } else {
-        // All text-based types → longtextV2
+        // Essay, fill_blank, matching, ordering, hotspot, rating → longtextV2
         questionData = buildEssayQuestionData(question, score)
       }
 
