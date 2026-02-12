@@ -34,6 +34,7 @@ import {
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 import { downloadQti21, downloadQti22 } from "@/lib/qti-export"
 import { downloadCSV } from "@/lib/csv-export"
+import { exportToWord } from "@/lib/word-export"
 
 interface Question {
   type: "mcq" | "true_false" | "longtextV2" | "short_answer" | "fill_blank" | "multiple_response" | "matching" | "ordering" | "hotspot" | "rating_scale"
@@ -352,11 +353,25 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
     }
   }
 
-  const handleExport = async (format: "wiseflow-legacy" | "wiseflow-utgaende" | "qti21" | "qti22" | "csv") => {
+  const handleExport = async (format: "wiseflow-legacy" | "wiseflow-utgaende" | "qti21" | "qti22" | "csv" | "word") => {
     setIsExportingFormat(true)
 
     try {
-      if (format === "csv") {
+      if (format === "word") {
+        const blob = await exportToWord(questions, metadata)
+        const timestamp = new Date().toISOString().split("T")[0]
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = `${metadata.subject}_tentafragor_${timestamp}.docx`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        toast.success("Word exported!", {
+          description: "Questions exported as Word (.docx) document."
+        })
+      } else if (format === "csv") {
         downloadCSV(questions, metadata)
         toast.success("CSV exported!", {
           description: "Questions exported in CSV format for Excel/Google Sheets."
@@ -451,6 +466,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("qti22")}>
                     QTI 2.2 Inspera (ZIP)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleExport("word")}>
+                    Word (.docx)
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("csv")}>
                     CSV (Excel/Sheets)

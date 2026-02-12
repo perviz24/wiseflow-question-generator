@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, CheckCircle2, Circle, Trash2, Filter } from "lucide-react"
+import { Loader2, BookOpen, Calendar, Tag, Download, Edit2, Check, X, CheckCircle2, Circle, Trash2, Filter, FileText } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import { AppHeader } from "@/components/app-header"
@@ -21,6 +21,7 @@ import { toast } from "sonner"
 import { Id } from "../../../convex/_generated/dataModel"
 import { exportToWiseflowJSON } from "@/lib/wiseflow-export"
 import { exportToQti21, exportToQti22 } from "@/lib/qti-export"
+import { exportToWord } from "@/lib/word-export"
 
 interface EditState {
   questionId: string
@@ -272,7 +273,7 @@ export default function LibraryPage() {
     }
   }
 
-  const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22") => {
+  const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22" | "word") => {
     if (!questions || selectedQuestions.size === 0) {
       toast.error("Ingen fråga vald", {
         description: "Välj minst en fråga att exportera"
@@ -293,7 +294,27 @@ export default function LibraryPage() {
         includeLanguageTag: selected[0]?.tags?.some((t: string) => t === "Svenska" || t === "English") || false,
       }
 
-      if (format === "qti21" || format === "qti22") {
+      // Helper to trigger download
+      const downloadBlob = (blob: Blob, filename: string) => {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+
+      if (format === "word") {
+        // Word (.docx) export
+        const blob = await exportToWord(selected, metadata)
+        const timestamp = new Date().toISOString().split("T")[0]
+        downloadBlob(blob, `${metadata.subject}_tentafragor_${timestamp}.docx`)
+        toast.success("Word-export lyckades!", {
+          description: `${selectedQuestions.size} frågor exporterade som .docx`
+        })
+      } else if (format === "qti21" || format === "qti22") {
         // QTI export as ZIP
         const JSZip = (await import("jszip")).default
         const zip = new JSZip()
@@ -304,18 +325,8 @@ export default function LibraryPage() {
         })
 
         const blob = await zip.generateAsync({ type: "blob" })
-        const url = URL.createObjectURL(blob)
         const timestamp = new Date().toISOString().split("T")[0]
-        const filename = `library_export_${format}_${timestamp}.zip`
-
-        const a = document.createElement("a")
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-
+        downloadBlob(blob, `library_export_${format}_${timestamp}.zip`)
         toast.success(`${format.toUpperCase()} export lyckades!`, {
           description: `${selectedQuestions.size} frågor exporterade som ZIP`
         })
@@ -326,17 +337,8 @@ export default function LibraryPage() {
           exportFormat: format === "legacy" ? "legacy" : "utgaende"
         })
         const filename = `library-export-${format}-${Date.now()}.json`
-
         const blob = new Blob([jsonContent], { type: "application/json" })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = filename
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        URL.revokeObjectURL(url)
-
+        downloadBlob(blob, filename)
         toast.success("Export lyckades!", {
           description: `${selectedQuestions.size} frågor exporterade (${format.toUpperCase()})`
         })
@@ -483,6 +485,15 @@ export default function LibraryPage() {
                       >
                         <Download className="mr-2 h-4 w-4" />
                         Legacy JSON
+                      </Button>
+                      <Button
+                        onClick={() => exportSelected("word")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        Word (.docx)
                       </Button>
                       <Button
                         onClick={() => exportSelected("qti21")}
