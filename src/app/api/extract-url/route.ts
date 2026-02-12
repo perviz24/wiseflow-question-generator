@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     // Use simple fetch for now (can be replaced with Firecrawl later)
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; WiseflowBot/1.0)",
+        "User-Agent": "Mozilla/5.0 (compatible; TentaGenBot/1.0)",
       },
     })
 

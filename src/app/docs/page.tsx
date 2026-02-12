@@ -35,8 +35,8 @@ export default function DocsPage() {
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {isSv
-                ? "Lär dig hur du skapar pedagogiskt genomtänkta tentafrågor med AI för dina Wiseflow-tentor"
-                : "Learn how to create pedagogically sound exam questions with AI for your Wiseflow exams"}
+                ? "Lär dig hur du skapar pedagogiskt genomtänkta tentafrågor med AI med hjälp av TentaGen"
+                : "Learn how to create pedagogically sound exam questions with AI using TentaGen"}
             </p>
           </div>
 
@@ -45,7 +45,7 @@ export default function DocsPage() {
           {/* Key Benefits */}
           <div className="space-y-6">
             <h2 className="text-2xl font-bold tracking-tight text-center">
-              {isSv ? "Varför Wiseflow Fr\u00e5gegenerator?" : "Why Wiseflow Question Generator?"}
+              {isSv ? "Varför TentaGen?" : "Why TentaGen?"}
             </h2>
             <div className="grid gap-4 md:grid-cols-3">
               <Card className="border-primary/20 bg-primary/5">

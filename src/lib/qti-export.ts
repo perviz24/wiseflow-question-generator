@@ -138,7 +138,7 @@ function generateQtiManifest(questions: Question[], metadata: ExportMetadata): s
           <imsmd:langstring xml:lang="${metadata.language}">${escapeXml(metadata.subject)} - ${escapeXml(metadata.topic)}</imsmd:langstring>
         </imsmd:title>
         <imsmd:description>
-          <imsmd:langstring xml:lang="${metadata.language}">Generated with Wiseflow Question Generator - ${timestamp}</imsmd:langstring>
+          <imsmd:langstring xml:lang="${metadata.language}">Generated with TentaGen - ${timestamp}</imsmd:langstring>
         </imsmd:description>
         <imsmd:keyword>
           <imsmd:langstring xml:lang="${metadata.language}">${escapeXml(metadata.subject)}</imsmd:langstring>
@@ -341,7 +341,7 @@ function generateQti22Manifest(questions: Question[], metadata: ExportMetadata):
           <imsmd:langstring xml:lang="${metadata.language}">${escapeXml(metadata.subject)} - ${escapeXml(metadata.topic)}</imsmd:langstring>
         </imsmd:title>
         <imsmd:description>
-          <imsmd:langstring xml:lang="${metadata.language}">Generated with Wiseflow Question Generator - ${timestamp}</imsmd:langstring>
+          <imsmd:langstring xml:lang="${metadata.language}">Generated with TentaGen - ${timestamp}</imsmd:langstring>
         </imsmd:description>
         <imsmd:keyword>
           <imsmd:langstring xml:lang="${metadata.language}">${escapeXml(metadata.subject)}</imsmd:langstring>

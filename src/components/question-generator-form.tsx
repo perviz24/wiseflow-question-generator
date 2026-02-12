@@ -485,9 +485,17 @@ export function QuestionGeneratorForm() {
           isExporting={isExporting}
         />
         <div className="flex justify-center">
-          <Button onClick={handleGenerateNew} variant="outline">
-            <Sparkles className="mr-2 h-4 w-4" />
-            {t("generateNew")}
+          <Button
+            onClick={() => {
+              localStorage.removeItem("wiseflow-preview-session")
+              window.location.href = "/"
+            }}
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+            {t("startOver")}
           </Button>
         </div>
       </div>
@@ -978,7 +986,7 @@ export function QuestionGeneratorForm() {
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
                     <p className="text-sm">
-                      These tags help organize questions in your Wiseflow exam center. All fields are optional and will be included in the export.
+                      These tags help organize your exported questions. All fields are optional and will be included in the export.
                     </p>
                   </TooltipContent>
                 </Tooltip>

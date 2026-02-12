@@ -482,7 +482,7 @@ export const translations: Record<Language, Translations> = {
     profileSettingsDescription: "Ställ in dina personliga inställningar för frågegenereringen",
     tutorInitials: "Lärarinitialer",
     tutorInitialsPlaceholder: "t.ex. AB, JD, eller id:pma",
-    tutorInitialsHelp: "Dessa initialer läggs automatiskt till som tagg på alla dina genererade frågor. Detta hjälper dig att hitta dina frågor i Wiseflow.",
+    tutorInitialsHelp: "Dessa initialer läggs automatiskt till som tagg på alla dina genererade frågor. Detta hjälper dig att hitta dina frågor.",
     uiLanguage: "Gränssnittsspråk",
     uiLanguageHelp: "Välj vilket språk du vill använda i gränssnittet",
     saveSettings: "Spara inställningar",
@@ -513,7 +513,7 @@ export const translations: Record<Language, Translations> = {
     instructionManual: "Användarmanual",
 
     // Library Page
-    librarySubtitle: "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i Wiseflow eller andra LMS-plattformar.",
+    librarySubtitle: "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i WISEflow, Inspera eller andra LMS-plattformar.",
 
     // Footer
     footerDeveloper: "Utvecklad av",
@@ -748,7 +748,7 @@ export const translations: Record<Language, Translations> = {
     profileSettingsDescription: "Configure your personal settings for question generation",
     tutorInitials: "Tutor Initials",
     tutorInitialsPlaceholder: "e.g., AB, JD, or id:pma",
-    tutorInitialsHelp: "These initials will be automatically added as a tag to all your generated questions. This helps you find your questions in Wiseflow.",
+    tutorInitialsHelp: "These initials will be automatically added as a tag to all your generated questions. This helps you find your questions.",
     uiLanguage: "UI Language",
     uiLanguageHelp: "Choose which language to use in the interface",
     saveSettings: "Save Settings",
@@ -779,7 +779,7 @@ export const translations: Record<Language, Translations> = {
     instructionManual: "Instruction Manual",
 
     // Library Page
-    librarySubtitle: "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in Wiseflow or other LMS platforms.",
+    librarySubtitle: "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in WISEflow, Inspera, or other LMS platforms.",
 
     // Footer
     footerDeveloper: "Developed by",
