@@ -23,20 +23,39 @@ export default function Home() {
         <SignedIn>
           <div className="flex flex-col items-center gap-6 sm:gap-8 w-full">
             <div className="text-center px-2">
-              {/* TentaGen Logo */}
-              <div className="flex justify-center mb-4">
+              {/* TentaGen Logo + Brand Name */}
+              <div className="flex items-center justify-center gap-3 mb-4">
                 <Image
                   src="/logo.svg"
                   alt="TentaGen"
-                  width={64}
-                  height={64}
+                  width={56}
+                  height={56}
                   className="text-foreground dark:invert"
                   priority
                 />
+                <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">TentaGen</span>
               </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 {t("createQuestionsTitle")}
               </h2>
+              {/* Start Over — positioned right below title */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const form = document.querySelector('form')
+                  if (form) {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  } else {
+                    localStorage.removeItem("wiseflow-preview-session")
+                    window.location.href = "/"
+                  }
+                }}
+                className="mt-2 text-muted-foreground hover:text-foreground"
+              >
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                {t("startOver")}
+              </Button>
               <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {t("createQuestionsSubtitle")}
               </p>
@@ -61,36 +80,19 @@ export default function Home() {
                   <span>{t("heroMultipleFormats")}</span>
                 </div>
               </div>
-              {/* Start Over / Scroll to Form Button */}
-              <Button
-                size="lg"
-                onClick={() => {
-                  // If a form exists, scroll to it; otherwise reload to reset preview state
-                  const form = document.querySelector('form')
-                  if (form) {
-                    form.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  } else {
-                    // Questions are showing (preview mode) — reset everything
-                    localStorage.removeItem("wiseflow-preview-session")
-                    window.location.href = "/"
-                  }
-                }}
-                className="mt-2"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                {t("startOver")}
-              </Button>
-              {/* Instruction Manual Button */}
-              <Link href="/docs">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="mt-2"
-                >
-                  <BookOpen className="mr-2 h-4 w-4" />
-                  {t("instructionManual")}
-                </Button>
-              </Link>
+              {/* Instruction Manual — centered below benefits */}
+              <div className="mt-4 flex justify-center">
+                <Link href="/docs">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-muted-foreground"
+                  >
+                    <BookOpen className="mr-1.5 h-3.5 w-3.5" />
+                    {t("instructionManual")}
+                  </Button>
+                </Link>
+              </div>
             </div>
             <QuestionGeneratorForm />
           </div>
@@ -98,15 +100,18 @@ export default function Home() {
 
         <SignedOut>
           <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
-            {/* TentaGen Logo */}
-            <Image
-              src="/logo.svg"
-              alt="TentaGen"
-              width={80}
-              height={80}
-              className="text-foreground dark:invert"
-              priority
-            />
+            {/* TentaGen Logo + Brand Name */}
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="TentaGen"
+                width={72}
+                height={72}
+                className="text-foreground dark:invert"
+                priority
+              />
+              <span className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">TentaGen</span>
+            </div>
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               {t("welcomeTitle")}
             </h2>

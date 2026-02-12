@@ -294,8 +294,8 @@ export const translations: Record<Language, Translations> = {
     contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
     videoSectionTitle: "🎬 Förvandla inspelad videoföreläsning till tentafrågor",
     uploadVideoFile: "Ladda upp videofil",
-    videoUrlLabel: "Eller klistra in en YouTube-URL (med undertexter aktiverade)",
-    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
+    videoUrlLabel: "Eller klistra in en video-URL",
+    videoUrlPlaceholder: "https://example.com/video...",
     videoSupportNote: "AI transkriberar och analyserar hela videon — vanligtvis klart inom 3–5 min för en 30 min föreläsning.",
 
     // Tagging Section
@@ -506,8 +506,8 @@ export const translations: Record<Language, Translations> = {
     contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
     videoSectionTitle: "🎬 Turn recorded video lectures into exam questions",
     uploadVideoFile: "Upload video file",
-    videoUrlLabel: "Or paste a YouTube URL (with captions enabled)",
-    videoUrlPlaceholder: "https://youtube.com/watch?v=...",
+    videoUrlLabel: "Or paste a video URL",
+    videoUrlPlaceholder: "https://example.com/video...",
     videoSupportNote: "AI transcribes and analyzes the full video — typically done in 3–5 min for a 30 min lecture.",
 
     // Tagging Section

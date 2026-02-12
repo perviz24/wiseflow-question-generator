@@ -326,7 +326,7 @@ export default function DocsPage() {
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                         <span>
-                          <strong>Video:</strong> {isSv ? "Ladda upp videofiler eller klistra in video-URL:er (YouTube, Vimeo m.fl.) för automatisk transkription" : "Upload video files or paste video URLs (YouTube, Vimeo, etc.) for automatic transcription"}
+                          <strong>Video:</strong> {isSv ? "Ladda upp videofiler eller klistra in video-URL:er för automatisk transkription" : "Upload video files or paste video URLs for automatic transcription"}
                         </span>
                       </li>
                       <li className="flex items-start gap-2">

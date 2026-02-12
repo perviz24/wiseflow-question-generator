@@ -502,10 +502,7 @@ export function QuestionGeneratorForm() {
             <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0 drop-shadow-sm" />
             <span className="truncate bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t("generateQuestions")}</span>
           </CardTitle>
-          <CardDescription className="text-sm sm:text-base text-muted-foreground mt-1.5">
-            {t("createQuestionsSubtitle")}
-          </CardDescription>
-          <div className="mt-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+          <div className="mt-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
             <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
               ℹ️ {t("aiModeInfo")}
             </p>

@@ -29,7 +29,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   const [isProcessing, setIsProcessing] = useState(false)
   const [uploadedItems, setUploadedItems] = useState<UploadedItem[]>([])
   const [urlInputs, setUrlInputs] = useState<string[]>([""])
-  const [youtubeUrl, setYoutubeUrl] = useState("")
+  const [videoUrl, setVideoUrl] = useState("")
   const [videoFile, setVideoFile] = useState<File | null>(null)
 
   const convex = useConvex()
@@ -347,7 +347,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     }
   }
 
-  // Check if a URL is a YouTube URL
+  // Check if a URL is a YouTube URL (uses youtube-transcript package for these)
   const isYouTubeUrl = (url: string): boolean => {
     try {
       const parsed = new URL(url)
@@ -379,7 +379,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
   }
 
   const handleVideoUrlSubmit = async () => {
-    const url = youtubeUrl.trim()
+    const url = videoUrl.trim()
     if (!url) return
 
     // Basic URL validation
@@ -396,8 +396,8 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
     try {
       if (isYouTubeUrl(url)) {
-        // YouTube URLs → use youtube-transcript package (AssemblyAI can't fetch YouTube pages)
-        setTranscriptionProgress("Hämtar YouTube-transkription...")
+        // YouTube URLs → use youtube-transcript package (AssemblyAI can't fetch YouTube/Vimeo pages)
+        setTranscriptionProgress("Hämtar transkription...")
 
         const response = await fetch("/api/extract-youtube-transcript", {
           method: "POST",
@@ -418,7 +418,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           { id: Date.now().toString() + Math.random(), name: url, type: "youtube" },
         ])
 
-        toast.success("YouTube-transkription klar!", {
+        toast.success("Videotranskription klar!", {
           description: `Extraherade ${data.characterCount} tecken`,
         })
       } else {
@@ -462,7 +462,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         })
       }
 
-      setYoutubeUrl("")
+      setVideoUrl("")
     } catch (error) {
       console.error("Video transcript extraction failed:", error)
       toast.error("Extraktion misslyckades", {
@@ -679,19 +679,19 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
 
             {/* Video URL Input */}
             <div className="space-y-2">
-              <Label htmlFor="youtube-url">
+              <Label htmlFor="video-url">
                 {t("videoUrlLabel")}
               </Label>
               <div className="flex gap-2">
                 <Input
-                  id="youtube-url"
+                  id="video-url"
                   type="url"
                   placeholder={t("videoUrlPlaceholder")}
-                  value={youtubeUrl}
-                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
                   disabled={isProcessing}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && youtubeUrl.trim()) {
+                    if (e.key === "Enter" && videoUrl.trim()) {
                       e.preventDefault()
                       handleVideoUrlSubmit()
                     }
@@ -700,7 +700,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
                 <Button
                   type="button"
                   onClick={handleVideoUrlSubmit}
-                  disabled={isProcessing || !youtubeUrl.trim()}
+                  disabled={isProcessing || !videoUrl.trim()}
                   size="icon"
                 >
                   {isProcessing ? (
