@@ -1,5 +1,6 @@
 // Export questions to Wiseflow "innehållsbank" JSON format
 // Formats aligned with real WISEflow BEL.json reference structure
+import { getLearnosityType } from "@/lib/question-types"
 
 interface Question {
   type: string // Question type ID from question-types.ts registry
@@ -136,6 +137,16 @@ function getQuestionTypeTag(type: string, isSv: boolean): string {
     ordering: ["Ordering", "Ordningsföljd"],
     hotspot: ["Image Hotspot", "Bildmarkering"],
     rating_scale: ["Rating Scale", "Betygsskala"],
+    choicematrix: ["Choice Matrix", "Valsmatris"],
+    clozetext: ["Cloze Text", "Lucktext"],
+    clozedropdown: ["Cloze Dropdown", "Rullgardinslucka"],
+    orderlist: ["Order List", "Ordningslista"],
+    tokenhighlight: ["Token Highlight", "Tokenmarkering"],
+    clozeassociation: ["Cloze Association", "Dra-och-släpp lucka"],
+    imageclozeassociationV2: ["Image Cloze", "Bildlucka"],
+    plaintext: ["Plain Text", "Fritext"],
+    formulaessayV2: ["Formula Essay", "Formeluppsats"],
+    chemistryessayV2: ["Chemistry Essay", "Kemiuppsats"],
   }
   const entry = typeMap[type]
   return entry ? (isSv ? entry[1] : entry[0]) : type
@@ -386,6 +397,202 @@ function buildShortAnswerData(question: Question, score: number) {
   return data
 }
 
+// Build question data for choicematrix — grid of rows x columns
+function buildChoiceMatrixData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "choicematrix",
+    score,
+    minScore: 0,
+  }
+  if (question.options) {
+    data.stems = question.options.map(opt => opt.label)
+    data.options = question.options[0]?.value.split(",").map(v => ({ label: v.trim(), value: v.trim() })) || []
+    if (question.correctAnswer) {
+      data.validation = {
+        scoring_type: "exactMatch",
+        valid_response: { score, value: question.correctAnswer },
+      }
+    }
+  }
+  return data
+}
+
+// Build question data for clozetext — typed blanks
+function buildClozeTextData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: "",
+    template: question.stimulus,
+    type: "clozetext",
+    score,
+    minScore: 0,
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: {
+        score,
+        value: question.correctAnswer,
+      },
+    }
+  }
+  return data
+}
+
+// Build question data for clozedropdown — inline dropdowns
+function buildClozeDropdownData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: "",
+    template: question.stimulus,
+    type: "clozedropdown",
+    score,
+    minScore: 0,
+  }
+  if (question.options) {
+    data.possible_responses = question.options.map(opt => opt.value.split(",").map(v => ({ label: v.trim(), value: v.trim() })))
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: { score, value: question.correctAnswer },
+    }
+  }
+  return data
+}
+
+// Build question data for orderlist — drag to reorder
+function buildOrderListData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "orderlist",
+    list: question.options?.map(opt => opt.value) || [],
+    score,
+    minScore: 0,
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: { score, value: question.correctAnswer.map((_, i) => i) },
+    }
+  }
+  return data
+}
+
+// Build question data for tokenhighlight — select words/phrases
+function buildTokenHighlightData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: "",
+    template: question.stimulus,
+    type: "tokenhighlight",
+    tokenization: "word",
+    score,
+    minScore: 0,
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: { score, value: question.correctAnswer },
+    }
+  }
+  return data
+}
+
+// Build question data for clozeassociation — drag-and-drop gaps
+function buildClozeAssociationData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: "",
+    template: question.stimulus,
+    type: "clozeassociation",
+    possible_responses: question.options?.map(opt => opt.value) || [],
+    score,
+    minScore: 0,
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: { score, value: question.correctAnswer },
+    }
+  }
+  return data
+}
+
+// Build question data for imageclozeassociationV2 — image with drop zones
+function buildImageClozeAssociationData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "imageclozeassociationV2",
+    image: { src: "" },
+    possible_responses: question.options?.map(opt => opt.value) || [],
+    response_positions: question.options?.map(opt => ({ x: 0, y: 0, label: opt.label })) || [],
+    score,
+    minScore: 0,
+  }
+  if (question.correctAnswer) {
+    data.validation = {
+      scoring_type: "exactMatch",
+      valid_response: { score, value: question.correctAnswer },
+    }
+  }
+  return data
+}
+
+// Build question data for plaintext — simple text response
+function buildPlainTextData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "plaintext",
+    max_length: 10000,
+    show_word_count: true,
+    score,
+    minScore: 0,
+    validation: { max_score: score },
+  }
+  if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
+  return data
+}
+
+// Build question data for formulaessayV2 — math notation response
+function buildFormulaEssayData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "formulaessayV2",
+    max_length: 10000,
+    show_word_count: true,
+    is_math: true,
+    score,
+    minScore: 0,
+    validation: { max_score: score },
+  }
+  if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
+  return data
+}
+
+// Build question data for chemistryessayV2 — chemistry notation response
+function buildChemistryEssayData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "chemistryessayV2",
+    max_length: 10000,
+    show_word_count: true,
+    is_chemistry: true,
+    score,
+    minScore: 0,
+    validation: { max_score: score },
+  }
+  if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
+  return data
+}
+
 export function exportToWiseflowJSON(questions: Question[], metadata: ExportMetadata): string {
   const manualTags = generateManualTags(metadata)
 
@@ -413,8 +620,28 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
+      } else if (question.type === "choicematrix" || question.type === "matching") {
+        questionData = buildChoiceMatrixData(question, score)
+      } else if (question.type === "clozetext" || question.type === "fill_blank") {
+        questionData = buildClozeTextData(question, score)
+      } else if (question.type === "clozedropdown") {
+        questionData = buildClozeDropdownData(question, score)
+      } else if (question.type === "orderlist" || question.type === "ordering") {
+        questionData = buildOrderListData(question, score)
+      } else if (question.type === "tokenhighlight") {
+        questionData = buildTokenHighlightData(question, score)
+      } else if (question.type === "clozeassociation") {
+        questionData = buildClozeAssociationData(question, score)
+      } else if (question.type === "imageclozeassociationV2") {
+        questionData = buildImageClozeAssociationData(question, score)
+      } else if (question.type === "plaintext") {
+        questionData = buildPlainTextData(question, score)
+      } else if (question.type === "formulaessayV2") {
+        questionData = buildFormulaEssayData(question, score)
+      } else if (question.type === "chemistryessayV2") {
+        questionData = buildChemistryEssayData(question, score)
       } else {
-        // Essay, fill_blank, matching, ordering, hotspot, rating → longtextV2
+        // Fallback: essay format for unknown types
         questionData = buildEssayQuestionData(question, score)
       }
 
@@ -484,8 +711,28 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
+      } else if (question.type === "choicematrix" || question.type === "matching") {
+        questionData = buildChoiceMatrixData(question, score)
+      } else if (question.type === "clozetext" || question.type === "fill_blank") {
+        questionData = buildClozeTextData(question, score)
+      } else if (question.type === "clozedropdown") {
+        questionData = buildClozeDropdownData(question, score)
+      } else if (question.type === "orderlist" || question.type === "ordering") {
+        questionData = buildOrderListData(question, score)
+      } else if (question.type === "tokenhighlight") {
+        questionData = buildTokenHighlightData(question, score)
+      } else if (question.type === "clozeassociation") {
+        questionData = buildClozeAssociationData(question, score)
+      } else if (question.type === "imageclozeassociationV2") {
+        questionData = buildImageClozeAssociationData(question, score)
+      } else if (question.type === "plaintext") {
+        questionData = buildPlainTextData(question, score)
+      } else if (question.type === "formulaessayV2") {
+        questionData = buildFormulaEssayData(question, score)
+      } else if (question.type === "chemistryessayV2") {
+        questionData = buildChemistryEssayData(question, score)
       } else {
-        // Essay, fill_blank, matching, ordering, hotspot, rating → longtextV2
+        // Fallback: essay format for unknown types
         questionData = buildEssayQuestionData(question, score)
       }
 
@@ -533,25 +780,9 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
   }
 }
 
-// Map TentaGen types to WISEflow-compatible types
+// Map TentaGen types to WISEflow-compatible Learnosity types using the registry
 function getEffectiveWiseflowType(type: string): string {
-  // WISEflow only natively supports: longtextV2, mcq, choicematrix, association, classification
-  // Map our types to the closest WISEflow equivalent
-  switch (type) {
-    case "mcq":
-    case "true_false":
-    case "multiple_response":
-      return "mcq"
-    case "longtextV2":
-    case "short_answer":
-    case "fill_blank":
-    case "matching":
-    case "ordering":
-    case "hotspot":
-    case "rating_scale":
-    default:
-      return "longtextV2"
-  }
+  return getLearnosityType(type)
 }
 
 function generateUUID(): string {
