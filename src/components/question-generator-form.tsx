@@ -119,6 +119,32 @@ import { api } from "../../convex/_generated/api"
 import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
 import { downloadQti21 } from "@/lib/qti-export"
 import { useTranslation } from "@/lib/language-context"
+import type { Translations } from "@/lib/translations"
+import { QUESTION_TYPES, normalizeEnabledTypes } from "@/lib/question-types"
+
+// Map question type IDs to their translation keys
+const TYPE_TRANSLATION_KEY: Record<string, string> = {
+  mcq: "questionType_mcq",
+  true_false: "questionType_trueFalse",
+  longtextV2: "questionType_essay",
+  short_answer: "questionType_shortAnswer",
+  fill_blank: "questionType_fillBlank",
+  multiple_response: "questionType_multipleResponse",
+  matching: "questionType_matching",
+  ordering: "questionType_ordering",
+  hotspot: "questionType_hotspot",
+  rating_scale: "questionType_ratingScale",
+  choicematrix: "questionType_choicematrix",
+  clozetext: "questionType_clozetext",
+  clozedropdown: "questionType_clozedropdown",
+  orderlist: "questionType_orderlist",
+  tokenhighlight: "questionType_tokenhighlight",
+  clozeassociation: "questionType_clozeassociation",
+  imageclozeassociationV2: "questionType_imageclozeassociationV2",
+  plaintext: "questionType_plaintext",
+  formulaessayV2: "questionType_formulaessayV2",
+  chemistryessayV2: "questionType_chemistryessayV2",
+}
 
 type QuestionType = string // Question type ID from question-types.ts registry
 type Difficulty = "easy" | "medium" | "hard"
@@ -157,6 +183,119 @@ interface Question {
   }>
   correctAnswer?: string[]
   instructorStimulus?: string
+}
+
+// Core type IDs shown before "show more" toggle
+const PRIMARY_TYPE_IDS = ["mcq", "true_false", "longtextV2"]
+
+/** Renders type toggle buttons from the QUESTION_TYPES registry, filtered by user profile */
+function QuestionTypeSelector({
+  selectedTypes,
+  onToggleType,
+  enabledTypes,
+  showMore,
+  onToggleShowMore,
+  t,
+}: {
+  selectedTypes: string[]
+  onToggleType: (type: string) => void
+  enabledTypes: string[]
+  showMore: boolean
+  onToggleShowMore: () => void
+  t: (key: keyof Translations, params?: Record<string, string | number>) => string
+}) {
+  // Split enabled types into primary (always visible) and secondary (under "show more")
+  const primaryTypes = enabledTypes.filter((id) => PRIMARY_TYPE_IDS.includes(id))
+  const secondaryTypes = enabledTypes.filter((id) => !PRIMARY_TYPE_IDS.includes(id))
+
+  const tierBorderClass = (typeId: string) => {
+    const def = QUESTION_TYPES[typeId]
+    if (!def) return ""
+    if (def.tier === "specialized") return "ring-1 ring-amber-400/50"
+    if (def.tier === "extended") return "ring-1 ring-blue-400/50"
+    return ""
+  }
+
+  const renderTypeButton = (typeId: string) => {
+    const translationKey = TYPE_TRANSLATION_KEY[typeId]
+    const label = translationKey ? t(translationKey as keyof Translations) : typeId
+
+    return (
+      <button
+        key={typeId}
+        type="button"
+        onClick={() => onToggleType(typeId)}
+        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${tierBorderClass(typeId)} ${
+          selectedTypes.includes(typeId)
+            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+        }`}
+        aria-pressed={selectedTypes.includes(typeId)}
+      >
+        {label}
+      </button>
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-1.5">
+        <Label>{t("questionTypes")} *</Label>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
+              <Info className="h-3.5 w-3.5" />
+              <span className="sr-only">Question types information</span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            <p className="text-sm">
+              {t("questionTypesHelp") || "Select one or more question types to generate. You can mix different types in the same set."}
+            </p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+      <div className="space-y-3">
+        {/* Primary types — always visible */}
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+          {primaryTypes.map(renderTypeButton)}
+        </div>
+
+        {/* Secondary types — collapsible */}
+        {showMore && secondaryTypes.length > 0 && (
+          <div className="flex flex-wrap gap-2 pt-1" role="group" aria-label="Additional question types">
+            {secondaryTypes.map(renderTypeButton)}
+          </div>
+        )}
+
+        {/* Toggle button */}
+        {secondaryTypes.length > 0 && (
+          <button
+            type="button"
+            onClick={onToggleShowMore}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showMore ? (
+              <>
+                <ChevronUp className="h-3.5 w-3.5" />
+                {t("showLessTypes")}
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-3.5 w-3.5" />
+                {t("showMoreTypes")} (+{secondaryTypes.length})
+              </>
+            )}
+          </button>
+        )}
+      </div>
+      {selectedTypes.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          {t("questionTypesHelp")}
+        </p>
+      )}
+    </div>
+  )
 }
 
 export function QuestionGeneratorForm() {
@@ -326,13 +465,10 @@ export function QuestionGeneratorForm() {
       const diffEntry = difficultyMap[metadata.difficulty]
       const difficultyTag = diffEntry ? (isSv ? diffEntry[1] : diffEntry[0]) : metadata.difficulty
 
-      // Translate question type to display name (single language, not raw "true_false")
-      const typeMap: Record<string, [string, string]> = {
-        mcq: ["MCQ", "Flervalsfråga"], true_false: ["True/False", "Sant/Falskt"],
-        longtextV2: ["Essay", "Essä"], short_answer: ["Short Answer", "Kort svar"],
-        fill_blank: ["Fill in the Blank", "Ifyllnad"], multiple_response: ["Multiple Response", "Flera rätt"],
-        matching: ["Matching", "Matchning"], ordering: ["Ordering", "Ordningsföljd"],
-        hotspot: ["Image Hotspot", "Bildmarkering"], rating_scale: ["Rating Scale", "Betygsskala"],
+      // Translate question type to display name using translation keys (all 18+ types)
+      const getTypeTag = (typeId: string): string => {
+        const key = TYPE_TRANSLATION_KEY[typeId]
+        return key ? t(key as keyof Translations) : typeId
       }
 
       // Build base auto-tags with TRANSLATED values (same for all questions)
@@ -359,8 +495,7 @@ export function QuestionGeneratorForm() {
       // Transform questions to match Convex schema
       const questionsToSave = generatedQuestions.map((q) => {
         // Translate type to display name for tags (e.g., "Sant/Falskt" not "true_false")
-        const typeEntry = typeMap[q.type]
-        const typeTag = typeEntry ? (isSv ? typeEntry[1] : typeEntry[0]) : q.type
+        const typeTag = getTypeTag(q.type)
         // Combine all tags with translated display names only
         const allTags = [...baseAutoTags, typeTag, ...customTags, ...(aiTag ? [aiTag] : [])]
 
@@ -605,258 +740,15 @@ export function QuestionGeneratorForm() {
             <p className="text-sm text-muted-foreground">{t("numQuestionsHelp")}</p>
           </div>
 
-          {/* Question Types */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <Label>{t("questionTypes")} *</Label>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
-                    <Info className="h-3.5 w-3.5" />
-                    <span className="sr-only">Question types information</span>
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p className="text-sm">
-                    Select one or more question types to generate. You can mix different types in the same set.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="space-y-3">
-              {/* Default visible question types */}
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={() => toggleQuestionType("mcq")}
-                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                        formData.questionTypes.includes("mcq")
-                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      aria-pressed={formData.questionTypes.includes("mcq")}
-                    >
-                      {t("multipleChoice")}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">Fråga med flera svarsalternativ, ett rätt svar</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={() => toggleQuestionType("true_false")}
-                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                        formData.questionTypes.includes("true_false")
-                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      aria-pressed={formData.questionTypes.includes("true_false")}
-                    >
-                      {t("trueFalse")}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">Fråga med två alternativ: Sant eller Falskt</p>
-                  </TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button
-                      type="button"
-                      onClick={() => toggleQuestionType("longtextV2")}
-                      className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                        formData.questionTypes.includes("longtextV2")
-                          ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                          : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                      }`}
-                      aria-pressed={formData.questionTypes.includes("longtextV2")}
-                    >
-                      {t("essay")}
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-xs">Öppen fråga med längre textsvar (essä)</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-
-              {/* Additional question types (collapsible) */}
-              {showMoreQuestionTypes && (
-                <div className="flex flex-wrap gap-2 pt-1" role="group" aria-label="Additional question types">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("short_answer")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("short_answer")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("short_answer")}
-                      >
-                        Kortsvar
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Öppen fråga med kort textsvar (1-3 meningar)</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("fill_blank")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("fill_blank")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("fill_blank")}
-                      >
-                        Ifyllnad
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Text med luckor att fylla i</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("multiple_response")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("multiple_response")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("multiple_response")}
-                      >
-                        Flera rätt svar
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Fråga med flera alternativ där flera kan vara rätt</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("matching")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("matching")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("matching")}
-                      >
-                        Matchning
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Para ihop begrepp eller termer med definitioner</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("ordering")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("ordering")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("ordering")}
-                      >
-                        Ordningsföljd
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Sortera element i rätt ordning eller sekvens</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("hotspot")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("hotspot")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("hotspot")}
-                      >
-                        Bildmarkering
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Markera rätt område på en bild eller diagram</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={() => toggleQuestionType("rating_scale")}
-                        className={`inline-flex items-center justify-center rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                          formData.questionTypes.includes("rating_scale")
-                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
-                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-                        }`}
-                        aria-pressed={formData.questionTypes.includes("rating_scale")}
-                      >
-                        Betygsskala
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="text-xs">Betygsätta eller värdera på en skala (t.ex. 1-5)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              )}
-
-              {/* Toggle button */}
-              <button
-                type="button"
-                onClick={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showMoreQuestionTypes ? (
-                  <>
-                    <ChevronUp className="h-3.5 w-3.5" />
-                    Visa färre frågetyper
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="h-3.5 w-3.5" />
-                    {t("showMoreTypes")} ({7} till)
-                  </>
-                )}
-              </button>
-            </div>
-            {formData.questionTypes.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                {t("questionTypesHelp")}
-              </p>
-            )}
-          </div>
+          {/* Question Types — dynamically rendered from registry, filtered by profile */}
+          <QuestionTypeSelector
+            selectedTypes={formData.questionTypes}
+            onToggleType={toggleQuestionType}
+            enabledTypes={normalizeEnabledTypes(userProfile?.enabledQuestionTypes as string[] | undefined)}
+            showMore={showMoreQuestionTypes}
+            onToggleShowMore={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}
+            t={t}
+          />
 
           {/* Language */}
           <div className="space-y-2">
