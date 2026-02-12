@@ -42,16 +42,30 @@ export async function POST(request: NextRequest) {
 
     const errorMessage = error instanceof Error ? error.message : "Unknown error"
 
-    // Common YouTube transcript errors
-    if (errorMessage.includes("Could not get")) {
+    // Specific YouTube transcript error messages
+    if (errorMessage.includes("Transcript is disabled")) {
       return NextResponse.json(
-        { error: "Could not retrieve transcript. The video may not have captions enabled." },
+        { error: "Transkription är inaktiverad för denna video. Videons ägare har stängt av textning/undertexter. Prova en annan video eller ladda upp videofilen direkt." },
+        { status: 422 }
+      )
+    }
+
+    if (errorMessage.includes("Could not get") || errorMessage.includes("No transcript")) {
+      return NextResponse.json(
+        { error: "Ingen transkription hittades. Videon saknar textning/undertexter. Prova att ladda upp videofilen direkt istället — AI transkriberar den åt dig." },
         { status: 404 }
       )
     }
 
+    if (errorMessage.includes("not a valid YouTube")) {
+      return NextResponse.json(
+        { error: "Ogiltig YouTube-URL. Kontrollera att länken är korrekt." },
+        { status: 400 }
+      )
+    }
+
     return NextResponse.json(
-      { error: `YouTube transcript extraction failed: ${errorMessage}` },
+      { error: `YouTube-transkription misslyckades: ${errorMessage}` },
       { status: 500 }
     )
   }

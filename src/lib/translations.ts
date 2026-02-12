@@ -63,10 +63,17 @@ export interface Translations {
   utgaendeFormat: string
   qti21Format: string
 
+  // AI Mode Info
+  aiModeInfo: string
+  uploadSectionTitle: string
+  combineSources: string
+  additionalContextTips: string
+  generatingProgress: string
+
   // Content Upload
   uploadDocument: string
   uploadDocumentHelp: string
-  or: string
+  andAlso: string
   fetchFromUrls: string
   addMoreUrls: string
   contextGuidanceTip: string
@@ -268,14 +275,21 @@ export const translations: Record<Language, Translations> = {
     utgaendeFormat: "Legacy JSON",
     qti21Format: "QTI 2.1 (Universal LMS)",
 
+    // AI Mode Info
+    aiModeInfo: "AI kan generera frågor från sin allmänna kunskapsbas (inga filer behövs), från ditt uppladdade underlag (dokument, URL, video), eller en kombination av båda.",
+    uploadSectionTitle: "Vill du ladda upp underlag för frågorna?",
+    combineSources: "Du kan kombinera flera källor! Ladda upp dokument, URL:er och video samtidigt — AI sammanställer allt.",
+    additionalContextTips: "💡 Tips: Styr hur AI genererar frågor! Exempel:\n• \"Generera 3 frågor från videon och 3 från dokumentet\"\n• \"Fokusera enbart på kapitel 5 i PDF:en\"\n• \"Gör frågorna kliniskt inriktade\"",
+    generatingProgress: "Det tar ungefär 30 sekunder att generera frågor...",
+
     // Content Upload
-    uploadDocument: "Ladda upp dokument (valfritt)",
+    uploadDocument: "📄 Dokument",
     uploadDocumentHelp: "PDF, Word (.docx) eller PowerPoint (.pptx). Välj flera filer samtidigt. Inga filstorleksbegränsningar.",
-    or: "eller",
-    fetchFromUrls: "Hämta från webbadresser (valfritt)",
+    andAlso: "och/eller",
+    fetchFromUrls: "🌐 Webbadresser",
     addMoreUrls: "Lägg till fler URL:er",
     contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
-    videoSectionTitle: "🎬 Förvandla video till tentafrågor",
+    videoSectionTitle: "🎬 Förvandla inspelad videoföreläsning till tentafrågor",
     uploadVideoFile: "Ladda upp videofil",
     videoUrlLabel: "Eller klistra in en video-URL (YouTube, Vimeo m.fl.)",
     videoUrlPlaceholder: "https://youtube.com/watch?v=... eller annan video-URL",
@@ -471,14 +485,21 @@ export const translations: Record<Language, Translations> = {
     utgaendeFormat: "Legacy JSON",
     qti21Format: "QTI 2.1 (Universal LMS)",
 
+    // AI Mode Info
+    aiModeInfo: "AI can generate questions from its general knowledge base (no files needed), from your uploaded materials (documents, URLs, video), or a combination of both.",
+    uploadSectionTitle: "Want to upload source material for the questions?",
+    combineSources: "You can combine multiple sources! Upload documents, URLs, and video at the same time — AI combines everything.",
+    additionalContextTips: "💡 Tips: Control how AI generates questions! Examples:\n• \"Generate 3 questions from the video and 3 from the document\"\n• \"Focus only on chapter 5 of the PDF\"\n• \"Make the questions clinically oriented\"",
+    generatingProgress: "It takes about 30 seconds to generate questions...",
+
     // Content Upload
-    uploadDocument: "Upload Document (Optional)",
+    uploadDocument: "📄 Documents",
     uploadDocumentHelp: "PDF, Word (.docx), or PowerPoint (.pptx). Select multiple files at once. No file size limitations.",
-    or: "or",
-    fetchFromUrls: "Fetch from URLs (Optional)",
+    andAlso: "and/or",
+    fetchFromUrls: "🌐 Web URLs",
     addMoreUrls: "Add More URLs",
     contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
-    videoSectionTitle: "🎬 Turn any video into exam questions",
+    videoSectionTitle: "🎬 Turn recorded video lectures into exam questions",
     uploadVideoFile: "Upload video file",
     videoUrlLabel: "Or paste a video URL (YouTube, Vimeo, etc.)",
     videoUrlPlaceholder: "https://youtube.com/watch?v=... or any video URL",

@@ -361,6 +361,23 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     }
   }
 
+  // Check if URL is from a platform that doesn't support direct audio/video links
+  const isWebPageVideoUrl = (url: string): boolean => {
+    try {
+      const parsed = new URL(url)
+      return (
+        parsed.hostname.includes("vimeo.com") ||
+        parsed.hostname.includes("dailymotion.com") ||
+        parsed.hostname.includes("twitch.tv") ||
+        parsed.hostname.includes("facebook.com") ||
+        parsed.hostname.includes("instagram.com") ||
+        parsed.hostname.includes("tiktok.com")
+      )
+    } catch {
+      return false
+    }
+  }
+
   const handleVideoUrlSubmit = async () => {
     const url = youtubeUrl.trim()
     if (!url) return
@@ -406,6 +423,13 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         })
       } else {
         // Non-YouTube video URLs → AssemblyAI (can fetch direct audio/video URLs)
+        // Warn if the URL is from a web-page-only platform (Vimeo, TikTok, etc.)
+        if (isWebPageVideoUrl(url)) {
+          toast.warning("Obs! Denna plattform kanske inte stöder direktlänkar", {
+            description: "Om det misslyckas, ladda ner videon och ladda upp filen direkt istället.",
+            duration: 6000,
+          })
+        }
         setTranscriptionProgress("Skickar till transkribering...")
 
         const response = await fetch("/api/extract-video-transcript", {
@@ -512,7 +536,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                {t("or")}
+                {t("andAlso")}
               </span>
             </div>
           </div>
@@ -587,7 +611,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                {t("or")}
+                {t("andAlso")}
               </span>
             </div>
           </div>

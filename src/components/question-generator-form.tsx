@@ -88,6 +88,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Tooltip,
@@ -95,7 +96,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Loader2, Sparkles, Info, ChevronDown, ChevronUp } from "lucide-react"
+import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -175,6 +176,23 @@ export function QuestionGeneratorForm() {
   const [isExporting, setIsExporting] = useState(false)
   const [uploadedContentSource, setUploadedContentSource] = useState<string>("")
   const [showMoreQuestionTypes, setShowMoreQuestionTypes] = useState(false)
+  const [generationProgress, setGenerationProgress] = useState(0)
+
+  // Simulate progress bar during generation
+  useEffect(() => {
+    if (!isGenerating) {
+      setGenerationProgress(0)
+      return
+    }
+    setGenerationProgress(5)
+    const interval = setInterval(() => {
+      setGenerationProgress((prev) => {
+        if (prev >= 90) return prev // cap at 90%, jump to 100% when done
+        return prev + Math.random() * 8 + 2
+      })
+    }, 1500)
+    return () => clearInterval(interval)
+  }, [isGenerating])
 
   const saveQuestionsMutation = useMutation(api.questions.saveQuestions)
   const userProfile = useQuery(api.profiles.getUserProfile)
@@ -263,6 +281,7 @@ export function QuestionGeneratorForm() {
         metadata: data.metadata
       }))
 
+      setGenerationProgress(100)
       toast.success(t("questionsGenerated"), {
         description: t("questionsGeneratedDesc", { count: data.questions.length }),
       })
@@ -446,6 +465,11 @@ export function QuestionGeneratorForm() {
           <CardDescription className="text-sm sm:text-base text-muted-foreground mt-1.5">
             {t("createQuestionsSubtitle")}
           </CardDescription>
+          <div className="mt-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">
+            <p className="text-xs sm:text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+              ℹ️ {t("aiModeInfo")}
+            </p>
+          </div>
         </CardHeader>
         <CardContent className="px-4 sm:px-6 pb-6">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
@@ -807,11 +831,20 @@ export function QuestionGeneratorForm() {
             </Select>
           </div>
 
-          {/* Content Upload */}
-          <ContentUpload
-            onContentExtracted={handleContentExtracted}
-            onContentRemoved={handleContentRemoved}
-          />
+          {/* Content Upload Section */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-primary" />
+              <Label className="text-base font-semibold">{t("uploadSectionTitle")}</Label>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {t("combineSources")}
+            </p>
+            <ContentUpload
+              onContentExtracted={handleContentExtracted}
+              onContentRemoved={handleContentRemoved}
+            />
+          </div>
 
           {/* Context Priority */}
           {formData.uploadedContext && (
@@ -888,6 +921,9 @@ export function QuestionGeneratorForm() {
                 dangerouslySetInnerHTML={{ __html: t("contextGuidanceTip") }}
               />
             )}
+            <div className="text-xs text-muted-foreground whitespace-pre-line bg-muted/50 p-3 rounded-md border border-border">
+              {t("additionalContextTips")}
+            </div>
           </div>
 
 
@@ -997,30 +1033,40 @@ export function QuestionGeneratorForm() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full h-11 sm:h-10 touch-action-manipulation shadow-md hover:shadow-lg transition-all duration-200"
-            disabled={
-              isGenerating ||
-              formData.questionTypes.length === 0 ||
-              // Subject/topic required UNLESS prioritizing uploaded context with content
-              (formData.contextPriority !== "context_only" && (!formData.subject || !formData.topic)) ||
-              (formData.contextPriority === "context_only" && !formData.uploadedContext)
-            }
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {t("generating")}
-              </>
-            ) : (
-              <>
-                <Sparkles className="mr-2 h-4 w-4" />
-                {t("generateQuestions")}
-              </>
+          {/* Submit Button with Progress */}
+          <div className="space-y-2">
+            <Button
+              type="submit"
+              className="w-full h-11 sm:h-10 touch-action-manipulation shadow-md hover:shadow-lg transition-all duration-200"
+              disabled={
+                isGenerating ||
+                formData.questionTypes.length === 0 ||
+                // Subject/topic required UNLESS prioritizing uploaded context with content
+                (formData.contextPriority !== "context_only" && (!formData.subject || !formData.topic)) ||
+                (formData.contextPriority === "context_only" && !formData.uploadedContext)
+              }
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {t("generating")}
+                </>
+              ) : (
+                <>
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {t("generateQuestions")}
+                </>
+              )}
+            </Button>
+            {isGenerating && (
+              <div className="space-y-1.5">
+                <Progress value={generationProgress} className="h-2" />
+                <p className="text-xs text-center text-muted-foreground animate-pulse">
+                  {t("generatingProgress")}
+                </p>
+              </div>
             )}
-          </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

@@ -45,13 +45,27 @@ export async function POST(request: NextRequest) {
 
     if (errorMessage.includes("timeout") || errorMessage.includes("ETIMEDOUT")) {
       return NextResponse.json(
-        { error: "Request timeout. Please try again." },
+        { error: "Begäran tog för lång tid. Försök igen." },
         { status: 504 }
       )
     }
 
+    if (errorMessage.includes("text/html") || errorMessage.includes("HTML document")) {
+      return NextResponse.json(
+        { error: "Videons URL leder till en webbsida, inte en direktlänk till video/ljud. Plattformar som Vimeo delar inte direktlänkar. Prova istället att ladda ner videon och ladda upp filen direkt." },
+        { status: 422 }
+      )
+    }
+
+    if (errorMessage.includes("does not appear to contain audio")) {
+      return NextResponse.json(
+        { error: "Filen innehåller inget ljud. Kontrollera att det är en riktig video/ljudfil, eller ladda ner videon från webbplatsen och ladda upp den direkt." },
+        { status: 422 }
+      )
+    }
+
     return NextResponse.json(
-      { error: `Transcription failed: ${errorMessage}` },
+      { error: `Transkription misslyckades: ${errorMessage}` },
       { status: 500 }
     )
   }
