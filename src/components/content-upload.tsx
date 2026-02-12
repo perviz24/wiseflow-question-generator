@@ -423,12 +423,15 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         })
       } else {
         // Non-YouTube video URLs → AssemblyAI (can fetch direct audio/video URLs)
-        // Warn if the URL is from a web-page-only platform (Vimeo, TikTok, etc.)
+        // Block web-page-only platforms (Vimeo, TikTok, etc.) — AssemblyAI gets HTML, not audio
         if (isWebPageVideoUrl(url)) {
-          toast.warning("Obs! Denna plattform kanske inte stöder direktlänkar", {
-            description: "Om det misslyckas, ladda ner videon och ladda upp filen direkt istället.",
-            duration: 6000,
+          toast.error("Denna plattform stöds inte för direktlänkar", {
+            description: "Vimeo, TikTok, Instagram m.fl. kräver att du laddar ner videon först. Ladda sedan upp filen direkt via filuppladdningen ovan.",
+            duration: 8000,
           })
+          setIsProcessing(false)
+          setTranscriptionProgress("")
+          return
         }
         setTranscriptionProgress("Skickar till transkribering...")
 
