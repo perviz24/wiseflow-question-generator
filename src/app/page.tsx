@@ -6,7 +6,8 @@ import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
-import { Sparkles, BookOpen, RotateCcw } from "lucide-react"
+import Image from "next/image"
+import { BookOpen, RotateCcw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -22,6 +23,17 @@ export default function Home() {
         <SignedIn>
           <div className="flex flex-col items-center gap-6 sm:gap-8 w-full">
             <div className="text-center px-2">
+              {/* TentaGen Logo */}
+              <div className="flex justify-center mb-4">
+                <Image
+                  src="/logo.svg"
+                  alt="TentaGen"
+                  width={64}
+                  height={64}
+                  className="text-foreground dark:invert"
+                  priority
+                />
+              </div>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 {t("createQuestionsTitle")}
               </h2>
@@ -86,6 +98,15 @@ export default function Home() {
 
         <SignedOut>
           <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+            {/* TentaGen Logo */}
+            <Image
+              src="/logo.svg"
+              alt="TentaGen"
+              width={80}
+              height={80}
+              className="text-foreground dark:invert"
+              priority
+            />
             <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               {t("welcomeTitle")}
             </h2>

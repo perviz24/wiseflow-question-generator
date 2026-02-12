@@ -1,13 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- T letter with integrated question mark -->
-  <g stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- TentaGen Logo: T with integrated question mark + AI sparkle -->
+  <!-- Main T? letterform -->
+  <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
     <!-- Top horizontal bar of T -->
-    <line x1="20" y1="20" x2="80" y2="20" />
-    <!-- Vertical stem of T -->
-    <line x1="50" y1="20" x2="50" y2="55" />
-    <!-- Question mark curve (integrated with T stem) -->
-    <path d="M 50 55 Q 65 60 65 70 Q 65 80 50 82" fill="none" />
+    <line x1="18" y1="18" x2="82" y2="18" />
+    <!-- Vertical stem of T going into question mark curve -->
+    <line x1="50" y1="18" x2="50" y2="52" />
+    <!-- Question mark curve -->
+    <path d="M 50 52 Q 68 56 68 68 Q 68 80 50 83" fill="none" />
     <!-- Question mark dot -->
-    <circle cx="50" cy="92" r="3" fill="currentColor" stroke="none" />
+    <circle cx="50" cy="93" r="4" fill="currentColor" stroke="none" />
+  </g>
+  <!-- AI sparkle (top-right corner) -->
+  <g fill="currentColor" opacity="0.7">
+    <path d="M 78 8 L 80 14 L 86 16 L 80 18 L 78 24 L 76 18 L 70 16 L 76 14 Z" />
+    <path d="M 88 22 L 89 25 L 92 26 L 89 27 L 88 30 L 87 27 L 84 26 L 87 25 Z" transform="scale(0.7) translate(40, 5)" />
   </g>
 </svg>
