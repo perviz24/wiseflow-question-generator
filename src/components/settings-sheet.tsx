@@ -25,6 +25,8 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { Settings, Loader2, User, Languages, Save } from "lucide-react"
 import { useTranslation } from "@/lib/language-context"
+import { QuestionTypesDialog } from "@/components/question-types-dialog"
+import { normalizeEnabledTypes } from "@/lib/question-types"
 
 export function SettingsSheet() {
   const { t } = useTranslation()
@@ -33,6 +35,9 @@ export function SettingsSheet() {
 
   const [tutorInitials, setTutorInitials] = useState("")
   const [uiLanguage, setUiLanguage] = useState<"sv" | "en">("sv")
+  const [enabledQuestionTypes, setEnabledQuestionTypes] = useState<string[]>(() =>
+    normalizeEnabledTypes(undefined)
+  )
   const [isSaving, setIsSaving] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -41,6 +46,9 @@ export function SettingsSheet() {
     if (profile) {
       setTutorInitials(profile.tutorInitials)
       setUiLanguage(profile.uiLanguage)
+      setEnabledQuestionTypes(
+        normalizeEnabledTypes(profile.enabledQuestionTypes ?? undefined)
+      )
     }
   }, [profile])
 
@@ -52,6 +60,7 @@ export function SettingsSheet() {
       const result = await upsertProfile({
         tutorInitials: tutorInitials.trim(),
         uiLanguage,
+        enabledQuestionTypes,
       })
 
       toast.success(t("settingsSaved"), {
@@ -153,6 +162,12 @@ export function SettingsSheet() {
                 {t("uiLanguageHelp")}
               </p>
             </div>
+
+            {/* Question Types Management */}
+            <QuestionTypesDialog
+              enabledTypes={enabledQuestionTypes}
+              onTypesChange={setEnabledQuestionTypes}
+            />
 
             {/* Save Button */}
             <Button
