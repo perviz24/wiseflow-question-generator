@@ -2,6 +2,65 @@
 
 import { useState, useEffect } from "react"
 
+// Generate a short representative title (2-4 keywords) from question text
+function generateQuestionTitle(stimulus: string, type: string): string {
+  // Strip HTML tags
+  const plainText = stimulus.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim()
+
+  // Common stop words to skip (English + Swedish)
+  const stopWords = new Set([
+    'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+    'should', 'may', 'might', 'shall', 'can', 'need', 'dare', 'ought',
+    'used', 'to', 'of', 'in', 'for', 'on', 'with', 'at', 'by', 'from',
+    'as', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+    'between', 'out', 'off', 'over', 'under', 'again', 'further', 'then',
+    'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'each',
+    'every', 'both', 'few', 'more', 'most', 'other', 'some', 'such', 'no',
+    'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very',
+    'just', 'because', 'but', 'and', 'or', 'if', 'while', 'about', 'up',
+    'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'what',
+    'it', 'its', 'my', 'your', 'his', 'her', 'our', 'their', 'me', 'him',
+    'she', 'he', 'we', 'they', 'them', 'i', 'you',
+    // Swedish stop words
+    'en', 'ett', 'den', 'det', 'de', 'och', 'eller', 'men', 'som', 'att',
+    'är', 'var', 'har', 'hade', 'kan', 'ska', 'vill', 'med', 'för', 'på',
+    'av', 'till', 'från', 'om', 'inte', 'vid', 'efter', 'under', 'över',
+    'mellan', 'utan', 'inom', 'bland', 'hos', 'mot', 'genom', 'sedan',
+    'denna', 'detta', 'dessa', 'vilken', 'vilket', 'vilka', 'vad', 'hur',
+    'när', 'där', 'här', 'varför', 'alla', 'andra', 'några', 'också',
+    'sig', 'sin', 'sitt', 'sina', 'dig', 'mig', 'oss', 'dem',
+    // Question-specific words
+    'following', 'statement', 'correct', 'true', 'false', 'answer',
+    'question', 'explain', 'describe', 'select', 'choose', 'identify',
+    'förklara', 'beskriv', 'välj', 'ange', 'fråga', 'svar', 'rätt',
+    'sant', 'falskt', 'påstående', 'följande',
+  ])
+
+  // Extract meaningful words (3+ chars, not stop words, not numbers-only)
+  const words = plainText
+    .split(/[\s,.:;!?()\[\]{}'"\/\\]+/)
+    .map(w => w.replace(/[^a-zA-ZåäöÅÄÖéèêüû0-9-]/g, ''))
+    .filter(w => w.length >= 3 && !stopWords.has(w.toLowerCase()) && !/^\d+$/.test(w))
+
+  // Take first 2-4 meaningful keywords
+  const keywords = words.slice(0, 4)
+
+  if (keywords.length === 0) {
+    // Fallback: use type + first few words
+    const typeLabels: Record<string, string> = {
+      mcq: 'MCQ', true_false: 'T/F', longtextV2: 'Essay',
+      short_answer: 'Short', fill_blank: 'Fill', multiple_response: 'Multi',
+      matching: 'Match', ordering: 'Order', hotspot: 'Hotspot', rating_scale: 'Rating',
+    }
+    return `${typeLabels[type] || type} - ${plainText.substring(0, 40)}`
+  }
+
+  // Capitalize first keyword, rest as-is
+  const title = keywords.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ')
+  return title
+}
+
 // Calculate default score based on difficulty
 function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
   switch (difficulty) {
@@ -249,7 +308,7 @@ export function QuestionGeneratorForm() {
         const allTags = [...baseAutoTags, q.type, ...customTags, ...(aiTag ? [aiTag] : [])]
 
         return {
-          title: q.stimulus.substring(0, 100), // Use first 100 chars as title
+          title: generateQuestionTitle(q.stimulus, q.type),
           subject: metadata.subject,
           difficulty: metadata.difficulty as "easy" | "medium" | "hard",
           language: metadata.language as "sv" | "en",
