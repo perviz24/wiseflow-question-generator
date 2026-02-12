@@ -124,6 +124,17 @@ export interface Translations {
   questionType_ordering: string
   questionType_hotspot: string
   questionType_ratingScale: string
+  // Specialized tier types (off by default)
+  questionType_choicematrix: string
+  questionType_clozetext: string
+  questionType_clozedropdown: string
+  questionType_orderlist: string
+  questionType_tokenhighlight: string
+  questionType_clozeassociation: string
+  questionType_imageclozeassociationV2: string
+  questionType_plaintext: string
+  questionType_formulaessayV2: string
+  questionType_chemistryessayV2: string
   showMoreTypes: string
   showLessTypes: string
   questionNumber: string
@@ -190,6 +201,24 @@ export interface Translations {
   uiLanguage: string
   uiLanguageHelp: string
   saveSettings: string
+  // Question Types Management
+  manageQuestionTypes: string
+  questionTypesTitle: string
+  questionTypesDescription: string
+  tierCore: string
+  tierCoreDesc: string
+  tierExtended: string
+  tierExtendedDesc: string
+  tierSpecialized: string
+  tierSpecializedDesc: string
+  categoryLanguage: string
+  categoryScience: string
+  categoryGeneral: string
+  categoryMath: string
+  alwaysOn: string
+  resetToDefaults: string
+  typesUpdated: string
+  typesUpdateFailed: string
 
   // Library Page
   editTags: string
@@ -392,6 +421,17 @@ export const translations: Record<Language, Translations> = {
     questionType_ordering: "Ordningsföljd",
     questionType_hotspot: "Bildmarkering",
     questionType_ratingScale: "Betygsskala",
+    // Specialized tier types
+    questionType_choicematrix: "Matris (flerval)",
+    questionType_clozetext: "Lucktext (fritext)",
+    questionType_clozedropdown: "Lucktext (rullmeny)",
+    questionType_orderlist: "Ordningslista",
+    questionType_tokenhighlight: "Markera text",
+    questionType_clozeassociation: "Dra-och-släpp (text)",
+    questionType_imageclozeassociationV2: "Dra-och-släpp (bild)",
+    questionType_plaintext: "Fritext (enkel)",
+    questionType_formulaessayV2: "Essä (matematik)",
+    questionType_chemistryessayV2: "Essä (kemi)",
     showMoreTypes: "Fler frågetyper",
     showLessTypes: "Färre frågetyper",
     questionNumber: "Fråga {n}",
@@ -486,6 +526,24 @@ export const translations: Record<Language, Translations> = {
     uiLanguage: "Gränssnittsspråk",
     uiLanguageHelp: "Välj vilket språk du vill använda i gränssnittet",
     saveSettings: "Spara inställningar",
+    // Question Types Management
+    manageQuestionTypes: "Hantera frågetyper",
+    questionTypesTitle: "Frågetyper",
+    questionTypesDescription: "Välj vilka frågetyper som ska vara tillgängliga i generatorn. Kärntyper är alltid aktiva.",
+    tierCore: "Kärntyper",
+    tierCoreDesc: "Grundläggande frågetyper — alltid aktiverade",
+    tierExtended: "Utökade typer",
+    tierExtendedDesc: "Fler frågeformat för variation",
+    tierSpecialized: "Specialiserade typer",
+    tierSpecializedDesc: "Avancerade typer för specifika ämnen och behov",
+    categoryLanguage: "Språk",
+    categoryScience: "Naturvetenskap",
+    categoryGeneral: "Allmänt",
+    categoryMath: "Matematik",
+    alwaysOn: "Alltid aktiv",
+    resetToDefaults: "Återställ standard",
+    typesUpdated: "Frågetyper uppdaterade",
+    typesUpdateFailed: "Kunde inte uppdatera frågetyper",
 
     // Toast Messages
     questionsGenerated: "Frågor genererade!",
@@ -658,6 +716,17 @@ export const translations: Record<Language, Translations> = {
     questionType_ordering: "Ordering",
     questionType_hotspot: "Image Hotspot",
     questionType_ratingScale: "Rating Scale",
+    // Specialized tier types
+    questionType_choicematrix: "Choice Matrix",
+    questionType_clozetext: "Cloze (Text Entry)",
+    questionType_clozedropdown: "Cloze (Dropdown)",
+    questionType_orderlist: "Order List",
+    questionType_tokenhighlight: "Token Highlight",
+    questionType_clozeassociation: "Drag & Drop (Text)",
+    questionType_imageclozeassociationV2: "Drag & Drop (Image)",
+    questionType_plaintext: "Plain Text",
+    questionType_formulaessayV2: "Essay (Math)",
+    questionType_chemistryessayV2: "Essay (Chemistry)",
     showMoreTypes: "More Question Types",
     showLessTypes: "Less Question Types",
     questionNumber: "Question {n}",
@@ -752,6 +821,24 @@ export const translations: Record<Language, Translations> = {
     uiLanguage: "UI Language",
     uiLanguageHelp: "Choose which language to use in the interface",
     saveSettings: "Save Settings",
+    // Question Types Management
+    manageQuestionTypes: "Manage Question Types",
+    questionTypesTitle: "Question Types",
+    questionTypesDescription: "Choose which question types are available in the generator. Core types are always active.",
+    tierCore: "Core Types",
+    tierCoreDesc: "Fundamental question types — always enabled",
+    tierExtended: "Extended Types",
+    tierExtendedDesc: "More question formats for variation",
+    tierSpecialized: "Specialized Types",
+    tierSpecializedDesc: "Advanced types for specific subjects and needs",
+    categoryLanguage: "Language",
+    categoryScience: "Science",
+    categoryGeneral: "General",
+    categoryMath: "Mathematics",
+    alwaysOn: "Always on",
+    resetToDefaults: "Reset to defaults",
+    typesUpdated: "Question types updated",
+    typesUpdateFailed: "Could not update question types",
 
     // Toast Messages
     questionsGenerated: "Questions generated!",
