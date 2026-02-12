@@ -7,7 +7,7 @@ import { FeedbackButton } from "@/components/feedback-button"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import Image from "next/image"
-import { BookOpen, RotateCcw } from "lucide-react"
+import { BookOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -38,24 +38,6 @@ export default function Home() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
                 {t("createQuestionsTitle")}
               </h2>
-              {/* Start Over — positioned right below title */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  const form = document.querySelector('form')
-                  if (form) {
-                    form.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  } else {
-                    localStorage.removeItem("wiseflow-preview-session")
-                    window.location.href = "/"
-                  }
-                }}
-                className="mt-2 text-muted-foreground hover:text-foreground"
-              >
-                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-                {t("startOver")}
-              </Button>
               <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {t("createQuestionsSubtitle")}
               </p>

@@ -110,7 +110,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload } from "lucide-react"
+import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -1120,6 +1120,20 @@ export function QuestionGeneratorForm() {
                 </p>
               </div>
             )}
+            {/* Start Over — reset form and preview */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                localStorage.removeItem("wiseflow-preview-session")
+                window.location.href = "/"
+              }}
+              className="w-full text-muted-foreground hover:text-foreground"
+            >
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+              {t("startOver")}
+            </Button>
           </div>
         </form>
       </CardContent>
