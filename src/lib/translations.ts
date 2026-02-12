@@ -238,7 +238,7 @@ export const translations: Record<Language, Translations> = {
     welcomeSubtitle: "Generera högkvalitativa tentafrågor med AI. Logga in för att komma igång.",
     signInToContinue: "Logga in för att fortsätta",
     createQuestionsTitle: "Skapa tentafrågor",
-    createQuestionsSubtitle: "Generera pedagogiskt genomtänkta frågor för dina Wiseflow-tentor",
+    createQuestionsSubtitle: "Låt AI generera frågor från sin kunskapsbas, ladda upp eget underlag för kontroll över innehållet, eller kombinera båda",
 
     // Question Generator Form
     generateQuestions: "Generera frågor",
@@ -450,7 +450,7 @@ export const translations: Record<Language, Translations> = {
     welcomeSubtitle: "Generate high-quality exam questions using AI. Sign in to get started.",
     signInToContinue: "Sign In to Continue",
     createQuestionsTitle: "Create Exam Questions",
-    createQuestionsSubtitle: "Generate pedagogically sound questions for your Wiseflow exams",
+    createQuestionsSubtitle: "Let AI generate questions from its knowledge base, upload your own material for content control, or combine both",
 
     // Question Generator Form
     generateQuestions: "Generate Questions",

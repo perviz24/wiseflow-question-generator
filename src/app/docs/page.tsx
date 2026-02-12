@@ -107,8 +107,8 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint, video/YouTube eller URL:er för frågor baserade på specifikt material</>
-                        : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, video/YouTube, or URLs for questions based on specific material</>}
+                        ? <><strong>Dokumentbaserad generering:</strong> Ladda upp Word, PowerPoint, video eller URL:er för frågor baserade på specifikt material</>
+                        : <><strong>Document-based generation:</strong> Upload Word, PowerPoint, video, or URLs for questions based on specific material</>}
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -200,8 +200,8 @@ export default function DocsPage() {
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {isSv
-                      ? "Ladda upp dokument, video/YouTube eller URL:er för frågor från specifikt material"
-                      : "Upload documents, video/YouTube, or URLs for questions from specific material"}
+                      ? "Ladda upp dokument, video eller URL:er för frågor från specifikt material"
+                      : "Upload documents, video, or URLs for questions from specific material"}
                   </p>
                 </div>
 
