@@ -649,21 +649,22 @@ export default function LibraryPage() {
                               <div className="flex gap-2">
                                 {isEditing ? (
                                   <>
-                                    <Button size="sm" variant="default" onClick={saveEdit}>
+                                    <Button size="sm" variant="default" aria-label="Save changes" onClick={saveEdit}>
                                       <Check className="h-4 w-4" />
                                     </Button>
-                                    <Button size="sm" variant="outline" onClick={cancelEditing}>
+                                    <Button size="sm" variant="outline" aria-label="Cancel editing" onClick={cancelEditing}>
                                       <X className="h-4 w-4" />
                                     </Button>
                                   </>
                                 ) : (
                                   <>
-                                    <Button size="sm" variant="ghost" onClick={() => startEditing(question)}>
+                                    <Button size="sm" variant="ghost" aria-label="Edit question" onClick={() => startEditing(question)}>
                                       <Edit2 className="h-4 w-4" />
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="ghost"
+                                      aria-label="Delete question"
                                       onClick={() => handleDelete(question._id)}
                                       disabled={deletingId === question._id}
                                       className="text-destructive hover:text-destructive"
