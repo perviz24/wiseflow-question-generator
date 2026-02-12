@@ -273,21 +273,24 @@ function getShortTitle(question: Question): string {
 }
 
 // Build question data object for longtextV2 (essay) — matches real WISEflow format
+// max_length = WORD count (Learnosity default 10000). 10000 lets students write freely.
 function buildEssayQuestionData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     submit_over_limit: true,
-    character_map: true,
+    show_word_count: true,
     stimulus: question.stimulus,
     type: "longtextV2",
-    max_length: 75,
+    max_length: 10000,
     validation: {
       max_score: score,
     },
     formatting_options: [
       "bold", "italic", "underline", "|",
-      "unorderedList", "orderedList", "charactermap"
+      "unorderedList", "orderedList", "|",
+      "charactermap"
     ],
+    character_map: true,
     score: score,
     minScore: 0,
   }
@@ -360,17 +363,20 @@ function buildMultipleResponseData(question: Question, score: number) {
 }
 
 // Build question data for short_answer — uses longtextV2 with shorter max_length
+// Short answer uses longtextV2 with smaller word limit (50 words) and minimal formatting
 function buildShortAnswerData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     submit_over_limit: true,
+    show_word_count: true,
     stimulus: question.stimulus,
     type: "longtextV2",
-    max_length: 25,
+    max_length: 200,
     validation: {
       max_score: score,
     },
     formatting_options: ["bold", "unorderedList", "orderedList"],
+    character_map: true,
     score: score,
     minScore: 0,
   }
