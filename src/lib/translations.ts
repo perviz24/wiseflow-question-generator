@@ -13,6 +13,7 @@ export interface Translations {
   myLibrary: string
   questionLibrary: string
   selectAll: string
+  deleteSelected: string
   documentation: string
   cancel: string
 
@@ -227,6 +228,7 @@ export const translations: Record<Language, Translations> = {
     myLibrary: "Mitt bibliotek",
     questionLibrary: "Frågebibliotek",
     selectAll: "Markera alla",
+    deleteSelected: "Ta bort valda",
     documentation: "Dokumentation",
     cancel: "Avbryt",
     startOver: "Börja om",
@@ -438,6 +440,7 @@ export const translations: Record<Language, Translations> = {
     myLibrary: "My Library",
     questionLibrary: "Question Library",
     selectAll: "Select All",
+    deleteSelected: "Delete Selected",
     documentation: "Documentation",
     cancel: "Cancel",
     startOver: "Start Over",

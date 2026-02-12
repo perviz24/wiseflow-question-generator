@@ -266,3 +266,24 @@ export const deleteQuestion = mutation({
     return { success: true }
   },
 })
+
+// Bulk delete multiple questions
+export const deleteQuestions = mutation({
+  args: { ids: v.array(v.id("questions")) },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Unauthorized")
+    }
+
+    let deleted = 0
+    for (const id of args.ids) {
+      const question = await ctx.db.get(id)
+      if (question && question.userId === identity.subject) {
+        await ctx.db.delete(id)
+        deleted++
+      }
+    }
+    return { success: true, deleted }
+  },
+})

@@ -36,6 +36,7 @@ export default function LibraryPage() {
   const questions = useQuery(api.questions.getUserQuestions)
   const updateQuestion = useMutation(api.questions.updateQuestion)
   const deleteQuestion = useMutation(api.questions.deleteQuestion)
+  const deleteQuestionsBulk = useMutation(api.questions.deleteQuestions)
   const updateDifficulty = useMutation(api.questions.updateDifficulty)
   const updateScore = useMutation(api.questions.updateScore)
   const updateTutorInitials = useMutation(api.questions.updateTutorInitials)
@@ -247,6 +248,27 @@ export default function LibraryPage() {
       })
     } finally {
       setDeletingId(null)
+    }
+  }
+
+  const handleDeleteSelected = async () => {
+    if (selectedQuestions.size === 0) return
+    const count = selectedQuestions.size
+    if (!confirm(`Är du säker på att du vill ta bort ${count} valda frågor? Detta kan inte ångras.`)) {
+      return
+    }
+    try {
+      await deleteQuestionsBulk({
+        ids: Array.from(selectedQuestions) as Id<"questions">[],
+      })
+      setSelectedQuestions(new Set())
+      toast.success(`${count} frågor borttagna`, {
+        description: "Frågorna har tagits bort från biblioteket",
+      })
+    } catch {
+      toast.error("Misslyckades att ta bort", {
+        description: "Kunde inte ta bort de valda frågorna",
+      })
     }
   }
 
@@ -479,6 +501,15 @@ export default function LibraryPage() {
                       >
                         <Download className="mr-2 h-4 w-4" />
                         QTI 2.2 Inspera
+                      </Button>
+                      <Button
+                        onClick={handleDeleteSelected}
+                        disabled={selectedQuestions.size === 0}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        {t("deleteSelected")} ({selectedQuestions.size})
                       </Button>
                     </div>
                   </div>
