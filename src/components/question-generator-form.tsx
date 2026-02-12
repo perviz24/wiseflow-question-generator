@@ -2,12 +2,11 @@
 
 import { useState, useEffect } from "react"
 
-// Generate a short representative title (2-4 keywords) from question text
+// Generate a concise 2-3 word title from question text (e.g. "Vitreous structure")
 function generateQuestionTitle(stimulus: string, type: string): string {
-  // Strip HTML tags
   const plainText = stimulus.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ').trim()
 
-  // Common stop words to skip (English + Swedish)
+  // Broad stop words: common EN + SV words + question phrasing words
   const stopWords = new Set([
     'the', 'a', 'an', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
     'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
@@ -22,7 +21,6 @@ function generateQuestionTitle(stimulus: string, type: string): string {
     'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'what',
     'it', 'its', 'my', 'your', 'his', 'her', 'our', 'their', 'me', 'him',
     'she', 'he', 'we', 'they', 'them', 'i', 'you',
-    // Swedish stop words
     'en', 'ett', 'den', 'det', 'de', 'och', 'eller', 'men', 'som', 'att',
     'är', 'var', 'har', 'hade', 'kan', 'ska', 'vill', 'med', 'för', 'på',
     'av', 'till', 'från', 'om', 'inte', 'vid', 'efter', 'under', 'över',
@@ -30,35 +28,51 @@ function generateQuestionTitle(stimulus: string, type: string): string {
     'denna', 'detta', 'dessa', 'vilken', 'vilket', 'vilka', 'vad', 'hur',
     'när', 'där', 'här', 'varför', 'alla', 'andra', 'några', 'också',
     'sig', 'sin', 'sitt', 'sina', 'dig', 'mig', 'oss', 'dem',
-    // Question-specific words
-    'following', 'statement', 'correct', 'true', 'false', 'answer',
-    'question', 'explain', 'describe', 'select', 'choose', 'identify',
+    'following', 'statement', 'statements', 'correct', 'correctly',
+    'true', 'false', 'answer', 'answers', 'question', 'questions',
+    'explain', 'describe', 'select', 'choose', 'identify', 'regarding',
+    'concerning', 'associated', 'directly', 'primarily', 'typically',
     'förklara', 'beskriv', 'välj', 'ange', 'fråga', 'svar', 'rätt',
-    'sant', 'falskt', 'påstående', 'följande',
+    'sant', 'falskt', 'påstående', 'följande', 'avseende', 'gällande',
+    'direkt', 'strukturer', 'fenomen',
   ])
 
-  // Extract meaningful words (3+ chars, not stop words, not numbers-only)
+  // Extract meaningful words (4+ chars to skip short common words)
   const words = plainText
     .split(/[\s,.:;!?()\[\]{}'"\/\\]+/)
     .map(w => w.replace(/[^a-zA-ZåäöÅÄÖéèêüû0-9-]/g, ''))
-    .filter(w => w.length >= 3 && !stopWords.has(w.toLowerCase()) && !/^\d+$/.test(w))
+    .filter(w => w.length >= 4 && !stopWords.has(w.toLowerCase()) && !/^\d+$/.test(w))
 
-  // Take first 2-4 meaningful keywords
-  const keywords = words.slice(0, 4)
+  // Prioritize longer words (likely domain-specific terms like "vitreous", "presbyopi")
+  const scored = words.map((w, i) => ({
+    word: w,
+    score: w.length + (i < 5 ? 3 - i * 0.5 : 0), // bonus for appearing early
+  }))
+  scored.sort((a, b) => b.score - a.score)
 
-  if (keywords.length === 0) {
-    // Fallback: use type + first few words
-    const typeLabels: Record<string, string> = {
-      mcq: 'MCQ', true_false: 'T/F', longtextV2: 'Essay',
-      short_answer: 'Short', fill_blank: 'Fill', multiple_response: 'Multi',
-      matching: 'Match', ordering: 'Order', hotspot: 'Hotspot', rating_scale: 'Rating',
-    }
-    return `${typeLabels[type] || type} - ${plainText.substring(0, 40)}`
+  // Take top 2-3 unique terms, max 40 chars total
+  const seen = new Set<string>()
+  const keywords: string[] = []
+  for (const item of scored) {
+    const lower = item.word.toLowerCase()
+    if (seen.has(lower)) continue
+    seen.add(lower)
+    keywords.push(item.word)
+    if (keywords.length >= 3) break
+    if (keywords.join(' ').length > 35) break
   }
 
-  // Capitalize first keyword, rest as-is
-  const title = keywords.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ')
-  return title
+  if (keywords.length === 0) {
+    const typeLabels: Record<string, string> = {
+      mcq: 'MCQ', true_false: 'T/F', longtextV2: 'Essä',
+      short_answer: 'Kort svar', fill_blank: 'Ifyllnad', multiple_response: 'Flera rätt',
+      matching: 'Matchning', ordering: 'Ordning', hotspot: 'Hotspot', rating_scale: 'Skala',
+    }
+    return `${typeLabels[type] || type} - ${plainText.substring(0, 30)}`
+  }
+
+  // Capitalize first keyword
+  return keywords.map((w, i) => i === 0 ? w.charAt(0).toUpperCase() + w.slice(1) : w).join(' ')
 }
 
 // Calculate default score based on difficulty
