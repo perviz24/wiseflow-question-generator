@@ -145,6 +145,7 @@ interface FormData {
   courseCode?: string // BIO101, MATH202
   additionalTags?: string // Comma-separated custom tags
   includeAITag: boolean // Whether to include "AI-generated" tag
+  includeLanguageTag: boolean // Whether to include language tag (e.g., "Svenska")
 }
 
 interface Question {
@@ -177,6 +178,7 @@ export function QuestionGeneratorForm() {
     courseCode: "",
     additionalTags: "",
     includeAITag: true, // Default to true (include AI-generated tag)
+    includeLanguageTag: true, // Default to true (include language tag like "Svenska")
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedQuestions, setGeneratedQuestions] = useState<Question[] | null>(null)
@@ -334,11 +336,12 @@ export function QuestionGeneratorForm() {
       }
 
       // Build base auto-tags with TRANSLATED values (same for all questions)
+      const languageTag = formData.includeLanguageTag ? (isSv ? "Svenska" : "English") : null
       const baseAutoTags = [
         metadata.subject,
         metadata.topic,
         difficultyTag,
-        isSv ? "Svenska" : "English",
+        languageTag,
         formData.term,
         formData.semester,
         formData.examType,
@@ -415,6 +418,7 @@ export function QuestionGeneratorForm() {
         additionalTags: formData.additionalTags,
         tutorInitials: userProfile?.tutorInitials || "N/A",
         includeAITag: formData.includeAITag,
+        includeLanguageTag: formData.includeLanguageTag,
       }
 
       // Choose export format based on user selection
@@ -466,6 +470,7 @@ export function QuestionGeneratorForm() {
           metadata={{
             ...metadata,
             includeAITag: formData.includeAITag,
+            includeLanguageTag: formData.includeLanguageTag,
             tutorInitials: userProfile?.tutorInitials || "N/A",
             term: formData.term,
             semester: formData.semester,
@@ -1050,21 +1055,38 @@ export function QuestionGeneratorForm() {
               </p>
             </div>
 
-            {/* AI Tag Toggle */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="includeAITag"
-                checked={formData.includeAITag}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, includeAITag: checked as boolean })
-                }
-              />
-              <Label
-                htmlFor="includeAITag"
-                className="text-sm font-normal cursor-pointer"
-              >
-                {t("includeAITag")}
-              </Label>
+            {/* Optional Tag Toggles */}
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="includeAITag"
+                  checked={formData.includeAITag}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, includeAITag: checked as boolean })
+                  }
+                />
+                <Label
+                  htmlFor="includeAITag"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("includeAITag")}
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="includeLanguageTag"
+                  checked={formData.includeLanguageTag}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, includeLanguageTag: checked as boolean })
+                  }
+                />
+                <Label
+                  htmlFor="includeLanguageTag"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("includeLanguageTag")}
+                </Label>
+              </div>
             </div>
           </div>
 

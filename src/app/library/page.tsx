@@ -268,6 +268,7 @@ export default function LibraryPage() {
         language: selected[0]?.language || "sv",
         tutorInitials: selected[0]?.tutorInitials || "",
         includeAITag: selected[0]?.tags?.some((t: string) => t === "AI-genererad" || t === "AI-generated") || false,
+        includeLanguageTag: selected[0]?.tags?.some((t: string) => t === "Svenska" || t === "English") || false,
       }
 
       if (format === "qti21" || format === "qti22") {
