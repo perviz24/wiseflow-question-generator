@@ -63,6 +63,16 @@ function getTypeDisplayName(type: string, lang: string): string {
     ordering: ["Ordningsföljd", "Ordering"],
     hotspot: ["Bildmarkering", "Image Hotspot"],
     rating_scale: ["Betygsskala", "Rating Scale"],
+    choicematrix: ["Valsmatris", "Choice Matrix"],
+    clozetext: ["Lucktext", "Cloze Text"],
+    clozedropdown: ["Rullgardinslucka", "Cloze Dropdown"],
+    orderlist: ["Ordningslista", "Order List"],
+    tokenhighlight: ["Tokenmarkering", "Token Highlight"],
+    clozeassociation: ["Dra-och-släpp lucka", "Cloze Association"],
+    imageclozeassociationV2: ["Bildlucka", "Image Cloze"],
+    plaintext: ["Fritext", "Plain Text"],
+    formulaessayV2: ["Formeluppsats", "Formula Essay"],
+    chemistryessayV2: ["Kemiuppsats", "Chemistry Essay"],
   }
   const entry = names[type]
   return entry ? (lang === "sv" ? entry[0] : entry[1]) : type

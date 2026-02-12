@@ -42,6 +42,23 @@ function escapeXml(text: string): string {
     .replace(/'/g, "&apos;")
 }
 
+// Determine QTI cardinality based on question type and answers
+function getQtiCardinality(question: Question): string {
+  const multiTypes = ["multiple_response", "tokenhighlight"]
+  if (multiTypes.includes(question.type)) return "multiple"
+  if (question.correctAnswer && question.correctAnswer.length > 1 &&
+      (question.type === "mcq" || question.type === "ordering" || question.type === "orderlist")) return "ordered"
+  return "single"
+}
+
+// Determine QTI baseType based on question type
+function getQtiBaseType(question: Question): string {
+  const stringTypes = ["longtextV2", "short_answer", "plaintext", "formulaessayV2", "chemistryessayV2", "fill_blank", "clozetext"]
+  if (stringTypes.includes(question.type)) return "string"
+  if (question.type === "matching" || question.type === "choicematrix" || question.type === "clozeassociation" || question.type === "imageclozeassociationV2") return "directedPair"
+  return "identifier"
+}
+
 // Convert question to QTI 2.1 assessment item XML
 function questionToQtiItem(question: Question, index: number, metadata: ExportMetadata): string {
   const itemId = generateQtiId("item", index)
@@ -56,18 +73,15 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
     adaptive="false"
     timeDependent="false">
 
-    <responseDeclaration identifier="${responseId}" cardinality="${question.type === "mcq" && question.correctAnswer && question.correctAnswer.length > 1 ? "multiple" : "single"}" baseType="${question.type === "longtextV2" ? "string" : "identifier"}">
+    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">
 `
 
-  // Add correct response for MCQ and True/False
-  if (question.type !== "longtextV2" && question.correctAnswer && question.options) {
+  // Add correct response for types with correctAnswer
+  const essayTypes = ["longtextV2", "short_answer", "plaintext", "formulaessayV2", "chemistryessayV2"]
+  if (!essayTypes.includes(question.type) && question.correctAnswer) {
     qtiXml += `      <correctResponse>\n`
-    question.correctAnswer.forEach((label) => {
-      const option = question.options!.find(opt => opt.label === label)
-      if (option) {
-        // Use label as identifier (A, B, C, D or TRUE, FALSE)
-        qtiXml += `        <value>${label}</value>\n`
-      }
+    question.correctAnswer.forEach((val) => {
+      qtiXml += `        <value>${escapeXml(val)}</value>\n`
     })
     qtiXml += `      </correctResponse>\n`
   }
@@ -85,20 +99,91 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
 `
 
   // Add interaction based on question type
-  if (question.type === "mcq" && question.options) {
-    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="${question.correctAnswer && question.correctAnswer.length > 1 ? question.correctAnswer.length : "1"}">\n`
+  if ((question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") && question.options) {
+    const maxChoices = question.type === "true_false" ? "1" : (question.correctAnswer && question.correctAnswer.length > 1 ? String(question.correctAnswer.length) : "1")
+    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="${maxChoices}">\n`
     question.options.forEach((option) => {
       qtiXml += `        <simpleChoice identifier="${option.label}">${escapeXml(option.value)}</simpleChoice>\n`
     })
     qtiXml += `      </choiceInteraction>\n`
-  } else if (question.type === "true_false" && question.options) {
-    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="1">\n`
+  } else if ((question.type === "fill_blank" || question.type === "clozetext") && question.correctAnswer) {
+    // TextEntryInteraction — each blank is a separate interaction
+    question.correctAnswer.forEach((answer, i) => {
+      const blankId = `${responseId}_blank_${i}`
+      qtiXml += `      <textEntryInteraction responseIdentifier="${blankId}" expectedLength="20"/>\n`
+    })
+  } else if (question.type === "clozedropdown" && question.options) {
+    // InlineChoiceInteraction — dropdown in text
+    qtiXml += `      <inlineChoiceInteraction responseIdentifier="${responseId}" shuffle="false">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <inlineChoice identifier="${option.label}">${escapeXml(option.value)}</inlineChoice>\n`
+    })
+    qtiXml += `      </inlineChoiceInteraction>\n`
+  } else if ((question.type === "ordering" || question.type === "orderlist") && question.options) {
+    // OrderInteraction — items to be sequenced
+    qtiXml += `      <orderInteraction responseIdentifier="${responseId}" shuffle="false">\n`
     question.options.forEach((option) => {
       qtiXml += `        <simpleChoice identifier="${option.label}">${escapeXml(option.value)}</simpleChoice>\n`
     })
-    qtiXml += `      </choiceInteraction>\n`
-  } else if (question.type === "longtextV2") {
-    qtiXml += `      <extendedTextInteraction responseIdentifier="${responseId}" expectedLength="5000">\n`
+    qtiXml += `      </orderInteraction>\n`
+  } else if (question.type === "tokenhighlight") {
+    // HottextInteraction — selectable tokens in passage
+    qtiXml += `      <hottextInteraction responseIdentifier="${responseId}" maxChoices="${question.correctAnswer?.length || 1}">\n`
+    // Split stimulus into words, wrap highlightable ones in hottext
+    const words = question.stimulus.split(/\s+/)
+    words.forEach((word, i) => {
+      const isToken = question.correctAnswer?.includes(word)
+      if (isToken) {
+        qtiXml += `        <hottext identifier="token_${i}">${escapeXml(word)}</hottext> `
+      } else {
+        qtiXml += `${escapeXml(word)} `
+      }
+    })
+    qtiXml += `\n      </hottextInteraction>\n`
+  } else if ((question.type === "matching" || question.type === "choicematrix") && question.options) {
+    // MatchInteraction — pairs/matrix matching
+    qtiXml += `      <matchInteraction responseIdentifier="${responseId}" shuffle="false" maxAssociations="${question.options.length}">\n`
+    qtiXml += `        <simpleMatchSet>\n`
+    question.options.forEach((option) => {
+      qtiXml += `          <simpleAssociableChoice identifier="${option.label}" matchMax="1">${escapeXml(option.label)}</simpleAssociableChoice>\n`
+    })
+    qtiXml += `        </simpleMatchSet>\n`
+    qtiXml += `        <simpleMatchSet>\n`
+    question.options.forEach((option) => {
+      qtiXml += `          <simpleAssociableChoice identifier="val_${option.label}" matchMax="1">${escapeXml(option.value)}</simpleAssociableChoice>\n`
+    })
+    qtiXml += `        </simpleMatchSet>\n`
+    qtiXml += `      </matchInteraction>\n`
+  } else if (question.type === "clozeassociation" && question.options) {
+    // GapMatchInteraction — drag answers into gaps
+    qtiXml += `      <gapMatchInteraction responseIdentifier="${responseId}">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+    })
+    // Insert gaps in stimulus
+    const parts = question.stimulus.split("[___]")
+    parts.forEach((part, i) => {
+      qtiXml += `        ${escapeXml(part)}`
+      if (i < parts.length - 1) {
+        qtiXml += `<gap identifier="gap_${i}"/>`
+      }
+    })
+    qtiXml += `\n      </gapMatchInteraction>\n`
+  } else if (question.type === "imageclozeassociationV2" && question.options) {
+    // GraphicGapMatchInteraction — drag onto image zones
+    qtiXml += `      <graphicGapMatchInteraction responseIdentifier="${responseId}">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+    })
+    // Add placeholder associable hotspots
+    question.options.forEach((option, i) => {
+      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 100},50,${150 + i * 100},150"/>\n`
+    })
+    qtiXml += `      </graphicGapMatchInteraction>\n`
+  } else {
+    // ExtendedTextInteraction — essay types (longtextV2, short_answer, plaintext, formulaessayV2, chemistryessayV2)
+    const expectedLength = question.type === "short_answer" ? "500" : "5000"
+    qtiXml += `      <extendedTextInteraction responseIdentifier="${responseId}" expectedLength="${expectedLength}">\n`
     if (question.instructorStimulus) {
       qtiXml += `        <prompt>${escapeXml(question.instructorStimulus)}</prompt>\n`
     }
@@ -258,17 +343,15 @@ function questionToQti22Item(question: Question, index: number, metadata: Export
     adaptive="false"
     timeDependent="false">
 
-    <responseDeclaration identifier="${responseId}" cardinality="${question.type === "mcq" && question.correctAnswer && question.correctAnswer.length > 1 ? "multiple" : "single"}" baseType="${question.type === "longtextV2" ? "string" : "identifier"}">
+    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">
 `
 
-  // Add correct response for MCQ and True/False
-  if (question.type !== "longtextV2" && question.correctAnswer && question.options) {
+  // Add correct response for types with correctAnswer
+  const essayTypes22 = ["longtextV2", "short_answer", "plaintext", "formulaessayV2", "chemistryessayV2"]
+  if (!essayTypes22.includes(question.type) && question.correctAnswer) {
     qtiXml += `      <correctResponse>\n`
-    question.correctAnswer.forEach((label) => {
-      const option = question.options!.find(opt => opt.label === label)
-      if (option) {
-        qtiXml += `        <value>${label}</value>\n`
-      }
+    question.correctAnswer.forEach((val) => {
+      qtiXml += `        <value>${escapeXml(val)}</value>\n`
     })
     qtiXml += `      </correctResponse>\n`
   }
@@ -288,20 +371,80 @@ function questionToQti22Item(question: Question, index: number, metadata: Export
 `
 
   // Add interaction based on question type
-  if (question.type === "mcq" && question.options) {
-    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="${question.correctAnswer && question.correctAnswer.length > 1 ? question.correctAnswer.length : "1"}">\n`
+  if ((question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") && question.options) {
+    const maxChoices = question.type === "true_false" ? "1" : (question.correctAnswer && question.correctAnswer.length > 1 ? String(question.correctAnswer.length) : "1")
+    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="${maxChoices}">\n`
     question.options.forEach((option) => {
       qtiXml += `        <simpleChoice identifier="${option.label}">${escapeXml(option.value)}</simpleChoice>\n`
     })
     qtiXml += `      </choiceInteraction>\n`
-  } else if (question.type === "true_false" && question.options) {
-    qtiXml += `      <choiceInteraction responseIdentifier="${responseId}" shuffle="false" maxChoices="1">\n`
+  } else if ((question.type === "fill_blank" || question.type === "clozetext") && question.correctAnswer) {
+    question.correctAnswer.forEach((answer, i) => {
+      const blankId = `${responseId}_blank_${i}`
+      qtiXml += `      <textEntryInteraction responseIdentifier="${blankId}" expectedLength="20"/>\n`
+    })
+  } else if (question.type === "clozedropdown" && question.options) {
+    qtiXml += `      <inlineChoiceInteraction responseIdentifier="${responseId}" shuffle="false">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <inlineChoice identifier="${option.label}">${escapeXml(option.value)}</inlineChoice>\n`
+    })
+    qtiXml += `      </inlineChoiceInteraction>\n`
+  } else if ((question.type === "ordering" || question.type === "orderlist") && question.options) {
+    qtiXml += `      <orderInteraction responseIdentifier="${responseId}" shuffle="false">\n`
     question.options.forEach((option) => {
       qtiXml += `        <simpleChoice identifier="${option.label}">${escapeXml(option.value)}</simpleChoice>\n`
     })
-    qtiXml += `      </choiceInteraction>\n`
-  } else if (question.type === "longtextV2") {
-    qtiXml += `      <extendedTextInteraction responseIdentifier="${responseId}" expectedLength="5000">\n`
+    qtiXml += `      </orderInteraction>\n`
+  } else if (question.type === "tokenhighlight") {
+    qtiXml += `      <hottextInteraction responseIdentifier="${responseId}" maxChoices="${question.correctAnswer?.length || 1}">\n`
+    const words = question.stimulus.split(/\s+/)
+    words.forEach((word, i) => {
+      const isToken = question.correctAnswer?.includes(word)
+      if (isToken) {
+        qtiXml += `        <hottext identifier="token_${i}">${escapeXml(word)}</hottext> `
+      } else {
+        qtiXml += `${escapeXml(word)} `
+      }
+    })
+    qtiXml += `\n      </hottextInteraction>\n`
+  } else if ((question.type === "matching" || question.type === "choicematrix") && question.options) {
+    qtiXml += `      <matchInteraction responseIdentifier="${responseId}" shuffle="false" maxAssociations="${question.options.length}">\n`
+    qtiXml += `        <simpleMatchSet>\n`
+    question.options.forEach((option) => {
+      qtiXml += `          <simpleAssociableChoice identifier="${option.label}" matchMax="1">${escapeXml(option.label)}</simpleAssociableChoice>\n`
+    })
+    qtiXml += `        </simpleMatchSet>\n`
+    qtiXml += `        <simpleMatchSet>\n`
+    question.options.forEach((option) => {
+      qtiXml += `          <simpleAssociableChoice identifier="val_${option.label}" matchMax="1">${escapeXml(option.value)}</simpleAssociableChoice>\n`
+    })
+    qtiXml += `        </simpleMatchSet>\n`
+    qtiXml += `      </matchInteraction>\n`
+  } else if (question.type === "clozeassociation" && question.options) {
+    qtiXml += `      <gapMatchInteraction responseIdentifier="${responseId}">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+    })
+    const parts = question.stimulus.split("[___]")
+    parts.forEach((part, i) => {
+      qtiXml += `        ${escapeXml(part)}`
+      if (i < parts.length - 1) {
+        qtiXml += `<gap identifier="gap_${i}"/>`
+      }
+    })
+    qtiXml += `\n      </gapMatchInteraction>\n`
+  } else if (question.type === "imageclozeassociationV2" && question.options) {
+    qtiXml += `      <graphicGapMatchInteraction responseIdentifier="${responseId}">\n`
+    question.options.forEach((option) => {
+      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+    })
+    question.options.forEach((option, i) => {
+      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 100},50,${150 + i * 100},150"/>\n`
+    })
+    qtiXml += `      </graphicGapMatchInteraction>\n`
+  } else {
+    const expectedLength = question.type === "short_answer" ? "500" : "5000"
+    qtiXml += `      <extendedTextInteraction responseIdentifier="${responseId}" expectedLength="${expectedLength}">\n`
     if (question.instructorStimulus) {
       qtiXml += `        <prompt>${escapeXml(question.instructorStimulus)}</prompt>\n`
     }
