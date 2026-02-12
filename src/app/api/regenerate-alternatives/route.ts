@@ -3,9 +3,29 @@ import { generateText, Output } from "ai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { auth } from "@clerk/nextjs/server"
 import { z } from "zod"
+import { readFileSync } from "fs"
+import { join } from "path"
 
 // Set function timeout to 60 seconds
 export const maxDuration = 60
+
+// Turbopack workaround: read API key from .env.local if env var is empty
+function getAnthropicKey(): string {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return process.env.ANTHROPIC_API_KEY
+  }
+  try {
+    const envPath = join(process.cwd(), ".env.local")
+    const envContent = readFileSync(envPath, "utf-8")
+    const match = envContent.match(/ANTHROPIC_API_KEY=(.+)/)
+    if (match && match[1]) {
+      return match[1].trim()
+    }
+  } catch {
+    // .env.local not found (production) — env var should be set
+  }
+  return ""
+}
 
 // Define the schema for regenerated options
 const RegeneratedOptionsSchema = z.object({
@@ -86,7 +106,7 @@ Requirements:
 Generate the new answer options now.`
 
     // Create Anthropic provider instance at runtime
-    const apiKey = process.env.ANTHROPIC_API_KEY
+    const apiKey = getAnthropicKey()
     if (!apiKey) {
       return Response.json(
         { error: "ANTHROPIC_API_KEY not configured" },
@@ -94,7 +114,7 @@ Generate the new answer options now.`
       )
     }
 
-    const anthropic = createAnthropic({ apiKey })
+    const anthropic = createAnthropic({ apiKey, baseURL: "https://api.anthropic.com/v1" })
 
     // Generate new options using Vercel AI SDK with Anthropic
     const { output } = await generateText({

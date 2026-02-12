@@ -3,9 +3,33 @@ import { auth } from "@clerk/nextjs/server"
 import { generateObject } from "ai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { z } from "zod"
+import { readFileSync } from "fs"
+import { join } from "path"
+
+// Set function timeout to 60 seconds
+export const maxDuration = 60
+
+// Turbopack workaround: read API key from .env.local if env var is empty
+function getAnthropicKey(): string {
+  if (process.env.ANTHROPIC_API_KEY) {
+    return process.env.ANTHROPIC_API_KEY
+  }
+  try {
+    const envPath = join(process.cwd(), ".env.local")
+    const envContent = readFileSync(envPath, "utf-8")
+    const match = envContent.match(/ANTHROPIC_API_KEY=(.+)/)
+    if (match && match[1]) {
+      return match[1].trim()
+    }
+  } catch {
+    // .env.local not found (production) — env var should be set
+  }
+  return ""
+}
 
 const anthropic = createAnthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
+  apiKey: getAnthropicKey(),
+  baseURL: "https://api.anthropic.com/v1",
 })
 
 // Define the schema for a single question
@@ -121,7 +145,7 @@ CRITICAL: User specifically selected these question types: ${questionTypesText}
     }
 
     const result = await generateObject({
-      model: anthropic("claude-3-7-sonnet-20250219"),
+      model: anthropic("claude-sonnet-4-5-20250929"),
       schema: QuestionsResponseSchema,
       prompt,
       temperature: 0.7,
