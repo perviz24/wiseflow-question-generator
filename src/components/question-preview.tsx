@@ -99,6 +99,16 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       ordering: "questionType_ordering",
       hotspot: "questionType_hotspot",
       rating_scale: "questionType_ratingScale",
+      choicematrix: "questionType_choicematrix",
+      clozetext: "questionType_clozetext",
+      clozedropdown: "questionType_clozedropdown",
+      orderlist: "questionType_orderlist",
+      tokenhighlight: "questionType_tokenhighlight",
+      clozeassociation: "questionType_clozeassociation",
+      imageclozeassociationV2: "questionType_imageclozeassociationV2",
+      plaintext: "questionType_plaintext",
+      formulaessayV2: "questionType_formulaessayV2",
+      chemistryessayV2: "questionType_chemistryessayV2",
     }
     const key = translationKeys[type]
     return key ? t(key) : type
@@ -1117,6 +1127,367 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       <p className="text-xs text-green-600 dark:text-green-400">
                         {t("expectedRating")} {displayQuestion.correctAnswer.join(", ")}
                       </p>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Choice Matrix - grid display */}
+              {displayQuestion.type === "choicematrix" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50 overflow-x-auto">
+                      {displayQuestion.options && displayQuestion.options.length > 0 ? (
+                        <table className="w-full text-sm border-collapse">
+                          <thead>
+                            <tr>
+                              <th className="text-left p-2 border-b font-medium text-muted-foreground">&nbsp;</th>
+                              {displayQuestion.options[0]?.value.split(",").map((col, ci) => (
+                                <th key={ci} className="p-2 border-b text-center font-medium text-muted-foreground">
+                                  {col.trim()}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {displayQuestion.options.map((row, ri) => (
+                              <tr key={ri} className="border-b last:border-0">
+                                <td className="p-2 font-medium">{row.label}</td>
+                                {row.value.split(",").map((_, ci) => {
+                                  const isCorrect = displayQuestion.correctAnswer?.[ri] === row.value.split(",")[ci]?.trim()
+                                  return (
+                                    <td key={ci} className="p-2 text-center">
+                                      <div className={`mx-auto h-5 w-5 rounded-full border-2 ${
+                                        isCorrect
+                                          ? "bg-green-100 border-green-500 dark:bg-green-900/50"
+                                          : "border-gray-300 dark:border-gray-700"
+                                      }`}>
+                                        {isCorrect && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+                                      </div>
+                                    </td>
+                                  )
+                                })}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p className="text-sm text-muted-foreground italic">Matrix grid preview</p>
+                      )}
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {displayQuestion.correctAnswer.map((ans, i) => (
+                            <Badge key={i} variant="outline" className="bg-white dark:bg-gray-950">{ans}</Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Cloze Text - text with typed blanks */}
+              {displayQuestion.type === "clozetext" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <p className="text-sm leading-relaxed">
+                        {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
+                          <span key={i}>
+                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            {i < arr.length - 1 && (
+                              <span className="inline-flex items-center mx-1">
+                                <Input readOnly placeholder={`(${i + 1})`} className="h-7 w-24 inline-flex text-center text-xs" />
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.correctAnswer.map((answer, index) => (
+                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                              [{index + 1}] {answer}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Cloze Dropdown - text with dropdown indicators */}
+              {displayQuestion.type === "clozedropdown" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <p className="text-sm leading-relaxed">
+                        {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
+                          <span key={i}>
+                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            {i < arr.length - 1 && (
+                              <span className="inline-flex items-center mx-1">
+                                <span className="inline-flex items-center h-7 px-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-xs text-muted-foreground">
+                                  ▾ ({i + 1})
+                                </span>
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                    </Card>
+                    {displayQuestion.options && displayQuestion.options.length > 0 && (
+                      <Card className="p-3 bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800">
+                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">{t("answerOptions")}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {displayQuestion.options.map((opt, i) => (
+                            <Badge key={i} variant="outline" className="bg-white dark:bg-gray-950">{opt.label}: {opt.value}</Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.correctAnswer.map((answer, index) => (
+                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                              [{index + 1}] {answer}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Order List - numbered drag list */}
+              {displayQuestion.type === "orderlist" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <div className="space-y-2">
+                        {(displayQuestion.options || []).map((item, index) => (
+                          <div key={index} className="flex items-center gap-3 p-2 rounded-md border bg-white dark:bg-gray-950">
+                            <span className="flex h-6 w-6 items-center justify-center rounded bg-gray-200 dark:bg-gray-800 text-xs font-medium shrink-0">
+                              ≡
+                            </span>
+                            <span className="text-sm">{item.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {displayQuestion.correctAnswer.map((label, i) => (
+                            <Badge key={i} variant="outline" className="bg-white dark:bg-gray-950">
+                              {i + 1}. {label}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Token Highlight - passage with highlighted tokens */}
+              {displayQuestion.type === "tokenhighlight" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: displayQuestion.stimulus }} />
+                    </Card>
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {displayQuestion.correctAnswer.map((token, i) => (
+                            <Badge key={i} className="bg-yellow-100 text-yellow-900 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-700">
+                              {token}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Cloze Association - drag-and-drop gaps */}
+              {displayQuestion.type === "clozeassociation" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <p className="text-sm leading-relaxed">
+                        {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
+                          <span key={i}>
+                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            {i < arr.length - 1 && (
+                              <span className="inline-flex items-center mx-1 px-3 py-0.5 rounded border-2 border-dashed border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/30 text-xs text-muted-foreground">
+                                ↕ ({i + 1})
+                              </span>
+                            )}
+                          </span>
+                        ))}
+                      </p>
+                    </Card>
+                    {displayQuestion.options && displayQuestion.options.length > 0 && (
+                      <Card className="p-3 bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800">
+                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">{t("answerOptions")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.options.map((opt, i) => (
+                            <Badge key={i} variant="outline" className="bg-white dark:bg-gray-950 cursor-grab">
+                              {opt.value}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.correctAnswer.map((answer, index) => (
+                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                              [{index + 1}] {answer}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Image Cloze Association - image with drop zones */}
+              {displayQuestion.type === "imageclozeassociationV2" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-full h-40 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                          <span className="text-sm text-muted-foreground">🖼️ Image / Diagram</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: displayQuestion.stimulus }} />
+                      </div>
+                    </Card>
+                    {displayQuestion.options && displayQuestion.options.length > 0 && (
+                      <Card className="p-3 bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-800">
+                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">{t("answerOptions")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.options.map((opt, i) => (
+                            <Badge key={i} variant="outline" className="bg-white dark:bg-gray-950 cursor-grab">
+                              {opt.label}: {opt.value}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                    {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
+                      <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
+                        <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">{t("correctAnswers")}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {displayQuestion.correctAnswer.map((answer, index) => (
+                            <Badge key={index} variant="outline" className="bg-white dark:bg-gray-950">
+                              Zone {index + 1} → {answer}
+                            </Badge>
+                          ))}
+                        </div>
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Plain Text - simple text response */}
+              {displayQuestion.type === "plaintext" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <Textarea
+                        readOnly
+                        placeholder={t("studentAnswerPlaceholder")}
+                        className="min-h-[100px] resize-none"
+                      />
+                    </Card>
+                    {displayQuestion.instructorStimulus && (
+                      <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+                        <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Formula Essay - math notation response */}
+              {displayQuestion.type === "formulaessayV2" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-700">
+                          𝑓(𝑥) Math
+                        </Badge>
+                      </div>
+                      <Textarea
+                        readOnly
+                        placeholder={t("studentAnswerPlaceholder")}
+                        className="min-h-[100px] resize-none font-mono"
+                      />
+                    </Card>
+                    {displayQuestion.instructorStimulus && (
+                      <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+                        <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                      </Card>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Chemistry Essay - chemical notation response */}
+              {displayQuestion.type === "chemistryessayV2" && (
+                <>
+                  <Separator className="my-4" />
+                  <div className="space-y-2">
+                    <Card className="p-4 bg-muted/50">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-700">
+                          ⚗️ Chemistry
+                        </Badge>
+                      </div>
+                      <Textarea
+                        readOnly
+                        placeholder={t("studentAnswerPlaceholder")}
+                        className="min-h-[100px] resize-none font-mono"
+                      />
+                    </Card>
+                    {displayQuestion.instructorStimulus && (
+                      <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
+                        <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                      </Card>
                     )}
                   </div>
                 </>

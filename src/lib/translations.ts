@@ -173,6 +173,7 @@ export interface Translations {
   addNewAnswer: string
   studentAnswerPlaceholder: string
   sampleAnswer: string
+  answerOptions: string
   ratingLow: string
   ratingHigh: string
   expectedRating: string
@@ -470,6 +471,7 @@ export const translations: Record<Language, Translations> = {
     addNewAnswer: "Lägg till nytt svar...",
     studentAnswerPlaceholder: "Studenten skriver 1-3 meningar här...",
     sampleAnswer: "✓ Exempelsvar:",
+    answerOptions: "Svarsalternativ:",
     ratingLow: "Låg",
     ratingHigh: "Hög",
     expectedRating: "✓ Förväntat betyg:",
@@ -765,6 +767,7 @@ export const translations: Record<Language, Translations> = {
     addNewAnswer: "Add new answer...",
     studentAnswerPlaceholder: "Student writes 1-3 sentence answer here...",
     sampleAnswer: "✓ Sample answer:",
+    answerOptions: "Answer options:",
     ratingLow: "Low",
     ratingHigh: "High",
     expectedRating: "✓ Expected rating:",
