@@ -133,8 +133,8 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
   const handlePointsSave = (index: number) => {
     const parsedPoints = parseFloat(tempPoints)
     if (isNaN(parsedPoints) || parsedPoints <= 0) {
-      toast.error("Invalid points", {
-        description: "Please enter a valid positive number for points."
+      toast.error(t("invalidPoints"), {
+        description: t("invalidPointsDesc")
       })
       return
     }
@@ -236,8 +236,8 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
 
     // Only regenerate for MCQ and True/False questions
     if (question.type === "longtextV2") {
-      toast.error("Cannot regenerate", {
-        description: "Essay questions don't have answer options to regenerate."
+      toast.error(t("cannotRegenerate"), {
+        description: t("cannotRegenerateDesc")
       })
       return
     }
@@ -276,13 +276,13 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
         onUpdateQuestions(updatedQuestions)
       }
 
-      toast.success("Alternatives regenerated!", {
-        description: "New answer options have been generated for this question."
+      toast.success(t("alternativesRegenerated"), {
+        description: t("alternativesRegeneratedDesc")
       })
     } catch (error) {
       console.error("Regeneration failed:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to regenerate alternatives"
-      toast.error("Regeneration failed", {
+      const errorMessage = error instanceof Error ? error.message : t("regenerationFailed")
+      toast.error(t("regenerationFailed"), {
         description: errorMessage
       })
     } finally {
@@ -298,15 +298,15 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
 
   const handleGenerateMore = async () => {
     if (additionalTypes.length === 0) {
-      toast.error("No question types selected", {
-        description: "Please select at least one question type to generate."
+      toast.error(t("noTypesSelected"), {
+        description: t("noTypesSelectedDesc")
       })
       return
     }
 
     if (additionalCount < 1 || additionalCount > 20) {
-      toast.error("Invalid number of questions", {
-        description: "Please enter a number between 1 and 20."
+      toast.error(t("invalidQuestionCount"), {
+        description: t("invalidQuestionCountDesc")
       })
       return
     }
@@ -338,14 +338,14 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
       if (onUpdateQuestions && data.questions) {
         const updatedQuestions = [...questions, ...data.questions]
         onUpdateQuestions(updatedQuestions)
-        toast.success(`${data.questions.length} questions added!`, {
-          description: "New questions have been added to your set."
+        toast.success(t("questionsAdded").replace("{count}", String(data.questions.length)), {
+          description: t("questionsAddedDesc")
         })
       }
     } catch (error) {
       console.error("Generate more failed:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to generate additional questions"
-      toast.error("Generation failed", {
+      const errorMessage = error instanceof Error ? error.message : t("generationFailed")
+      toast.error(t("generationFailed"), {
         description: errorMessage
       })
     } finally {
@@ -368,23 +368,23 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
         a.click()
         document.body.removeChild(a)
         URL.revokeObjectURL(url)
-        toast.success("Word exported!", {
-          description: "Questions exported as Word (.docx) document."
+        toast.success(t("exportWordSuccess"), {
+          description: t("exportWordDesc")
         })
       } else if (format === "csv") {
         downloadCSV(questions, metadata)
-        toast.success("CSV exported!", {
-          description: "Questions exported in CSV format for Excel/Google Sheets."
+        toast.success(t("exportCSVSuccess"), {
+          description: t("exportCSVDesc")
         })
       } else if (format === "qti21") {
         await downloadQti21(questions, metadata)
-        toast.success("QTI 2.1 exported!", {
-          description: "Questions exported in QTI 2.1 format (ZIP file)."
+        toast.success(t("exportQti21Success"), {
+          description: t("exportQti21Desc")
         })
       } else if (format === "qti22") {
         await downloadQti22(questions, metadata)
-        toast.success("QTI 2.2 Inspera exported!", {
-          description: "Questions exported in QTI 2.2 Inspera format (ZIP file)."
+        toast.success(t("exportQti22Success"), {
+          description: t("exportQti22Desc")
         })
       } else {
         // Wiseflow JSON formats
@@ -393,15 +393,15 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
           ...metadata,
           exportFormat
         })
-        const formatName = exportFormat === "legacy" ? "New Wiseflow JSON" : "Legacy JSON"
-        toast.success(`${formatName} exported!`, {
-          description: "Questions exported in Wiseflow innehållsbank format."
+        const formatName = exportFormat === "legacy" ? t("newWiseflowJson") : t("legacyJson")
+        toast.success(`${formatName} ${t("exportSuccessful").toLowerCase()}`, {
+          description: t("exportWiseflowDesc")
         })
       }
     } catch (error) {
       console.error("Export failed:", error)
-      const errorMessage = error instanceof Error ? error.message : "Failed to export questions"
-      toast.error("Export failed", {
+      const errorMessage = error instanceof Error ? error.message : t("exportFailed")
+      toast.error(t("exportFailed"), {
         description: errorMessage
       })
     } finally {
@@ -416,9 +416,9 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
         <CardHeader>
           <div className="flex items-start justify-between">
             <div>
-              <CardTitle>Generated Questions</CardTitle>
+              <CardTitle>{t("generatedQuestions")}</CardTitle>
               <CardDescription>
-                {questions.length} {questions.length === 1 ? "question" : "questions"} about{" "}
+                {t("questionsAbout").replace("{count}", String(questions.length)).replace("{unit}", questions.length === 1 ? t("questionSingular") : t("questionPlural"))}{" "}
                 {metadata.topic}
               </CardDescription>
             </div>
@@ -427,12 +427,12 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
-                    <span className="hidden sm:inline">Saving...</span>
+                    <span className="hidden sm:inline">{t("saving")}</span>
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 sm:mr-2" />
-                    <span className="hidden sm:inline">Save to Library</span>
+                    <span className="hidden sm:inline">{t("saveToLibrary")}</span>
                   </>
                 )}
               </Button>
@@ -443,12 +443,12 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {isExportingFormat ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin sm:mr-2" />
-                        <span className="hidden sm:inline">Exporting...</span>
+                        <span className="hidden sm:inline">{t("exporting")}</span>
                       </>
                     ) : (
                       <>
                         <Download className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Export</span>
+                        <span className="hidden sm:inline">{t("export")}</span>
                         <ChevronDown className="ml-2 h-4 w-4 hidden sm:inline" />
                       </>
                     )}
@@ -456,22 +456,22 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => handleExport("wiseflow-legacy")}>
-                    New Wiseflow JSON
+                    {t("newWiseflowJson")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("wiseflow-utgaende")}>
-                    Legacy JSON
+                    {t("legacyJson")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("qti21")}>
-                    QTI 2.1 (ZIP)
+                    {t("qti21Zip")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("qti22")}>
-                    QTI 2.2 Inspera (ZIP)
+                    {t("qti22InsperaZip")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("word")}>
-                    Word (.docx)
+                    {t("wordDocx")}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => handleExport("csv")}>
-                    CSV (Excel/Sheets)
+                    {t("csvExcelSheets")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -488,7 +488,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               {metadata.difficulty}
             </Badge>
             <Badge variant="secondary">
-              {metadata.language === "sv" ? "Swedish" : "English"}
+              {metadata.language === "sv" ? t("langSwedish") : t("langEnglish")}
             </Badge>
           </div>
         </CardContent>
@@ -540,7 +540,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         {question.points ?? getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
                       </Badge>
                     )}
-                    <span className="text-sm text-muted-foreground">Question {index + 1}</span>
+                    <span className="text-sm text-muted-foreground">{t("questionNumber").replace("{n}", String(index + 1))}</span>
                   </div>
                   {/* No CardTitle here - question will appear in CardContent */}
                 </div>
@@ -651,7 +651,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   <Separator />
                   <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 dark:border-primary/30 dark:bg-primary/10">
                     <div className="text-sm font-medium text-foreground mb-2">
-                      Instructor Guidance
+                      {t("instructorGuidance")}
                     </div>
                     {isEditing ? (
                       <Textarea
@@ -727,7 +727,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       )
                     })}
                     <p className="text-xs text-muted-foreground mt-2">
-                      ✓ Multiple correct answers possible
+                      {t("multipleCorrectPossible")}
                     </p>
                   </div>
                 </>
@@ -745,7 +745,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                           {isEditing ? (
                             <div className="flex flex-col gap-2">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium shrink-0">Term:</span>
+                                <span className="text-sm font-medium shrink-0">{t("termLabel")}</span>
                                 <Input
                                   value={option.label}
                                   onChange={(e) => updateEditedOption(optionIndex, 'label', e.target.value)}
@@ -753,7 +753,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                                 />
                               </div>
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-medium shrink-0">Match:</span>
+                                <span className="text-sm font-medium shrink-0">{t("matchLabel")}</span>
                                 <Input
                                   value={option.value}
                                   onChange={(e) => updateEditedOption(optionIndex, 'value', e.target.value)}
@@ -773,7 +773,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
                       <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800 mt-2">
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
-                          ✓ Correct pairs:
+                          {t("correctPairs")}
                         </p>
                         {isEditing ? (
                           <Textarea
@@ -801,7 +801,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <>
                   <Separator className="my-4" />
                   <div className="space-y-2">
-                    <p className="text-sm font-medium mb-3">Arrange in correct order:</p>
+                    <p className="text-sm font-medium mb-3">{t("arrangeCorrectOrder")}</p>
                     {displayQuestion.options.map((option, optionIndex) => {
                       const correctPosition = displayQuestion.correctAnswer?.indexOf(option.label)
                       return (
@@ -854,7 +854,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       )
                     })}
                     <p className="text-xs text-muted-foreground mt-2">
-                      {isEditing ? "Enter position numbers (1, 2, 3...)" : "Numbers show the correct sequence"}
+                      {isEditing ? t("enterPositionNumbers") : t("numbersShowSequence")}
                     </p>
                   </div>
                 </>
@@ -872,7 +872,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         </svg>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
-                            Image-based question
+                            {t("imageBasedQuestion")}
                           </p>
                           {isEditing ? (
                             <Textarea
@@ -882,7 +882,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                             />
                           ) : (
                             <p className="text-sm text-amber-800 dark:text-amber-200">
-                              {displayQuestion.instructorStimulus || "Click or tap on the correct area of the image/diagram"}
+                              {displayQuestion.instructorStimulus || t("hotspotDefaultInstruction")}
                             </p>
                           )}
                         </div>
@@ -891,7 +891,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
                       <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
-                          ✓ Correct area(s):
+                          {t("correctAreas")}
                         </p>
                         {isEditing ? (
                           <div className="space-y-2">
@@ -913,7 +913,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                               <Input
                                 value={newAnswerInput}
                                 onChange={(e) => setNewAnswerInput(e.target.value)}
-                                placeholder="Add area name..."
+                                placeholder={t("addAreaName")}
                                 className="flex-1"
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
@@ -968,7 +968,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
                       <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-2">
-                          ✓ Correct answers:
+                          {t("correctAnswers")}
                         </p>
                         {isEditing ? (
                           <div className="space-y-2">
@@ -996,7 +996,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                               <Input
                                 value={newAnswerInput}
                                 onChange={(e) => setNewAnswerInput(e.target.value)}
-                                placeholder="Add new answer..."
+                                placeholder={t("addNewAnswer")}
                                 className="flex-1"
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
@@ -1040,14 +1040,14 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     <Card className="p-4 bg-muted/50">
                       <Textarea
                         readOnly
-                        placeholder="Student writes 1-3 sentence answer here..."
+                        placeholder={t("studentAnswerPlaceholder")}
                         className="min-h-[80px] resize-none"
                       />
                     </Card>
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
                       <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
                         <p className="text-sm font-medium text-green-900 dark:text-green-100 mb-1">
-                          ✓ Sample answer:
+                          {t("sampleAnswer")}
                         </p>
                         {isEditing ? (
                           <Textarea
@@ -1106,7 +1106,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                                 </div>
                               )}
                               <span className="text-xs text-muted-foreground">
-                                {rating === 1 ? "Low" : rating === 5 ? "High" : ""}
+                                {rating === 1 ? t("ratingLow") : rating === 5 ? t("ratingHigh") : ""}
                               </span>
                             </div>
                           )
@@ -1115,7 +1115,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     </Card>
                     {displayQuestion.correctAnswer && (
                       <p className="text-xs text-green-600 dark:text-green-400">
-                        ✓ Expected rating: {displayQuestion.correctAnswer.join(", ")}
+                        {t("expectedRating")} {displayQuestion.correctAnswer.join(", ")}
                       </p>
                     )}
                   </div>

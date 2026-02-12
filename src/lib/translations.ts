@@ -126,6 +126,60 @@ export interface Translations {
   questionType_ratingScale: string
   showMoreTypes: string
   showLessTypes: string
+  questionNumber: string
+  questionsAbout: string
+  questionSingular: string
+  questionPlural: string
+  export: string
+  exportWordSuccess: string
+  exportWordDesc: string
+  exportCSVSuccess: string
+  exportCSVDesc: string
+  exportQti21Success: string
+  exportQti21Desc: string
+  exportQti22Success: string
+  exportQti22Desc: string
+  exportWiseflowDesc: string
+  newWiseflowJson: string
+  legacyJson: string
+  qti21Zip: string
+  qti22InsperaZip: string
+  wordDocx: string
+  csvExcelSheets: string
+  instructorGuidance: string
+  multipleCorrectPossible: string
+  termLabel: string
+  matchLabel: string
+  correctPairs: string
+  arrangeCorrectOrder: string
+  enterPositionNumbers: string
+  numbersShowSequence: string
+  imageBasedQuestion: string
+  hotspotDefaultInstruction: string
+  correctAreas: string
+  addAreaName: string
+  correctAnswers: string
+  addNewAnswer: string
+  studentAnswerPlaceholder: string
+  sampleAnswer: string
+  ratingLow: string
+  ratingHigh: string
+  expectedRating: string
+  invalidPoints: string
+  invalidPointsDesc: string
+  cannotRegenerate: string
+  cannotRegenerateDesc: string
+  alternativesRegenerated: string
+  alternativesRegeneratedDesc: string
+  regenerationFailed: string
+  noTypesSelected: string
+  noTypesSelectedDesc: string
+  invalidQuestionCount: string
+  invalidQuestionCountDesc: string
+  questionsAdded: string
+  questionsAddedDesc: string
+  langSwedish: string
+  langEnglish: string
 
   // Settings Page
   profileSettings: string
@@ -340,6 +394,60 @@ export const translations: Record<Language, Translations> = {
     questionType_ratingScale: "Betygsskala",
     showMoreTypes: "Fler frågetyper",
     showLessTypes: "Färre frågetyper",
+    questionNumber: "Fråga {n}",
+    questionsAbout: "{count} {unit} om",
+    questionSingular: "fråga",
+    questionPlural: "frågor",
+    export: "Exportera",
+    exportWordSuccess: "Word exporterad!",
+    exportWordDesc: "Frågor exporterade som Word (.docx)-dokument.",
+    exportCSVSuccess: "CSV exporterad!",
+    exportCSVDesc: "Frågor exporterade i CSV-format för Excel/Google Sheets.",
+    exportQti21Success: "QTI 2.1 exporterad!",
+    exportQti21Desc: "Frågor exporterade i QTI 2.1-format (ZIP-fil).",
+    exportQti22Success: "QTI 2.2 Inspera exporterad!",
+    exportQti22Desc: "Frågor exporterade i QTI 2.2 Inspera-format (ZIP-fil).",
+    exportWiseflowDesc: "Frågor exporterade i Wiseflow innehållsbank-format.",
+    newWiseflowJson: "Ny Wiseflow JSON",
+    legacyJson: "Äldre JSON",
+    qti21Zip: "QTI 2.1 (ZIP)",
+    qti22InsperaZip: "QTI 2.2 Inspera (ZIP)",
+    wordDocx: "Word (.docx)",
+    csvExcelSheets: "CSV (Excel/Sheets)",
+    instructorGuidance: "Bedömningsanvisning",
+    multipleCorrectPossible: "✓ Flera rätta svar möjliga",
+    termLabel: "Term:",
+    matchLabel: "Match:",
+    correctPairs: "✓ Korrekta par:",
+    arrangeCorrectOrder: "Ordna i korrekt ordning:",
+    enterPositionNumbers: "Ange positionsnummer (1, 2, 3...)",
+    numbersShowSequence: "Siffrorna visar korrekt ordning",
+    imageBasedQuestion: "Bildbaserad fråga",
+    hotspotDefaultInstruction: "Klicka eller tryck på rätt område i bilden/diagrammet",
+    correctAreas: "✓ Korrekta områden:",
+    addAreaName: "Lägg till områdesnamn...",
+    correctAnswers: "✓ Korrekta svar:",
+    addNewAnswer: "Lägg till nytt svar...",
+    studentAnswerPlaceholder: "Studenten skriver 1-3 meningar här...",
+    sampleAnswer: "✓ Exempelsvar:",
+    ratingLow: "Låg",
+    ratingHigh: "Hög",
+    expectedRating: "✓ Förväntat betyg:",
+    invalidPoints: "Ogiltiga poäng",
+    invalidPointsDesc: "Ange ett giltigt positivt nummer för poäng.",
+    cannotRegenerate: "Kan inte generera om",
+    cannotRegenerateDesc: "Essäfrågor har inga svarsalternativ att generera om.",
+    alternativesRegenerated: "Alternativ omgenererade!",
+    alternativesRegeneratedDesc: "Nya svarsalternativ har genererats för denna fråga.",
+    regenerationFailed: "Omgenerering misslyckades",
+    noTypesSelected: "Inga frågetyper valda",
+    noTypesSelectedDesc: "Välj minst en frågetyp att generera.",
+    invalidQuestionCount: "Ogiltigt antal frågor",
+    invalidQuestionCountDesc: "Ange ett nummer mellan 1 och 20.",
+    questionsAdded: "{count} frågor tillagda!",
+    questionsAddedDesc: "Nya frågor har lagts till i ditt set.",
+    langSwedish: "Svenska",
+    langEnglish: "Engelska",
 
     // Library Page
     editTags: "Redigera taggar",
@@ -552,6 +660,60 @@ export const translations: Record<Language, Translations> = {
     questionType_ratingScale: "Rating Scale",
     showMoreTypes: "More Question Types",
     showLessTypes: "Less Question Types",
+    questionNumber: "Question {n}",
+    questionsAbout: "{count} {unit} about",
+    questionSingular: "question",
+    questionPlural: "questions",
+    export: "Export",
+    exportWordSuccess: "Word exported!",
+    exportWordDesc: "Questions exported as Word (.docx) document.",
+    exportCSVSuccess: "CSV exported!",
+    exportCSVDesc: "Questions exported in CSV format for Excel/Google Sheets.",
+    exportQti21Success: "QTI 2.1 exported!",
+    exportQti21Desc: "Questions exported in QTI 2.1 format (ZIP file).",
+    exportQti22Success: "QTI 2.2 Inspera exported!",
+    exportQti22Desc: "Questions exported in QTI 2.2 Inspera format (ZIP file).",
+    exportWiseflowDesc: "Questions exported in Wiseflow innehållsbank format.",
+    newWiseflowJson: "New Wiseflow JSON",
+    legacyJson: "Legacy JSON",
+    qti21Zip: "QTI 2.1 (ZIP)",
+    qti22InsperaZip: "QTI 2.2 Inspera (ZIP)",
+    wordDocx: "Word (.docx)",
+    csvExcelSheets: "CSV (Excel/Sheets)",
+    instructorGuidance: "Instructor Guidance",
+    multipleCorrectPossible: "✓ Multiple correct answers possible",
+    termLabel: "Term:",
+    matchLabel: "Match:",
+    correctPairs: "✓ Correct pairs:",
+    arrangeCorrectOrder: "Arrange in correct order:",
+    enterPositionNumbers: "Enter position numbers (1, 2, 3...)",
+    numbersShowSequence: "Numbers show the correct sequence",
+    imageBasedQuestion: "Image-based question",
+    hotspotDefaultInstruction: "Click or tap on the correct area of the image/diagram",
+    correctAreas: "✓ Correct area(s):",
+    addAreaName: "Add area name...",
+    correctAnswers: "✓ Correct answers:",
+    addNewAnswer: "Add new answer...",
+    studentAnswerPlaceholder: "Student writes 1-3 sentence answer here...",
+    sampleAnswer: "✓ Sample answer:",
+    ratingLow: "Low",
+    ratingHigh: "High",
+    expectedRating: "✓ Expected rating:",
+    invalidPoints: "Invalid points",
+    invalidPointsDesc: "Please enter a valid positive number for points.",
+    cannotRegenerate: "Cannot regenerate",
+    cannotRegenerateDesc: "Essay questions don't have answer options to regenerate.",
+    alternativesRegenerated: "Alternatives regenerated!",
+    alternativesRegeneratedDesc: "New answer options have been generated for this question.",
+    regenerationFailed: "Regeneration failed",
+    noTypesSelected: "No question types selected",
+    noTypesSelectedDesc: "Please select at least one question type to generate.",
+    invalidQuestionCount: "Invalid number of questions",
+    invalidQuestionCountDesc: "Please enter a number between 1 and 20.",
+    questionsAdded: "{count} questions added!",
+    questionsAddedDesc: "New questions have been added to your set.",
+    langSwedish: "Swedish",
+    langEnglish: "English",
 
     // Library Page
     editTags: "Edit Tags",
