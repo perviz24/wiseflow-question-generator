@@ -16,6 +16,8 @@ interface Question {
   minScore?: number
   // Short keyword title from Convex (e.g. "Celldelning", "Presbyopi")
   title?: string
+  // Stored tags from Convex (used to avoid duplicate tags during export)
+  tags?: string[]
 }
 
 // Legacy format (nya versionen) - Learnosity structure
@@ -118,6 +120,7 @@ interface ExportMetadata {
   additionalTags?: string
   tutorInitials?: string
   includeAITag?: boolean
+  includeLanguageTag?: boolean
 }
 
 // Get the display name for a question type (single language only)
@@ -163,30 +166,38 @@ function getScore(question: Question, metadata: ExportMetadata): number {
 }
 
 // Generate tags for a SINGLE question (single language, no raw internal values)
-function generateAutoTags(metadata: ExportMetadata, questionType: string): string[] {
+// existingTags: tags already stored on the question (from library) — skip duplicates
+function generateAutoTags(metadata: ExportMetadata, questionType: string, existingTags?: string[]): string[] {
   const autoTags: string[] = []
   const isSv = metadata.language === "sv"
+  const existing = new Set(existingTags || [])
 
-  autoTags.push(metadata.subject)
-  if (metadata.topic) autoTags.push(metadata.topic)
+  const addIfNew = (tag: string) => {
+    if (tag && !existing.has(tag)) autoTags.push(tag)
+  }
+
+  addIfNew(metadata.subject)
+  if (metadata.topic) addIfNew(metadata.topic)
 
   // Translated question type (e.g. "Flervalsfråga" not "mcq")
-  autoTags.push(getQuestionTypeTag(questionType, isSv))
+  addIfNew(getQuestionTypeTag(questionType, isSv))
 
   // Translated difficulty (e.g. "Svår" not "hard")
-  autoTags.push(getDifficultyTag(metadata.difficulty, isSv))
+  addIfNew(getDifficultyTag(metadata.difficulty, isSv))
 
-  // Language tag
-  autoTags.push(isSv ? "Svenska" : "English")
+  // Language tag (only if metadata.includeLanguageTag is not explicitly false)
+  if (metadata.includeLanguageTag !== false) {
+    addIfNew(isSv ? "Svenska" : "English")
+  }
 
   // AI-generated marker only if explicitly enabled
   if (metadata.includeAITag === true) {
-    autoTags.push(isSv ? "AI-genererad" : "AI-generated")
+    addIfNew(isSv ? "AI-genererad" : "AI-generated")
   }
 
   // Tutor initials if provided
   if (metadata.tutorInitials && metadata.tutorInitials.trim()) {
-    autoTags.push(metadata.tutorInitials.trim())
+    addIfNew(metadata.tutorInitials.trim())
   }
 
   return autoTags
@@ -316,6 +327,38 @@ function buildMcqQuestionData(question: Question, score: number) {
   return data
 }
 
+// Build question data for multiple_response — WISEflow needs multiple_responses flag
+function buildMultipleResponseData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "mcq",
+    multiple_responses: true,
+    shuffle_options: true,
+    score: score,
+    minScore: 0,
+  }
+  if (question.options) {
+    data.options = convertOptionsToWiseflow(question.options)
+    data.ui_style = {
+      choice_label: "upper-alpha",
+      type: "horizontal",
+    }
+    if (question.correctAnswer) {
+      data.validation = {
+        scoring_type: "partialMatchV2",
+        valid_response: {
+          score: score,
+          value: mapCorrectAnswersToIndices(question.correctAnswer, question.options),
+        },
+        penalty: 0,
+        rounding: "none",
+      }
+    }
+  }
+  return data
+}
+
 // Build question data for short_answer — uses longtextV2 with shorter max_length
 function buildShortAnswerData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -350,15 +393,18 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       const title = getShortTitle(question)
       const score = getScore(question, metadata)
 
-      const autoTags = generateAutoTags(metadata, question.type)
-      const allTags = [...autoTags, ...manualTags]
+      // Pass existing tags to avoid duplicates (e.g., "Matchning" already in stored tags)
+      const autoTags = generateAutoTags(metadata, question.type, question.tags)
+      const allTags = [...(question.tags || []), ...autoTags, ...manualTags]
 
       // Build question data based on type
       let questionData
       const effectiveType = getEffectiveWiseflowType(question.type)
 
-      if (question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") {
+      if (question.type === "mcq" || question.type === "true_false") {
         questionData = buildMcqQuestionData(question, score)
+      } else if (question.type === "multiple_response") {
+        questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
       } else {
@@ -418,15 +464,18 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       const title = getShortTitle(question)
       const score = getScore(question, metadata)
 
-      const autoTags = generateAutoTags(metadata, question.type)
-      const allTags = [...autoTags, ...manualTags]
+      // Pass existing tags to avoid duplicates (e.g., "Matchning" already in stored tags)
+      const autoTags = generateAutoTags(metadata, question.type, question.tags)
+      const allTags = [...(question.tags || []), ...autoTags, ...manualTags]
 
       // Build question data based on type (matching real WISEflow format)
       let questionData
       const effectiveType = getEffectiveWiseflowType(question.type)
 
-      if (question.type === "mcq" || question.type === "true_false" || question.type === "multiple_response") {
+      if (question.type === "mcq" || question.type === "true_false") {
         questionData = buildMcqQuestionData(question, score)
+      } else if (question.type === "multiple_response") {
+        questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
       } else {

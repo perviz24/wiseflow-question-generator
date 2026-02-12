@@ -265,7 +265,9 @@ export default function LibraryPage() {
         subject: selected[0]?.subject || "Export",
         topic: selected[0]?.tags?.[0] || "",
         difficulty: selected[0]?.difficulty || "medium",
-        language: selected[0]?.language || "sv"
+        language: selected[0]?.language || "sv",
+        tutorInitials: selected[0]?.tutorInitials || "",
+        includeAITag: selected[0]?.tags?.some((t: string) => t === "AI-genererad" || t === "AI-generated") || false,
       }
 
       if (format === "qti21" || format === "qti22") {
