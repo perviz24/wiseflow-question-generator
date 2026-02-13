@@ -33,7 +33,7 @@ interface EditState {
 }
 
 export default function LibraryPage() {
-  const { t } = useTranslation()
+  const { t, language: uiLanguage } = useTranslation()
   const questions = useQuery(api.questions.getUserQuestions)
   const updateQuestion = useMutation(api.questions.updateQuestion)
   const deleteQuestion = useMutation(api.questions.deleteQuestion)
@@ -229,23 +229,23 @@ export default function LibraryPage() {
   }
 
   const handleDelete = async (questionId: string) => {
-    if (!confirm("Är du säker på att du vill ta bort denna fråga?")) {
+    if (!confirm(uiLanguage === "sv" ? "Är du säker på att du vill ta bort denna fråga?" : "Are you sure you want to delete this question?")) {
       return
     }
 
     setDeletingId(questionId)
     try {
       await deleteQuestion({ id: questionId as Id<"questions"> })
-      toast.success("Fråga borttagen", {
-        description: "Frågan har tagits bort från biblioteket"
+      toast.success(uiLanguage === "sv" ? "Fråga borttagen" : "Question deleted", {
+        description: uiLanguage === "sv" ? "Frågan har tagits bort från biblioteket" : "Question has been removed from the library"
       })
       // Remove from selected if it was selected
       const newSelected = new Set(selectedQuestions)
       newSelected.delete(questionId)
       setSelectedQuestions(newSelected)
     } catch (error) {
-      toast.error("Misslyckades att ta bort", {
-        description: "Kunde inte ta bort frågan"
+      toast.error(uiLanguage === "sv" ? "Misslyckades att ta bort" : "Deletion failed", {
+        description: uiLanguage === "sv" ? "Kunde inte ta bort frågan" : "Could not delete the question"
       })
     } finally {
       setDeletingId(null)
@@ -255,7 +255,9 @@ export default function LibraryPage() {
   const handleDeleteSelected = async () => {
     if (selectedQuestions.size === 0) return
     const count = selectedQuestions.size
-    if (!confirm(`Är du säker på att du vill ta bort ${count} valda frågor? Detta kan inte ångras.`)) {
+    if (!confirm(uiLanguage === "sv"
+      ? `Är du säker på att du vill ta bort ${count} valda frågor? Detta kan inte ångras.`
+      : `Are you sure you want to delete ${count} selected questions? This cannot be undone.`)) {
       return
     }
     try {
@@ -263,20 +265,20 @@ export default function LibraryPage() {
         ids: Array.from(selectedQuestions) as Id<"questions">[],
       })
       setSelectedQuestions(new Set())
-      toast.success(`${count} frågor borttagna`, {
-        description: "Frågorna har tagits bort från biblioteket",
+      toast.success(uiLanguage === "sv" ? `${count} frågor borttagna` : `${count} questions deleted`, {
+        description: uiLanguage === "sv" ? "Frågorna har tagits bort från biblioteket" : "Questions have been removed from the library",
       })
     } catch {
-      toast.error("Misslyckades att ta bort", {
-        description: "Kunde inte ta bort de valda frågorna",
+      toast.error(uiLanguage === "sv" ? "Misslyckades att ta bort" : "Deletion failed", {
+        description: uiLanguage === "sv" ? "Kunde inte ta bort de valda frågorna" : "Could not delete the selected questions",
       })
     }
   }
 
   const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22" | "word") => {
     if (!questions || selectedQuestions.size === 0) {
-      toast.error("Ingen fråga vald", {
-        description: "Välj minst en fråga att exportera"
+      toast.error(uiLanguage === "sv" ? "Ingen fråga vald" : "No question selected", {
+        description: uiLanguage === "sv" ? "Välj minst en fråga att exportera" : "Select at least one question to export"
       })
       return
     }
@@ -288,7 +290,7 @@ export default function LibraryPage() {
         subject: selected[0]?.subject || "Export",
         topic: selected[0]?.tags?.[0] || "",
         difficulty: selected[0]?.difficulty || "medium",
-        language: selected[0]?.language || "sv",
+        language: uiLanguage,
         tutorInitials: selected[0]?.tutorInitials || "",
         includeAITag: selected[0]?.tags?.some((t: string) => t === "TentaGen" || t === "AI-genererad" || t === "AI-generated") || false,
         includeLanguageTag: selected[0]?.tags?.some((t: string) => t === "Svenska" || t === "English") || false,
@@ -310,9 +312,12 @@ export default function LibraryPage() {
         // Word (.docx) export
         const blob = await exportToWord(selected, metadata)
         const timestamp = new Date().toISOString().split("T")[0]
-        downloadBlob(blob, `${metadata.subject}_tentafragor_${timestamp}.docx`)
-        toast.success("Word-export lyckades!", {
-          description: `${selectedQuestions.size} frågor exporterade som .docx`
+        const fileLabel = uiLanguage === "sv" ? "tentafragor" : "exam_questions"
+        downloadBlob(blob, `${metadata.subject}_${fileLabel}_${timestamp}.docx`)
+        toast.success(uiLanguage === "sv" ? "Word-export lyckades!" : "Word export succeeded!", {
+          description: uiLanguage === "sv"
+            ? `${selectedQuestions.size} frågor exporterade som .docx`
+            : `${selectedQuestions.size} questions exported as .docx`
         })
       } else if (format === "qti21" || format === "qti22") {
         // QTI export as ZIP
@@ -327,8 +332,10 @@ export default function LibraryPage() {
         const blob = await zip.generateAsync({ type: "blob" })
         const timestamp = new Date().toISOString().split("T")[0]
         downloadBlob(blob, `library_export_${format}_${timestamp}.zip`)
-        toast.success(`${format.toUpperCase()} export lyckades!`, {
-          description: `${selectedQuestions.size} frågor exporterade som ZIP`
+        toast.success(`${format.toUpperCase()} export ${uiLanguage === "sv" ? "lyckades" : "succeeded"}!`, {
+          description: uiLanguage === "sv"
+            ? `${selectedQuestions.size} frågor exporterade som ZIP`
+            : `${selectedQuestions.size} questions exported as ZIP`
         })
       } else {
         // Wiseflow JSON export
@@ -342,13 +349,15 @@ export default function LibraryPage() {
         const filename = `library-export-${formatLabel}-${Date.now()}.json`
         const blob = new Blob([jsonContent], { type: "application/json" })
         downloadBlob(blob, filename)
-        toast.success("Export lyckades!", {
-          description: `${selectedQuestions.size} frågor exporterade (${format.toUpperCase()})`
+        toast.success(uiLanguage === "sv" ? "Export lyckades!" : "Export succeeded!", {
+          description: uiLanguage === "sv"
+            ? `${selectedQuestions.size} frågor exporterade`
+            : `${selectedQuestions.size} questions exported`
         })
       }
     } catch (error) {
-      toast.error("Export misslyckades", {
-        description: "Kunde inte exportera frågor"
+      toast.error(uiLanguage === "sv" ? "Export misslyckades" : "Export failed", {
+        description: uiLanguage === "sv" ? "Kunde inte exportera frågor" : "Could not export questions"
       })
     } finally {
       setIsExporting(false)
@@ -559,7 +568,7 @@ export default function LibraryPage() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="text-sm font-semibold">Filters</h3>
+                      <h3 className="text-sm font-semibold">{uiLanguage === "sv" ? "Filter" : "Filters"}</h3>
                       {hasActiveFilters && (
                         <Button
                           variant="ghost"
@@ -575,7 +584,7 @@ export default function LibraryPage() {
                     <div className="space-y-3">
                       {/* Search filter — full width */}
                       <Input
-                        placeholder="Search questions..."
+                        placeholder={uiLanguage === "sv" ? "Sök frågor..." : "Search questions..."}
                         value={filterSearch}
                         onChange={(e) => setFilterSearch(e.target.value)}
                         className="text-sm"
@@ -590,7 +599,7 @@ export default function LibraryPage() {
                           <SelectValue placeholder={t("filterByTag")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="all">All tags</SelectItem>
+                          <SelectItem value="all">{uiLanguage === "sv" ? "Alla taggar" : "All tags"}</SelectItem>
                           {allTags.map((tag) => (
                             <SelectItem key={tag} value={tag}>
                               {tag}
@@ -621,9 +630,9 @@ export default function LibraryPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">{t("allDifficulties")}</SelectItem>
-                          <SelectItem value="easy">Lätt</SelectItem>
-                          <SelectItem value="medium">Medel</SelectItem>
-                          <SelectItem value="hard">Svår</SelectItem>
+                          <SelectItem value="easy">{uiLanguage === "sv" ? "Lätt" : "Easy"}</SelectItem>
+                          <SelectItem value="medium">{uiLanguage === "sv" ? "Medel" : "Medium"}</SelectItem>
+                          <SelectItem value="hard">{uiLanguage === "sv" ? "Svår" : "Hard"}</SelectItem>
                         </SelectContent>
                       </Select>
 
