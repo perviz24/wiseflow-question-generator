@@ -22,7 +22,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus, ChevronDown, ChevronUp } from "lucide-react"
+import { CheckCircle2, Circle, FileText, Save, Download, Loader2, Edit2, Check, X, RefreshCw, Plus, ChevronDown, ChevronUp, Shuffle } from "lucide-react"
+import { QUESTION_TYPES, normalizeEnabledTypes } from "@/lib/question-types"
+import { useQuery } from "convex/react"
+import { api } from "../../convex/_generated/api"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { useTranslation } from "@/lib/language-context"
@@ -48,6 +51,7 @@ interface Question {
   correctAnswer?: string[]
   instructorStimulus?: string
   points?: number
+  difficulty?: string // Per-question difficulty when "mixed" is selected
 }
 
 interface QuestionPreviewProps {
@@ -75,8 +79,35 @@ interface QuestionPreviewProps {
   isExporting?: boolean
 }
 
+// Map type IDs to translation keys
+const TYPE_TRANSLATION_KEY: Record<string, string> = {
+  mcq: "questionType_mcq",
+  true_false: "questionType_trueFalse",
+  longtextV2: "questionType_essay",
+  short_answer: "questionType_shortAnswer",
+  fill_blank: "questionType_fillBlank",
+  multiple_response: "questionType_multipleResponse",
+  matching: "questionType_matching",
+  ordering: "questionType_ordering",
+  choicematrix: "questionType_choicematrix",
+  clozetext: "questionType_clozetext",
+  clozedropdown: "questionType_clozedropdown",
+  orderlist: "questionType_orderlist",
+  tokenhighlight: "questionType_tokenhighlight",
+  clozeassociation: "questionType_clozeassociation",
+  imageclozeassociationV2: "questionType_imageclozeassociationV2",
+  plaintext: "questionType_plaintext",
+  formulaessayV2: "questionType_formulaessayV2",
+  chemistryessayV2: "questionType_chemistryessayV2",
+}
+
+// Core types always shown before "show more" toggle
+const PRIMARY_MORE_IDS = ["mcq", "true_false", "longtextV2"]
+
 export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdateQuestions, isSaving, isExporting }: QuestionPreviewProps) {
   const { t } = useTranslation()
+  const profile = useQuery(api.profiles.getUserProfile)
+  const enabledTypes = normalizeEnabledTypes(profile?.enabledQuestionTypes as string[] | undefined)
   const [editingIndex, setEditingIndex] = useState<number | null>(null)
   const [editedQuestion, setEditedQuestion] = useState<Question | null>(null)
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null)
@@ -139,7 +170,8 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
 
   const handlePointsEditClick = (index: number) => {
     const question = questions[index]
-    const currentPoints = question.points ?? getPointsForDifficulty(metadata.difficulty)
+    const effectiveDifficulty = metadata.difficulty === "mixed" && question.difficulty ? question.difficulty : metadata.difficulty
+    const currentPoints = question.points ?? getPointsForDifficulty(effectiveDifficulty)
     setEditingPointsIndex(index)
     setTempPoints(currentPoints.toString())
   }
@@ -308,6 +340,21 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
     setAdditionalTypes((prev) =>
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
     )
+  }
+
+  const selectAllEnabledTypes = () => {
+    const allSelected = enabledTypes.every((id) => additionalTypes.includes(id))
+    setAdditionalTypes(allSelected ? [] : [...enabledTypes])
+  }
+
+  const isMixedActive = enabledTypes.length > 0 && enabledTypes.every((id) => additionalTypes.includes(id))
+
+  const tierBorderClass = (typeId: string) => {
+    const def = QUESTION_TYPES[typeId]
+    if (!def) return ""
+    if (def.tier === "specialized") return "ring-1 ring-amber-400/50"
+    if (def.tier === "extended") return "ring-1 ring-blue-400/50"
+    return ""
   }
 
   const handleGenerateMore = async () => {
@@ -522,6 +569,12 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="outline">{getQuestionTypeLabel(question.type)}</Badge>
+                    {/* Per-question difficulty badge for mixed difficulty */}
+                    {metadata.difficulty === "mixed" && question.difficulty && (
+                      <Badge className={getDifficultyColor(question.difficulty)} variant="secondary">
+                        {t(question.difficulty as "easy" | "medium" | "hard")}
+                      </Badge>
+                    )}
                     {editingPointsIndex === index ? (
                       <div className="flex items-center gap-1">
                         <Input
@@ -553,7 +606,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         className="bg-primary/10 dark:bg-primary/20 cursor-pointer hover:bg-primary/20 dark:hover:bg-primary/30"
                         onClick={() => handlePointsEditClick(index)}
                       >
-                        {question.points ?? getPointsForDifficulty(metadata.difficulty)} {t("points").toLowerCase()}
+                        {question.points ?? getPointsForDifficulty(metadata.difficulty === "mixed" && question.difficulty ? question.difficulty : metadata.difficulty)} {t("points").toLowerCase()}
                       </Badge>
                     )}
                     <span className="text-sm text-muted-foreground">{t("questionNumber").replace("{n}", String(index + 1))}</span>
@@ -1468,7 +1521,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   <div className="space-y-2">
                     <Card className="p-4 bg-muted/50">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-700">
+                        <Badge variant="outline" className="bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/30 dark:text-teal-300 dark:border-teal-700">
                           𝑓(𝑥) Math
                         </Badge>
                       </div>
@@ -1546,130 +1599,89 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               <p className="text-xs text-muted-foreground">{t("chooseBetween")}</p>
             </div>
 
-            {/* Question types */}
+            {/* Question types — uses same registry as main form */}
             <div className="space-y-2">
               <label className="text-sm font-medium">{t("questionTypes")}</label>
-              <div className="flex flex-wrap gap-2">
-                {/* First 3 classic types - always visible */}
-                <Button
-                  type="button"
-                  variant={additionalTypes.includes("mcq") ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleAdditionalType("mcq")}
-                  className="flex-1 min-w-[100px]"
-                >
-                  {t("questionType_mcq")}
-                </Button>
-                <Button
-                  type="button"
-                  variant={additionalTypes.includes("true_false") ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleAdditionalType("true_false")}
-                  className="flex-1 min-w-[100px]"
-                >
-                  {t("questionType_trueFalse")}
-                </Button>
-                <Button
-                  type="button"
-                  variant={additionalTypes.includes("longtextV2") ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => toggleAdditionalType("longtextV2")}
-                  className="flex-1 min-w-[100px]"
-                >
-                  {t("questionType_essay")}
-                </Button>
+              <div className="space-y-3">
+                {/* Primary types with Mixed button */}
+                <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+                  <button
+                    type="button"
+                    onClick={selectAllEnabledTypes}
+                    className={`inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ring-1 ring-teal-400/50 ${
+                      isMixedActive
+                        ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                        : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                    }`}
+                  >
+                    <Shuffle className="h-3 w-3" />
+                    {t("mixedQuestionTypes")}
+                  </button>
+                  {enabledTypes.filter((id) => PRIMARY_MORE_IDS.includes(id)).map((typeId) => {
+                    const translationKey = TYPE_TRANSLATION_KEY[typeId]
+                    const label = translationKey ? t(translationKey as keyof Translations) : typeId
+                    return (
+                      <button
+                        key={typeId}
+                        type="button"
+                        onClick={() => toggleAdditionalType(typeId)}
+                        className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${tierBorderClass(typeId)} ${
+                          additionalTypes.includes(typeId)
+                            ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                            : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
 
-                {/* Expandable additional types */}
+                {/* Secondary types — collapsible */}
                 {showMoreTypes && (
-                  <>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("short_answer") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("short_answer")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_shortAnswer")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("fill_blank") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("fill_blank")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_fillBlank")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("multiple_response") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("multiple_response")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_multipleResponse")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("matching") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("matching")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_matching")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("ordering") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("ordering")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_ordering")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("hotspot") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("hotspot")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_hotspot")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={additionalTypes.includes("rating_scale") ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleAdditionalType("rating_scale")}
-                      className="flex-1 min-w-[100px]"
-                    >
-                      {t("questionType_ratingScale")}
-                    </Button>
-                  </>
+                  <div className="flex flex-wrap gap-2 pt-1" role="group" aria-label="Additional question types">
+                    {enabledTypes.filter((id) => !PRIMARY_MORE_IDS.includes(id)).map((typeId) => {
+                      const translationKey = TYPE_TRANSLATION_KEY[typeId]
+                      const label = translationKey ? t(translationKey as keyof Translations) : typeId
+                      return (
+                        <button
+                          key={typeId}
+                          type="button"
+                          onClick={() => toggleAdditionalType(typeId)}
+                          className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${tierBorderClass(typeId)} ${
+                            additionalTypes.includes(typeId)
+                              ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                              : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                )}
+
+                {/* Toggle button */}
+                {enabledTypes.filter((id) => !PRIMARY_MORE_IDS.includes(id)).length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowMoreTypes(!showMoreTypes)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showMoreTypes ? (
+                      <>
+                        <ChevronUp className="h-3.5 w-3.5" />
+                        {t("showLessTypes")}
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3.5 w-3.5" />
+                        {t("showMoreTypes")} (+{enabledTypes.filter((id) => !PRIMARY_MORE_IDS.includes(id)).length})
+                      </>
+                    )}
+                  </button>
                 )}
               </div>
-
-              {/* Toggle button */}
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowMoreTypes(!showMoreTypes)}
-                className="w-full mt-2"
-              >
-                {showMoreTypes ? (
-                  <>
-                    <ChevronUp className="mr-2 h-4 w-4" />
-                    {t("showLessTypes")}
-                  </>
-                ) : (
-                  <>
-                    <ChevronDown className="mr-2 h-4 w-4" />
-                    {t("showMoreTypes")}
-                  </>
-                )}
-              </Button>
-
               <p className="text-xs text-muted-foreground">{t("selectOneOrMore")}</p>
             </div>
           </div>

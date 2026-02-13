@@ -275,7 +275,7 @@ function QuestionTypeSelector({
               <button
                 type="button"
                 onClick={onSelectMixed}
-                className={`inline-flex items-center justify-center gap-1 rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-1 ring-purple-400/50 ${
+                className={`inline-flex items-center justify-center gap-1 rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-1 ring-teal-400/50 ${
                   isMixedActive
                     ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
                     : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
