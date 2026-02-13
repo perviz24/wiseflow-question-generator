@@ -451,7 +451,7 @@ export const translations: Record<Language, Translations> = {
     questionType_hotspot: "Bildmarkering",
     questionType_ratingScale: "Betygsskala",
     // Specialized tier types
-    questionType_choicematrix: "Matris (flerval)",
+    questionType_choicematrix: "Valmatris",
     questionType_clozetext: "Lucktext (fritext)",
     questionType_clozedropdown: "Lucktext (rullmeny)",
     questionType_orderlist: "Ordningslista",
