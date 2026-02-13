@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -603,75 +604,100 @@ export default function DocsPage() {
                           ? "Följ dessa steg för att importera legacy JSON-frågor till Wiseflow:"
                           : "Follow these steps to import legacy JSON questions into Wiseflow:"}
                       </p>
-                      <ol className="space-y-4 text-sm">
-                        <li className="flex items-start gap-3">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
-                            1
+                      <ol className="space-y-6 text-sm">
+                        <li className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                              1
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {isSv
+                                  ? "Öppna huvudsidan och navigera till \"Uppgifter (utgående)\""
+                                  : "Open the main page and navigate to \"Uppgifter (utgående)\""}
+                              </p>
+                              <p className="text-muted-foreground mt-1">
+                                {isSv
+                                  ? "Detta är den äldre uppgiftshanteringen i Wiseflow."
+                                  : "This is the legacy task management section in Wiseflow."}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">
-                              {isSv
-                                ? "Öppna huvudsidan och navigera till \"Uppgifter (utgående)\""
-                                : "Open the main page and navigate to \"Uppgifter (utgående)\""}
-                            </p>
-                            <p className="text-muted-foreground mt-1">
-                              {isSv
-                                ? "Detta är den äldre uppgiftshanteringen i Wiseflow."
-                                : "This is the legacy task management section in Wiseflow."}
-                            </p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
-                            2
-                          </div>
-                          <div>
-                            <p className="font-medium">
-                              {isSv
-                                ? "Navigera till \"Innehållsbank\""
-                                : "Navigate to \"Innehållsbank\" (Content Bank)"}
-                            </p>
+                          <div className="ml-9 rounded-lg border overflow-hidden">
+                            <Image src="/guide-images/guide-step-1.png" alt={isSv ? "Författaröversikt med Uppgifter (utgående) markerat" : "Author overview with Uppgifter (utgående) highlighted"} width={600} height={400} className="w-full h-auto" />
                           </div>
                         </li>
-                        <li className="flex items-start gap-3">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
-                            3
+                        <li className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                              2
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {isSv
+                                  ? "Navigera till \"Innehållsbank\""
+                                  : "Navigate to \"Innehållsbank\" (Content Bank)"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">
-                              {isSv
-                                ? "Klicka på importknappen"
-                                : "Click the import button"}
-                            </p>
-                          </div>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
-                            4
-                          </div>
-                          <div>
-                            <p className="font-medium">
-                              {isSv
-                                ? "Välj \"Wiseflow\" i rullgardinsmenyn och klicka \"Välj fil\""
-                                : "Choose \"Wiseflow\" in the dropdown and click \"Välj fil\" (Choose file)"}
-                            </p>
-                            <p className="text-muted-foreground mt-1">
-                              {isSv
-                                ? "Välj din exporterade .json-fil från TentaGen."
-                                : "Select your exported .json file from TentaGen."}
-                            </p>
+                          <div className="ml-9 rounded-lg border overflow-hidden">
+                            <Image src="/guide-images/guide-step-2.png" alt={isSv ? "Författare-sida med Innehållsbank markerat" : "Author page with Innehållsbank highlighted"} width={600} height={400} className="w-full h-auto" />
                           </div>
                         </li>
-                        <li className="flex items-start gap-3">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
-                            5
+                        <li className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                              3
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {isSv
+                                  ? "Klicka på importknappen"
+                                  : "Click the import button"}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium">
-                              {isSv
-                                ? "Förhandsgranska frågorna, lägg till taggar om du vill, och klicka importera"
-                                : "Preview the questions, add tags if needed, and click import"}
-                            </p>
+                          <div className="ml-9 rounded-lg border overflow-hidden">
+                            <Image src="/guide-images/guide-step-3.png" alt={isSv ? "Innehållsbank med importknapp markerad" : "Content bank with import button highlighted"} width={600} height={400} className="w-full h-auto" />
+                          </div>
+                        </li>
+                        <li className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                              4
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {isSv
+                                  ? "Välj \"Wiseflow\" i rullgardinsmenyn och klicka \"Välj fil\""
+                                  : "Choose \"Wiseflow\" in the dropdown and click \"Välj fil\" (Choose file)"}
+                              </p>
+                              <p className="text-muted-foreground mt-1">
+                                {isSv
+                                  ? "Välj din exporterade .json-fil från TentaGen."
+                                  : "Select your exported .json file from TentaGen."}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="ml-9 rounded-lg border overflow-hidden">
+                            <Image src="/guide-images/guide-step-4.png" alt={isSv ? "Importdialog med WISEflow valt och Välj fil-knapp" : "Import dialog with WISEflow selected and Choose file button"} width={300} height={300} className="w-full max-w-sm h-auto" />
+                          </div>
+                        </li>
+                        <li className="space-y-3">
+                          <div className="flex items-start gap-3">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                              5
+                            </div>
+                            <div>
+                              <p className="font-medium">
+                                {isSv
+                                  ? "Förhandsgranska frågorna, lägg till taggar om du vill, och klicka importera"
+                                  : "Preview the questions, add tags if needed, and click import"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="ml-9 rounded-lg border overflow-hidden">
+                            <Image src="/guide-images/guide-step-5.png" alt={isSv ? "Förhandsvisning av frågor med taggar innan import" : "Preview of questions with tags before import"} width={600} height={300} className="w-full h-auto" />
                           </div>
                         </li>
                       </ol>
