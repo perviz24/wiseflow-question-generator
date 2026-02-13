@@ -555,8 +555,8 @@ export async function exportToWord(
                         children: [
                           new TextRun({
                             text: isSv
-                              ? "AI-driven tentafråge-generator för högre utbildning"
-                              : "AI-powered exam question generator for higher education",
+                              ? "Smartare tentafrågor för utbildningsorganisationer"
+                              : "Smarter exam questions for educational organizations",
                             size: 18,
                             color: "4A6FA5",
                           }),

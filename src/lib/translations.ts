@@ -346,7 +346,7 @@ export const translations: Record<Language, Translations> = {
     welcomeTitle: "Välkommen till TentaGen",
     welcomeSubtitle: "Generera högkvalitativa tentafrågor med AI. Logga in för att komma igång.",
     signInToContinue: "Logga in för att fortsätta",
-    createQuestionsTitle: "Skapa tentafrågor",
+    createQuestionsTitle: "Smartare tentafrågor för utbildningsorganisationer",
     createQuestionsSubtitle: "Låt AI generera frågor från sin kunskapsbas, ladda upp eget underlag för kontroll över innehållet, eller kombinera båda",
 
     // Question Generator Form
@@ -666,7 +666,7 @@ export const translations: Record<Language, Translations> = {
     welcomeTitle: "Welcome to TentaGen",
     welcomeSubtitle: "Generate high-quality exam questions using AI. Sign in to get started.",
     signInToContinue: "Sign In to Continue",
-    createQuestionsTitle: "Create Exam Questions",
+    createQuestionsTitle: "Smarter exam questions for educational organizations",
     createQuestionsSubtitle: "Let AI generate questions from its knowledge base, upload your own material for content control, or combine both",
 
     // Question Generator Form

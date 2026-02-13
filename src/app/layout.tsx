@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TentaGen",
-  description: "AI-powered exam question generator",
+  title: "TentaGen — Smartare tentafrågor för utbildningsorganisationer",
+  description: "AI-driven tentafråge-generator som skapar högkvalitativa examensfrågor för utbildningsorganisationer. Stöder WISEflow, QTI, Word och fler format.",
 };
 
 export default function RootLayout({
