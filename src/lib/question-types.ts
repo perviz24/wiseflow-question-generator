@@ -65,7 +65,7 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
   short_answer: {
     id: "short_answer",
     tier: "core",
-    learnosityType: "longtextV2",
+    learnosityType: "plaintext",
     qtiInteraction: "ExtendedTextInteraction",
     defaultEnabled: true,
     canDisable: false,

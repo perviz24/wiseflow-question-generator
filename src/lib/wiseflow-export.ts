@@ -378,24 +378,21 @@ function buildMultipleResponseData(question: Question, score: number) {
   return data
 }
 
-// Build question data for short_answer — uses longtextV2 with shorter max_length
-// Short answer uses longtextV2 with smaller word limit (50 words) and minimal formatting
+// Build question data for short_answer — uses plaintext for simple text input
+// Plaintext renders as a simple text box (no rich editor), distinct from longtextV2 essay
 function buildShortAnswerData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
-    submit_over_limit: true,
-    show_word_count: true,
     stimulus: question.stimulus,
-    type: "longtextV2",
-    max_length: 200,
+    type: "plaintext",
+    max_length: 10000,
+    show_word_count: true,
+    score,
+    minScore: 0,
     validation: {
       max_score: score,
       automarkable: false,
     },
-    formatting_options: ["bold", "unorderedList", "orderedList"],
-    character_map: true,
-    score: score,
-    minScore: 0,
   }
   if (question.instructorStimulus) {
     data.instructor_stimulus = question.instructorStimulus
