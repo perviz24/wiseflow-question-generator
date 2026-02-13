@@ -290,7 +290,7 @@ export default function LibraryPage() {
         difficulty: selected[0]?.difficulty || "medium",
         language: selected[0]?.language || "sv",
         tutorInitials: selected[0]?.tutorInitials || "",
-        includeAITag: selected[0]?.tags?.some((t: string) => t === "AI-genererad" || t === "AI-generated") || false,
+        includeAITag: selected[0]?.tags?.some((t: string) => t === "TentaGen" || t === "AI-genererad" || t === "AI-generated") || false,
         includeLanguageTag: selected[0]?.tags?.some((t: string) => t === "Svenska" || t === "English") || false,
       }
 
@@ -876,7 +876,7 @@ export default function LibraryPage() {
                                 {(isEditing ? editState?.tags : question.tags)
                                   ?.filter(tag => tag && tag.trim().length > 0) // Hide empty tags
                                   .map((tag, idx) => {
-                                  const isAITag = tag === "AI-genererad" || tag === "AI-generated"
+                                  const isAITag = tag === "TentaGen" || tag === "AI-genererad" || tag === "AI-generated"
                                   return (
                                     <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
                                       {tag}

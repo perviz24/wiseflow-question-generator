@@ -205,9 +205,9 @@ function generateAutoTags(metadata: ExportMetadata, questionType: string, existi
     addIfNew(isSv ? "Svenska" : "English")
   }
 
-  // AI-generated marker only if explicitly enabled
+  // TentaGen marker only if explicitly enabled
   if (metadata.includeAITag === true) {
-    addIfNew(isSv ? "AI-genererad" : "AI-generated")
+    addIfNew("TentaGen")
   }
 
   // Tutor initials if provided

@@ -494,8 +494,8 @@ export function QuestionGeneratorForm() {
         ? formData.additionalTags.split(',').map(tag => tag.trim()).filter((tag): tag is string => Boolean(tag))
         : []
 
-      // Add AI-generated tag if requested
-      const aiTag = formData.includeAITag ? (isSv ? 'AI-genererad' : 'AI-generated') : null
+      // Add TentaGen tag if requested
+      const aiTag = formData.includeAITag ? 'TentaGen' : null
 
       // Transform questions to match Convex schema
       const questionsToSave = generatedQuestions.map((q) => {

@@ -494,7 +494,7 @@ export default function DocsPage() {
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                        <span>{isSv ? "Lägg till eller ta bort taggar (inklusive AI-genererad tagg)" : "Add or remove tags (including AI-generated tag)"}</span>
+                        <span>{isSv ? "Lägg till eller ta bort taggar (inklusive TentaGen-tagg)" : "Add or remove tags (including TentaGen tag)"}</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
