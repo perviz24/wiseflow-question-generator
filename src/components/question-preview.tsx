@@ -66,6 +66,7 @@ interface QuestionPreviewProps {
     tutorInitials?: string
     includeAITag?: boolean
     includeLanguageTag?: boolean
+    includeTopicTag?: boolean
   }
   onSave?: () => void
   onExport?: () => void

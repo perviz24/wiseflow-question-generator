@@ -174,6 +174,7 @@ interface FormData {
   additionalTags?: string // Comma-separated custom tags
   includeAITag: boolean // Whether to include "AI-generated" tag
   includeLanguageTag: boolean // Whether to include language tag (e.g., "Svenska")
+  includeTopicTag: boolean // Whether to include topic/ämnesområde tag
 }
 
 interface Question {
@@ -320,6 +321,7 @@ export function QuestionGeneratorForm() {
     additionalTags: "",
     includeAITag: true, // Default to true (include AI-generated tag)
     includeLanguageTag: true, // Default to true (include language tag like "Svenska")
+    includeTopicTag: false, // Default to false (ämnesområde NOT auto-tagged)
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedQuestions, setGeneratedQuestions] = useState<Question[] | null>(null)
@@ -475,9 +477,10 @@ export function QuestionGeneratorForm() {
 
       // Build base auto-tags with TRANSLATED values (same for all questions)
       const languageTag = formData.includeLanguageTag ? (isSv ? "Svenska" : "English") : null
+      const topicTag = formData.includeTopicTag ? metadata.topic : null
       const baseAutoTags = [
         metadata.subject,
-        metadata.topic,
+        topicTag,
         difficultyTag,
         languageTag,
         formData.term,
@@ -557,6 +560,7 @@ export function QuestionGeneratorForm() {
         tutorInitials: userProfile?.tutorInitials || "N/A",
         includeAITag: formData.includeAITag,
         includeLanguageTag: formData.includeLanguageTag,
+        includeTopicTag: formData.includeTopicTag,
       }
 
       // Choose export format based on user selection
@@ -609,6 +613,7 @@ export function QuestionGeneratorForm() {
             ...metadata,
             includeAITag: formData.includeAITag,
             includeLanguageTag: formData.includeLanguageTag,
+            includeTopicTag: formData.includeTopicTag,
             tutorInitials: userProfile?.tutorInitials || "N/A",
             term: formData.term,
             semester: formData.semester,
@@ -991,6 +996,21 @@ export function QuestionGeneratorForm() {
                   className="text-sm font-normal cursor-pointer"
                 >
                   {t("includeLanguageTag")}
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="includeTopicTag"
+                  checked={formData.includeTopicTag}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, includeTopicTag: checked as boolean })
+                  }
+                />
+                <Label
+                  htmlFor="includeTopicTag"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {t("includeTopicTag")}
                 </Label>
               </div>
             </div>

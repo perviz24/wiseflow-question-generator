@@ -122,6 +122,7 @@ interface ExportMetadata {
   tutorInitials?: string
   includeAITag?: boolean
   includeLanguageTag?: boolean
+  includeTopicTag?: boolean
 }
 
 // Get the display name for a question type (single language only)
@@ -190,7 +191,8 @@ function generateAutoTags(metadata: ExportMetadata, questionType: string, existi
   }
 
   addIfNew(metadata.subject)
-  if (metadata.topic) addIfNew(metadata.topic)
+  // Topic tag only if explicitly enabled (default off)
+  if (metadata.topic && metadata.includeTopicTag === true) addIfNew(metadata.topic)
 
   // Translated question type (e.g. "Flervalsfråga" not "mcq")
   addIfNew(getQuestionTypeTag(questionType, isSv))

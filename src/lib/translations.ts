@@ -101,6 +101,7 @@ export interface Translations {
   additionalTagsHelp: string
   includeAITag: string
   includeLanguageTag: string
+  includeTopicTag: string
 
   // Question Preview
   generatedQuestions: string
@@ -400,6 +401,7 @@ export const translations: Record<Language, Translations> = {
     additionalTagsHelp: "Separera flera taggar med kommatecken",
     includeAITag: "Inkludera 'AI-genererad' tagg",
     includeLanguageTag: "Inkludera språktagg (t.ex. 'Svenska')",
+    includeTopicTag: "Inkludera ämnesområdestagg",
 
     // Question Preview
     generatedQuestions: "Genererade frågor",
@@ -697,6 +699,7 @@ export const translations: Record<Language, Translations> = {
     additionalTagsHelp: "Separate multiple tags with commas",
     includeAITag: "Include 'AI-generated' tag",
     includeLanguageTag: "Include language tag (e.g., 'English')",
+    includeTopicTag: "Include topic tag",
 
     // Question Preview
     generatedQuestions: "Generated Questions",
