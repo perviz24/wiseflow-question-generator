@@ -53,24 +53,43 @@ export const upsertProfile = mutation({
     const now = Date.now()
 
     if (existing) {
-      // Update existing profile
-      await ctx.db.patch(existing._id, {
-        tutorInitials: args.tutorInitials,
-        uiLanguage: args.uiLanguage,
-        enabledQuestionTypes: args.enabledQuestionTypes,
-        updatedAt: now,
-      })
+      // Update existing profile — only include enabledQuestionTypes if actually provided
+      // Passing explicit undefined to Convex patch can cause validation errors
+      if (args.enabledQuestionTypes !== undefined) {
+        await ctx.db.patch(existing._id, {
+          tutorInitials: args.tutorInitials,
+          uiLanguage: args.uiLanguage,
+          enabledQuestionTypes: args.enabledQuestionTypes,
+          updatedAt: now,
+        })
+      } else {
+        await ctx.db.patch(existing._id, {
+          tutorInitials: args.tutorInitials,
+          uiLanguage: args.uiLanguage,
+          updatedAt: now,
+        })
+      }
       return { success: true, action: "updated" }
     } else {
-      // Create new profile
-      await ctx.db.insert("userProfiles", {
-        userId: identity.subject,
-        tutorInitials: args.tutorInitials,
-        uiLanguage: args.uiLanguage,
-        enabledQuestionTypes: args.enabledQuestionTypes,
-        createdAt: now,
-        updatedAt: now,
-      })
+      // Create new profile — only include enabledQuestionTypes if provided
+      if (args.enabledQuestionTypes !== undefined) {
+        await ctx.db.insert("userProfiles", {
+          userId: identity.subject,
+          tutorInitials: args.tutorInitials,
+          uiLanguage: args.uiLanguage,
+          enabledQuestionTypes: args.enabledQuestionTypes,
+          createdAt: now,
+          updatedAt: now,
+        })
+      } else {
+        await ctx.db.insert("userProfiles", {
+          userId: identity.subject,
+          tutorInitials: args.tutorInitials,
+          uiLanguage: args.uiLanguage,
+          createdAt: now,
+          updatedAt: now,
+        })
+      }
       return { success: true, action: "created" }
     }
   },

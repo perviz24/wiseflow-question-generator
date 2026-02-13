@@ -456,17 +456,23 @@ function buildAssociationData(question: Question, score: number) {
     // options[].label = prompt/statement (stimulus_list)
     // options[].value = matching answer (possible_responses)
     data.stimulus_list = question.options.map(opt => opt.label)
-    // Collect all response values + add distractors if available from correctAnswer
     const responses = question.options.map(opt => opt.value)
     data.possible_responses = responses
     if (question.correctAnswer) {
-      // For partialMatch scoring, Learnosity expects the TOTAL score —
-      // it automatically divides by the number of responses internally
+      // Map correctAnswer to actual response text values for Learnosity
+      // AI may generate labels ("A","B") or actual values — handle both
+      const mappedValues = question.correctAnswer.map(answer => {
+        // Check if answer is a label (e.g., "A", "B") that maps to an option
+        const matchedOpt = question.options?.find(opt => opt.label === answer)
+        if (matchedOpt) return matchedOpt.value
+        // Already a text value — use as-is
+        return answer
+      })
       data.validation = {
         scoring_type: "partialMatch",
         valid_response: {
           score: score,
-          value: question.correctAnswer, // Ordered array matching stimulus_list
+          value: mappedValues,
         },
       }
     }
