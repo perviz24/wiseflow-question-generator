@@ -6,7 +6,7 @@ import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp } from "lucide-react"
+import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp, FileText, Shuffle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -92,8 +92,8 @@ export default function DocsPage() {
                 <CardContent>
                   <p className="text-sm text-muted-foreground">
                     {isSv
-                      ? "Stöd för flera exportformat: Wiseflow JSON (Ny/Legacy), QTI 2.1 och QTI 2.2 Inspera. Fungerar med de flesta LMS-plattformar."
-                      : "Support for multiple export formats: Wiseflow JSON (New/Legacy), QTI 2.1, and QTI 2.2 Inspera. Works with most LMS platforms."}
+                      ? "Stöd för flera exportformat: Wiseflow JSON (Ny/Legacy), QTI 2.1, QTI 2.2 Inspera och Word (.docx). Fungerar med de flesta LMS-plattformar."
+                      : "Support for multiple export formats: Wiseflow JSON (New/Legacy), QTI 2.1, QTI 2.2 Inspera, and Word (.docx). Works with most LMS platforms."}
                   </p>
                 </CardContent>
               </Card>
@@ -117,8 +117,8 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>10+ frågetyper:</strong> Flerval, Sant/Falskt, Essay, Kort svar, Matchning, Ifyllnad, och mer</>
-                        : <><strong>10+ question types:</strong> Multiple Choice, True/False, Essay, Short Answer, Matching, Fill Blank, and more</>}
+                        ? <><strong>20 frågetyper:</strong> Flerval, Sant/Falskt, Essay, Kort svar, Matchning, Ifyllnad, Lucktext, Ordningslista, och mer</>
+                        : <><strong>20 question types:</strong> MCQ, True/False, Essay, Short Answer, Matching, Fill Blank, Cloze Text, Order List, and more</>}
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -149,8 +149,8 @@ export default function DocsPage() {
                     <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                     <span>
                       {isSv
-                        ? <><strong>Generera fler:</strong> Lägg till nya frågor till befintligt set utan att starta om</>
-                        : <><strong>Generate more:</strong> Add new questions to existing set without starting over</>}
+                        ? <><strong>Generera fler:</strong> Lägg till nya frågor till befintligt set utan att starta om — välj bland alla 20 frågetyper</>
+                        : <><strong>Generate more:</strong> Add new questions to existing set without starting over — choose from all 20 question types</>}
                     </span>
                   </div>
                 </div>
@@ -218,8 +218,8 @@ export default function DocsPage() {
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {isSv
-                      ? "Granska frågorna, spara till bibliotek, och exportera till Wiseflow JSON"
-                      : "Review questions, save to library, and export to Wiseflow JSON"}
+                      ? "Granska frågorna, spara till bibliotek, och exportera till Wiseflow JSON, QTI eller Word"
+                      : "Review questions, save to library, and export to Wiseflow JSON, QTI, or Word"}
                   </p>
                 </div>
               </div>
@@ -268,31 +268,50 @@ export default function DocsPage() {
                         <span>
                           <strong>{isSv ? "Svårighetsgrad" : "Difficulty"}:</strong>{" "}
                           {isSv
-                            ? "Lätt (1 poäng), Medel (2 poäng), eller Svår (3 poäng)"
-                            : "Easy (1 point), Medium (2 points), or Hard (3 points)"}
+                            ? "Lätt (1p), Medel (2p), Svår (3p), eller Blandad (jämn fördelning med individuella svårighetsmarkeringar per fråga)"
+                            : "Easy (1pt), Medium (2pt), Hard (3pt), or Mixed (balanced distribution with per-question difficulty badges)"}
                         </span>
                       </li>
                     </ul>
                   </div>
 
                   <div>
-                    <h4 className="font-semibold mb-2">{isSv ? "Frågetyper" : "Question Types"}</h4>
-                    <div className="grid gap-2 sm:grid-cols-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">MCQ</Badge>
-                        <span className="text-muted-foreground">{isSv ? "Flervalsfråga" : "Multiple Choice"}</span>
+                    <h4 className="font-semibold mb-2">{isSv ? "20 Frågetyper (3 kategorier)" : "20 Question Types (3 tiers)"}</h4>
+                    <div className="space-y-3 text-sm">
+                      <div>
+                        <p className="font-medium text-xs text-muted-foreground mb-1.5">{isSv ? "⭐ Grundläggande" : "⭐ Core"}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="secondary">{isSv ? "Flerval (MCQ)" : "MCQ"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Sant/Falskt" : "True/False"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Essä" : "Essay"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Kort svar" : "Short Answer"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Ifyllnad" : "Fill Blank"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Flera rätt" : "Multiple Response"}</Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">T/F</Badge>
-                        <span className="text-muted-foreground">{isSv ? "Sant/Falskt" : "True/False"}</span>
+                      <div>
+                        <p className="font-medium text-xs text-muted-foreground mb-1.5">{isSv ? "📚 Utökade" : "📚 Extended"}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="secondary">{isSv ? "Matchning" : "Matching"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Ordningsföljd" : "Ordering"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Lucktext" : "Cloze Text"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Rullgardinslucka" : "Cloze Dropdown"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Ordningslista" : "Order List"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Valsmatris" : "Choice Matrix"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Tokenmarkering" : "Token Highlight"}</Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">Essay</Badge>
-                        <span className="text-muted-foreground">{isSv ? "Essäfråga" : "Essay Question"}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary">+7 {isSv ? "fler" : "more"}</Badge>
-                        <span className="text-muted-foreground">{isSv ? "Kort svar, ifyllnad, m.m." : "Short answer, fill blank, etc."}</span>
+                      <div>
+                        <p className="font-medium text-xs text-muted-foreground mb-1.5">{isSv ? "🔬 Specialiserade" : "🔬 Specialized"}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="secondary">{isSv ? "Bildmarkering" : "Hotspot"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Betygsskala" : "Rating Scale"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Dra-och-släpp lucka" : "Cloze Association"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Bildlucka" : "Image Cloze"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Fritext" : "Plain Text"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Formeluppsats" : "Formula Essay"}</Badge>
+                          <Badge variant="secondary">{isSv ? "Kemiuppsats" : "Chemistry Essay"}</Badge>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -555,6 +574,14 @@ export default function DocsPage() {
                             : "Optimized QTI 2.2 format specifically for Inspera exam platform with improved compatibility."}
                         </span>
                       </li>
+                      <li className="flex items-start gap-2">
+                        <Badge variant="outline">Word (.docx)</Badge>
+                        <span>
+                          {isSv
+                            ? "Professionellt Word-dokument med frågor, svarsalternativ, rätta svar och bedömningsanvisningar. Perfekt för utskrift, granskning eller arkivering."
+                            : "Professional Word document with questions, answer options, correct answers, and grading guides. Perfect for printing, review, or archiving."}
+                        </span>
+                      </li>
                     </ul>
                   </div>
 
@@ -565,8 +592,8 @@ export default function DocsPage() {
                         <h4 className="font-semibold text-sm">{isSv ? "Tips" : "Tip"}</h4>
                         <p className="text-sm text-muted-foreground">
                           {isSv
-                            ? "Du kan välja exportformat både i förhandsvisningen efter generering och i biblioteket. Alla frågor exporteras i valt format oavsett var de kommer ifrån."
-                            : "You can choose export format both in the preview after generation and in the library. All questions are exported in the selected format regardless of their origin."}
+                            ? "Du kan välja exportformat både i förhandsvisningen efter generering och i biblioteket. Word-export inkluderar TentaGen-märkning, metadata och bedömningsanvisningar."
+                            : "You can choose export format both in the preview after generation and in the library. Word export includes TentaGen branding, metadata, and grading guides."}
                         </p>
                       </div>
                     </div>
@@ -996,6 +1023,27 @@ export default function DocsPage() {
                       </li>
                     </ul>
                   </div>
+                  <div>
+                    <h4 className="font-semibold mb-2">{isSv ? "Standardfrågetyper" : "Default Question Types"}</h4>
+                    <ul className="space-y-2 text-sm text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>
+                          {isSv
+                            ? "Välj vilka frågetyper som ska vara förvalda när du genererar frågor. Sparas automatiskt och laddas nästa gång du loggar in."
+                            : "Choose which question types should be pre-selected when generating questions. Saved automatically and loaded next time you log in."}
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                        <span>
+                          {isSv
+                            ? "Alla 20 frågetyper organiserade i tre kategorier: Grundläggande, Utökade och Specialiserade."
+                            : "All 20 question types organized in three tiers: Core, Extended, and Specialized."}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -1056,6 +1104,22 @@ export default function DocsPage() {
                             {isSv
                               ? "Spara alla genererade frågor till biblioteket för framtida användning"
                               : "Save all generated questions to the library for future use"}
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span>•</span>
+                          <span>
+                            {isSv
+                              ? "Använd 'Blandad' svårighetsgrad för en jämn mix av lätta, medel och svåra frågor — varje fråga får en egen svårighetsmärkning"
+                              : "Use 'Mixed' difficulty for a balanced mix of easy, medium, and hard questions — each question gets its own difficulty badge"}
+                          </span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span>•</span>
+                          <span>
+                            {isSv
+                              ? "Konfigurera standardfrågetyper i Inställningar för att spara tid vid varje generering"
+                              : "Configure default question types in Settings to save time on each generation"}
                           </span>
                         </li>
                       </ul>
