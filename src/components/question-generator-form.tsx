@@ -179,6 +179,7 @@ interface FormData {
 
 interface Question {
   type: QuestionType
+  title?: string // AI-generated topic title (e.g. "Kornea histologi")
   stimulus: string
   options?: Array<{
     label: string
@@ -557,7 +558,8 @@ export function QuestionGeneratorForm() {
         const questionScore = getDefaultScore(actualDifficulty as "easy" | "medium" | "hard" | "mixed")
 
         return {
-          title: generateQuestionTitle(q.stimulus, q.type),
+          // Prefer AI-generated topic title, fallback to keyword extraction
+          title: q.title?.trim() || generateQuestionTitle(q.stimulus, q.type),
           subject: metadata.subject,
           difficulty: actualDifficulty,
           language: metadata.language as "sv" | "en",

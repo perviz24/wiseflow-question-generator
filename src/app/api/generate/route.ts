@@ -69,6 +69,7 @@ const QuestionSchema = z.object({
     "formulaessayV2",
     "chemistryessayV2"
   ]),
+  title: z.string().describe("Short 2-4 word topic title summarizing the medical/scientific concept being assessed — NOT the question text itself. Examples: 'Kornea histologi', 'Diabetesbehandling', 'Cellcykeln', 'Njurfysiologi', 'Anemidiagnostik'. Write the pathology, disease, skill, or anatomical topic being tested."),
   stimulus: z.string().describe("The question text"),
   options: z
     .array(
@@ -241,6 +242,7 @@ Requirements:
 - For Plain Text: Simple open-ended questions. Provide grading rubric in instructorStimulus.
 - For Formula Essay: Questions requiring mathematical notation. Provide expected math content in instructorStimulus.
 - For Chemistry Essay: Questions requiring chemical notation. Provide expected chemical content in instructorStimulus.
+- TITLE: Each question MUST have a short 2-4 word "title" field that names the TOPIC or SKILL being assessed — NOT a summary of the question text. Think: what medical/scientific concept does this test? Examples: question about cornea layers → title "Kornea histologi", question about insulin treatment → title "Diabetesbehandling", question about cell division phases → title "Cellcykeln". Use the same language as the questions.
 - Questions should test understanding, not just memorization.
 - Avoid ambiguous wording.
 - Ensure questions are pedagogically sound and aligned with learning outcomes.
