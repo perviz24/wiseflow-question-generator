@@ -745,7 +745,7 @@ export function QuestionGeneratorForm() {
           </div>
 
           {/* Difficulty, Number of Questions, Language — horizontal row */}
-          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-4 sm:gap-6">
+          <div className="flex flex-col sm:grid sm:grid-cols-[1fr_auto_1fr] gap-4 sm:gap-6">
             {/* Difficulty */}
             <div className="space-y-2">
               <Label htmlFor="difficulty">{t("difficulty")}</Label>
@@ -803,7 +803,7 @@ export function QuestionGeneratorForm() {
                   setFormData({ ...formData, numQuestions: Math.min(20, Math.max(1, val)) })
                 }}
                 autoComplete="off"
-                className="text-center"
+                className="text-center w-20"
               />
             </div>
 
