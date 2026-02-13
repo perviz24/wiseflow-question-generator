@@ -11,6 +11,8 @@ interface Question {
   }>
   correctAnswer?: string[]
   instructorStimulus?: string
+  // Per-question difficulty (easy/medium/hard) — used for score when mixed
+  difficulty?: string
   // Score fields from Convex (based on difficulty: easy=1, medium=2, hard=3)
   score?: number
   maxScore?: number
@@ -169,8 +171,9 @@ function getDifficultyTag(difficulty: string, isSv: boolean): string {
 function getScore(question: Question, metadata: ExportMetadata): number {
   if (question.score && question.score > 0) return question.score
   if (question.maxScore && question.maxScore > 0) return question.maxScore
-  // Fallback based on difficulty
-  switch (metadata.difficulty) {
+  // Use per-question difficulty (set during save), fall back to global metadata
+  const diff = question.difficulty || metadata.difficulty
+  switch (diff) {
     case "easy": return 1
     case "medium": return 2
     case "hard": return 3

@@ -550,13 +550,16 @@ export function QuestionGeneratorForm() {
         // Combine all tags — per-question difficulty replaces "Mixed" tag
         const allTags = [...baseAutoTags, ...(perQuestionDiffTag ? [perQuestionDiffTag] : []), typeTag, ...customTags, ...(aiTag ? [aiTag] : [])]
 
+        // For mixed: use the AI's per-question difficulty, not the global "mixed" setting
+        const actualDifficulty = isMixed
+          ? (q.difficulty || "medium") as "easy" | "medium" | "hard"
+          : metadata.difficulty as "easy" | "medium" | "hard" | "mixed"
+        const questionScore = getDefaultScore(actualDifficulty as "easy" | "medium" | "hard" | "mixed")
+
         return {
           title: generateQuestionTitle(q.stimulus, q.type),
           subject: metadata.subject,
-          // Store per-question difficulty when mixed, otherwise global difficulty
-          difficulty: (isMixed
-            ? (q.difficulty || "medium")
-            : metadata.difficulty) as "easy" | "medium" | "hard" | "mixed",
+          difficulty: actualDifficulty,
           language: metadata.language as "sv" | "en",
           tags: allTags,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -569,9 +572,9 @@ export function QuestionGeneratorForm() {
           formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
           instructorStimulus: q.instructorStimulus,
           submitOverLimit: false,
-          score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard" | "mixed"),
+          score: questionScore,
           minScore: 0,
-          maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard" | "mixed"),
+          maxScore: questionScore,
           tutorInitials: userProfile?.tutorInitials || "N/A",
           generatedBy: "ai" as const,
         }
