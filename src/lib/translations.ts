@@ -225,6 +225,25 @@ export interface Translations {
   resetToDefaults: string
   typesUpdated: string
   typesUpdateFailed: string
+  // Question type tooltips (info icon hover text)
+  typeDesc_mcq: string
+  typeDesc_multiple_response: string
+  typeDesc_true_false: string
+  typeDesc_longtextV2: string
+  typeDesc_short_answer: string
+  typeDesc_fill_blank: string
+  typeDesc_matching: string
+  typeDesc_ordering: string
+  typeDesc_choicematrix: string
+  typeDesc_clozetext: string
+  typeDesc_clozedropdown: string
+  typeDesc_orderlist: string
+  typeDesc_tokenhighlight: string
+  typeDesc_clozeassociation: string
+  typeDesc_imageclozeassociationV2: string
+  typeDesc_plaintext: string
+  typeDesc_formulaessayV2: string
+  typeDesc_chemistryessayV2: string
 
   // Library Page
   editTags: string
@@ -557,6 +576,24 @@ export const translations: Record<Language, Translations> = {
     resetToDefaults: "Återställ standard",
     typesUpdated: "Frågetyper uppdaterade",
     typesUpdateFailed: "Kunde inte uppdatera frågetyper",
+    typeDesc_mcq: "Flervalsfråga med ett rätt svar bland flera alternativ.",
+    typeDesc_multiple_response: "Flervalsfråga där flera alternativ kan vara rätt.",
+    typeDesc_true_false: "Studenten väljer om ett påstående är sant eller falskt.",
+    typeDesc_longtextV2: "Längre fritextsvar med rik textformatering (essä).",
+    typeDesc_short_answer: "Kort fritextsvar, 1–3 meningar.",
+    typeDesc_fill_blank: "Fyll i luckan — studenten skriver rätt ord i tomrummet.",
+    typeDesc_matching: "Para ihop begrepp med rätt definition/kategori.",
+    typeDesc_ordering: "Ordna objekt i rätt sekvens/ordning.",
+    typeDesc_choicematrix: "Matris med rader och kolumner — t.ex. Sant/Falskt per påstående.",
+    typeDesc_clozetext: "Text med flera luckor att fylla i (avancerad ifyllnad).",
+    typeDesc_clozedropdown: "Text med rullgardinsmenyer i luckorna — välj rätt ord.",
+    typeDesc_orderlist: "Avancerad ordningsfråga med Learnosity orderlist-format.",
+    typeDesc_tokenhighlight: "Markera rätt ord eller fras i en text.",
+    typeDesc_clozeassociation: "Dra och släpp rätt ord till luckor i texten.",
+    typeDesc_imageclozeassociationV2: "Dra och släpp etiketter till rätt plats på en bild.",
+    typeDesc_plaintext: "Enkel fritext utan formatering.",
+    typeDesc_formulaessayV2: "Svar med matematiska formler (LaTeX-editor).",
+    typeDesc_chemistryessayV2: "Svar med kemiska formler och strukturer.",
 
     // Toast Messages
     questionsGenerated: "Frågor genererade!",
@@ -859,6 +896,24 @@ export const translations: Record<Language, Translations> = {
     resetToDefaults: "Reset to defaults",
     typesUpdated: "Question types updated",
     typesUpdateFailed: "Could not update question types",
+    typeDesc_mcq: "Multiple choice with one correct answer from several options.",
+    typeDesc_multiple_response: "Multiple choice where more than one option can be correct.",
+    typeDesc_true_false: "Student decides if a statement is true or false.",
+    typeDesc_longtextV2: "Longer free-text response with rich formatting (essay).",
+    typeDesc_short_answer: "Short free-text answer, 1–3 sentences.",
+    typeDesc_fill_blank: "Fill in the blank — student types the correct word.",
+    typeDesc_matching: "Match concepts with their correct definition/category.",
+    typeDesc_ordering: "Arrange items in the correct sequence/order.",
+    typeDesc_choicematrix: "Matrix with rows and columns — e.g., True/False per statement.",
+    typeDesc_clozetext: "Text with multiple blanks to fill in (advanced fill-in).",
+    typeDesc_clozedropdown: "Text with dropdown menus in blanks — pick the right word.",
+    typeDesc_orderlist: "Advanced ordering question using Learnosity orderlist format.",
+    typeDesc_tokenhighlight: "Highlight the correct word or phrase in a text.",
+    typeDesc_clozeassociation: "Drag and drop the correct word into blanks in the text.",
+    typeDesc_imageclozeassociationV2: "Drag and drop labels to the correct position on an image.",
+    typeDesc_plaintext: "Simple plain text response without formatting.",
+    typeDesc_formulaessayV2: "Response with mathematical formulas (LaTeX editor).",
+    typeDesc_chemistryessayV2: "Response with chemical formulas and structures.",
 
     // Toast Messages
     questionsGenerated: "Questions generated!",

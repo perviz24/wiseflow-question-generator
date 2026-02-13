@@ -25,7 +25,7 @@ export interface QuestionTypeDefinition {
 
 // All 18 active question types + 2 legacy (kept for DB compatibility)
 export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
-  // ─── CORE TIER (always ON) ───
+  // ─── CORE TIER (always ON, cannot be disabled) ───
   mcq: {
     id: "mcq",
     tier: "core",
@@ -38,8 +38,8 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
     hasCorrectAnswer: true,
     supportsRubric: false,
   },
-  true_false: {
-    id: "true_false",
+  multiple_response: {
+    id: "multiple_response",
     tier: "core",
     learnosityType: "mcq",
     qtiInteraction: "ChoiceInteraction",
@@ -50,46 +50,10 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
     hasCorrectAnswer: true,
     supportsRubric: false,
   },
-  longtextV2: {
-    id: "longtextV2",
-    tier: "core",
-    learnosityType: "longtextV2",
-    qtiInteraction: "ExtendedTextInteraction",
-    defaultEnabled: true,
-    canDisable: false,
-    category: "text",
-    hasOptions: false,
-    hasCorrectAnswer: false,
-    supportsRubric: true,
-  },
-  short_answer: {
-    id: "short_answer",
-    tier: "core",
-    learnosityType: "longtextV2",
-    qtiInteraction: "ExtendedTextInteraction",
-    defaultEnabled: true,
-    canDisable: false,
-    category: "text",
-    hasOptions: false,
-    hasCorrectAnswer: false,
-    supportsRubric: true,
-  },
-  fill_blank: {
-    id: "fill_blank",
-    tier: "core",
-    learnosityType: "clozetext",
-    qtiInteraction: "TextEntryInteraction",
-    defaultEnabled: true,
-    canDisable: false,
-    category: "cloze",
-    hasOptions: false,
-    hasCorrectAnswer: true,
-    supportsRubric: false,
-  },
 
   // ─── EXTENDED TIER (ON by default, can disable) ───
-  multiple_response: {
-    id: "multiple_response",
+  true_false: {
+    id: "true_false",
     tier: "extended",
     learnosityType: "mcq",
     qtiInteraction: "ChoiceInteraction",
@@ -97,6 +61,42 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
     canDisable: true,
     category: "choice",
     hasOptions: true,
+    hasCorrectAnswer: true,
+    supportsRubric: false,
+  },
+  longtextV2: {
+    id: "longtextV2",
+    tier: "extended",
+    learnosityType: "longtextV2",
+    qtiInteraction: "ExtendedTextInteraction",
+    defaultEnabled: true,
+    canDisable: true,
+    category: "text",
+    hasOptions: false,
+    hasCorrectAnswer: false,
+    supportsRubric: true,
+  },
+  short_answer: {
+    id: "short_answer",
+    tier: "extended",
+    learnosityType: "longtextV2",
+    qtiInteraction: "ExtendedTextInteraction",
+    defaultEnabled: true,
+    canDisable: true,
+    category: "text",
+    hasOptions: false,
+    hasCorrectAnswer: false,
+    supportsRubric: true,
+  },
+  fill_blank: {
+    id: "fill_blank",
+    tier: "extended",
+    learnosityType: "clozetext",
+    qtiInteraction: "TextEntryInteraction",
+    defaultEnabled: true,
+    canDisable: true,
+    category: "cloze",
+    hasOptions: false,
     hasCorrectAnswer: true,
     supportsRubric: false,
   },
@@ -124,20 +124,20 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
     hasCorrectAnswer: true,
     supportsRubric: false,
   },
-
-  // ─── SPECIALIZED TIER (OFF by default, enable in settings) ───
   choicematrix: {
     id: "choicematrix",
-    tier: "specialized",
+    tier: "extended",
     learnosityType: "choicematrix",
     qtiInteraction: "MatchInteraction",
-    defaultEnabled: false,
+    defaultEnabled: true,
     canDisable: true,
     category: "interactive",
     hasOptions: true,
     hasCorrectAnswer: true,
     supportsRubric: false,
   },
+
+  // ─── SPECIALIZED TIER (OFF by default, enable in settings) ───
   clozetext: {
     id: "clozetext",
     tier: "specialized",

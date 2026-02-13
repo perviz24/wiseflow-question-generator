@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { Settings, Loader2, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTranslation } from "@/lib/language-context"
+import QuestionTypeSettings from "@/components/question-type-settings"
 
 export default function SettingsPage() {
   const { t, language } = useTranslation()
@@ -91,13 +92,15 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl py-8">
+    <div className="container mx-auto max-w-2xl py-8 space-y-6">
       <div className="mb-4">
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-6 w-6" />
           {t("back")}
         </Button>
       </div>
+
+      {/* Profile Settings Card */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
@@ -167,6 +170,9 @@ export default function SettingsPage() {
           </form>
         </CardContent>
       </Card>
+
+      {/* Question Types Management Card */}
+      <QuestionTypeSettings />
     </div>
   )
 }
