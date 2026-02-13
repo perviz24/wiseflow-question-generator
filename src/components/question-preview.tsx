@@ -498,11 +498,13 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
               {metadata.subject}
             </Badge>
             <Badge className={getDifficultyColor(metadata.difficulty)}>
-              {metadata.difficulty}
+              {t(metadata.difficulty as "easy" | "medium" | "hard" | "mixed")}
             </Badge>
-            <Badge variant="secondary">
-              {metadata.language === "sv" ? t("langSwedish") : t("langEnglish")}
-            </Badge>
+            {metadata.term && <Badge variant="secondary">{metadata.term}</Badge>}
+            {metadata.semester && <Badge variant="secondary">{metadata.semester}</Badge>}
+            {metadata.examType && <Badge variant="secondary">{metadata.examType}</Badge>}
+            {metadata.courseCode && <Badge variant="secondary">{metadata.courseCode}</Badge>}
+            {metadata.tutorInitials && <Badge variant="outline">{metadata.tutorInitials}</Badge>}
           </div>
         </CardContent>
       </Card>
