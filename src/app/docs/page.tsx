@@ -6,7 +6,7 @@ import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp, FileText, Shuffle } from "lucide-react"
+import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp, FileText, Shuffle, List } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -232,11 +232,42 @@ export default function DocsPage() {
               {isSv ? "Huvudfunktioner" : "Main Features"}
             </h2>
 
+            {/* Table of Contents */}
+            <Card className="border-primary/20 bg-primary/5">
+              <CardContent className="pt-5 pb-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <List className="h-4 w-4 text-primary" />
+                  <h3 className="font-semibold text-sm">{isSv ? "Snabbnavigering" : "Quick Navigation"}</h3>
+                </div>
+                <nav className="grid gap-1.5 sm:grid-cols-2">
+                  {[
+                    { id: "question-generation", icon: "⚡", label: isSv ? "Frågegenerering" : "Question Generation" },
+                    { id: "upload-context", icon: "📤", label: isSv ? "Ladda upp kontext" : "Upload Context" },
+                    { id: "tags-organization", icon: "🏷️", label: isSv ? "Taggar & Organisation" : "Tags & Organization" },
+                    { id: "library-management", icon: "📚", label: isSv ? "Bibliotekshantering" : "Library Management" },
+                    { id: "export-options", icon: "📄", label: isSv ? "Exportalternativ" : "Export Options" },
+                    { id: "import-guide", icon: "📥", label: isSv ? "Importguider" : "Import Guides" },
+                    { id: "settings", icon: "⚙️", label: isSv ? "Inställningar" : "Settings" },
+                    { id: "tips", icon: "💡", label: isSv ? "Tips & Bästa Praxis" : "Tips & Best Practices" },
+                  ].map((item) => (
+                    <a
+                      key={item.id}
+                      href={`#${item.id}`}
+                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
+                    >
+                      <span>{item.icon}</span>
+                      {item.label}
+                    </a>
+                  ))}
+                </nav>
+              </CardContent>
+            </Card>
+
             {/* Question Generation */}
-            <Card>
+            <Card id="question-generation" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Zap className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Zap className="h-5 w-5 text-primary" />
                   {isSv ? "Frågegenerering" : "Question Generation"}
                 </CardTitle>
               </CardHeader>
@@ -320,10 +351,10 @@ export default function DocsPage() {
             </Card>
 
             {/* Content Upload */}
-            <Card>
+            <Card id="upload-context" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Upload className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Upload className="h-5 w-5 text-primary" />
                   {isSv ? "Ladda upp kontext" : "Upload Context"}
                 </CardTitle>
               </CardHeader>
@@ -397,10 +428,10 @@ export default function DocsPage() {
             </Card>
 
             {/* Tags & Organization */}
-            <Card>
+            <Card id="tags-organization" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Tag className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Tag className="h-5 w-5 text-primary" />
                   {isSv ? "Taggar & Organisation" : "Tags & Organization"}
                 </CardTitle>
               </CardHeader>
@@ -481,10 +512,10 @@ export default function DocsPage() {
             </Card>
 
             {/* Library Management */}
-            <Card>
+            <Card id="library-management" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Library className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Library className="h-5 w-5 text-primary" />
                   {isSv ? "Bibliotekshantering" : "Library Management"}
                 </CardTitle>
               </CardHeader>
@@ -530,10 +561,10 @@ export default function DocsPage() {
             </Card>
 
             {/* Export Options */}
-            <Card>
+            <Card id="export-options" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileJson className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <FileJson className="h-5 w-5 text-primary" />
                   {isSv ? "Exportalternativ" : "Export Options"}
                 </CardTitle>
               </CardHeader>
@@ -603,10 +634,10 @@ export default function DocsPage() {
             </Card>
 
             {/* How to Import */}
-            <Card>
+            <Card id="import-guide" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileUp className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <FileUp className="h-5 w-5 text-primary" />
                   {isSv ? "Så importerar du frågor" : "How to Import Questions"}
                 </CardTitle>
                 <CardDescription>
@@ -991,10 +1022,10 @@ export default function DocsPage() {
             </Card>
 
             {/* Settings */}
-            <Card>
+            <Card id="settings" className="scroll-mt-20">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Settings className="h-5 w-5 text-primary" />
                   {isSv ? "Inställningar" : "Settings"}
                 </CardTitle>
               </CardHeader>
@@ -1050,9 +1081,9 @@ export default function DocsPage() {
           </div>
 
           {/* Tips & Best Practices */}
-          <Card>
+          <Card id="tips" className="scroll-mt-20">
             <CardHeader>
-              <CardTitle>{isSv ? "Tips & Bästa Praxis" : "Tips & Best Practices"}</CardTitle>
+              <CardTitle className="text-xl">{isSv ? "Tips & Bästa Praxis" : "Tips & Best Practices"}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
