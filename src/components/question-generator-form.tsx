@@ -186,6 +186,7 @@ interface Question {
   }>
   correctAnswer?: string[]
   instructorStimulus?: string
+  difficulty?: string // Per-question difficulty when "mixed" is selected
 }
 
 // Core type IDs shown before "show more" toggle
@@ -258,6 +259,9 @@ function QuestionTypeSelector({
           <TooltipContent className="max-w-xs">
             <p className="text-sm">
               {t("questionTypesHelp") || "Select one or more question types to generate. You can mix different types in the same set."}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 {t("questionTypesSettingsHint")}
             </p>
           </TooltipContent>
         </Tooltip>
@@ -496,12 +500,14 @@ export function QuestionGeneratorForm() {
     try {
       const isSv = metadata.language === "sv"
 
-      // Translate difficulty to display name (single language, not raw "hard"/"easy")
+      // Difficulty display name helper
       const difficultyMap: Record<string, [string, string]> = {
         easy: ["Easy", "Lätt"], medium: ["Medium", "Medel"], hard: ["Hard", "Svår"], mixed: ["Mixed", "Blandat"],
       }
-      const diffEntry = difficultyMap[metadata.difficulty]
-      const difficultyTag = diffEntry ? (isSv ? diffEntry[1] : diffEntry[0]) : metadata.difficulty
+      const getDifficultyTag = (diff: string): string => {
+        const entry = difficultyMap[diff]
+        return entry ? (isSv ? entry[1] : entry[0]) : diff
+      }
 
       // Translate question type to display name using translation keys (all 18+ types)
       const getTypeTag = (typeId: string): string => {
@@ -509,13 +515,15 @@ export function QuestionGeneratorForm() {
         return key ? t(key as keyof Translations) : typeId
       }
 
-      // Build base auto-tags with TRANSLATED values (same for all questions)
+      // Build base auto-tags WITHOUT difficulty (difficulty added per-question when mixed)
       const languageTag = formData.includeLanguageTag ? (isSv ? "Svenska" : "English") : null
       const topicTag = formData.includeTopicTag ? metadata.topic : null
+      const isMixed = metadata.difficulty === "mixed"
       const baseAutoTags = [
         metadata.subject,
         topicTag,
-        difficultyTag,
+        // Only add global difficulty tag if NOT mixed (mixed = per-question tags)
+        !isMixed ? getDifficultyTag(metadata.difficulty) : null,
         languageTag,
         formData.term,
         formData.semester,
@@ -535,13 +543,20 @@ export function QuestionGeneratorForm() {
       const questionsToSave = generatedQuestions.map((q) => {
         // Translate type to display name for tags (e.g., "Sant/Falskt" not "true_false")
         const typeTag = getTypeTag(q.type)
-        // Combine all tags with translated display names only
-        const allTags = [...baseAutoTags, typeTag, ...customTags, ...(aiTag ? [aiTag] : [])]
+        // For mixed difficulty: use per-question difficulty from AI, fallback to "medium"
+        const perQuestionDiffTag = isMixed
+          ? getDifficultyTag(q.difficulty || "medium")
+          : null
+        // Combine all tags — per-question difficulty replaces "Mixed" tag
+        const allTags = [...baseAutoTags, ...(perQuestionDiffTag ? [perQuestionDiffTag] : []), typeTag, ...customTags, ...(aiTag ? [aiTag] : [])]
 
         return {
           title: generateQuestionTitle(q.stimulus, q.type),
           subject: metadata.subject,
-          difficulty: metadata.difficulty as "easy" | "medium" | "hard" | "mixed",
+          // Store per-question difficulty when mixed, otherwise global difficulty
+          difficulty: (isMixed
+            ? (q.difficulty || "medium")
+            : metadata.difficulty) as "easy" | "medium" | "hard" | "mixed",
           language: metadata.language as "sv" | "en",
           tags: allTags,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any

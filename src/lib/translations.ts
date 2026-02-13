@@ -42,6 +42,7 @@ export interface Translations {
   numQuestionsHelp: string
   questionTypes: string
   questionTypesHelp: string
+  questionTypesSettingsHint: string
   multipleChoice: string
   trueFalse: string
   essay: string
@@ -285,6 +286,7 @@ export interface Translations {
   footerDeveloper: string
   footerEmail: string
   footerBeta: string
+  footerPermission: string
 
   // Feedback
   feedbackTitle: string
@@ -344,6 +346,7 @@ export const translations: Record<Language, Translations> = {
     numQuestionsHelp: "Välj mellan 1 och 20 frågor",
     questionTypes: "Frågetyper",
     questionTypesHelp: "Välj minst en frågetyp",
+    questionTypesSettingsHint: "Fler frågetyper kan aktiveras under Inställningar.",
     multipleChoice: "Flervalsfråga",
     trueFalse: "Sant/Falskt",
     essay: "Essä",
@@ -587,6 +590,7 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Utvecklad av",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta-version",
+    footerPermission: "Distribution för bredare bruk kräver tillstånd från utvecklaren.",
 
     // Feedback
     feedbackTitle: "Skicka feedback",
@@ -644,6 +648,7 @@ export const translations: Record<Language, Translations> = {
     numQuestionsHelp: "Choose between 1 and 20 questions",
     questionTypes: "Question Types",
     questionTypesHelp: "Select at least one question type",
+    questionTypesSettingsHint: "More question types can be activated in Settings.",
     multipleChoice: "Multiple Choice",
     trueFalse: "True/False",
     essay: "Essay",
@@ -887,6 +892,7 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Developed by",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta version",
+    footerPermission: "Distribution for broader use requires permission from the developer.",
 
     // Feedback
     feedbackTitle: "Send feedback",
