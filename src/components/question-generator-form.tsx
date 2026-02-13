@@ -810,7 +810,7 @@ export function QuestionGeneratorForm() {
             </div>
 
             {/* Language */}
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2 flex-1 sm:ml-4">
               <Label htmlFor="language">{t("language")}</Label>
               <Select
                 value={formData.language}
