@@ -92,7 +92,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl py-8 space-y-6">
+    <div className="container mx-auto max-w-lg px-4 sm:px-6 py-8 space-y-6">
       <div className="mb-4">
         <Button variant="ghost" onClick={() => router.back()}>
           <ArrowLeft className="mr-2 h-6 w-6" />
@@ -126,6 +126,7 @@ export default function SettingsPage() {
                 maxLength={20}
                 autoComplete="off"
                 required
+                className="max-w-xs"
               />
               <p className="text-sm text-muted-foreground">
                 {t("tutorInitialsHelp")}
@@ -139,7 +140,7 @@ export default function SettingsPage() {
                 value={uiLanguage}
                 onValueChange={(value: "sv" | "en") => setUiLanguage(value)}
               >
-                <SelectTrigger id="uiLanguage">
+                <SelectTrigger id="uiLanguage" className="max-w-xs">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -155,7 +156,6 @@ export default function SettingsPage() {
             {/* Save Button */}
             <Button
               type="submit"
-              className="w-full"
               disabled={isSaving || !tutorInitials.trim()}
             >
               {isSaving ? (
