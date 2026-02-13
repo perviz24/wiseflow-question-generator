@@ -12,14 +12,28 @@ export const saveQuestions = mutation({
         language: v.union(v.literal("sv"), v.literal("en")),
         tags: v.array(v.string()),
         type: v.union(
+          // Core tier (always on)
           v.literal("mcq"),
           v.literal("longtextV2"),
           v.literal("true_false"),
           v.literal("short_answer"),
           v.literal("fill_blank"),
+          // Extended tier (on by default)
           v.literal("multiple_response"),
           v.literal("matching"),
           v.literal("ordering"),
+          // Specialized tier (off by default, enable in settings)
+          v.literal("choicematrix"),
+          v.literal("clozetext"),
+          v.literal("clozedropdown"),
+          v.literal("orderlist"),
+          v.literal("tokenhighlight"),
+          v.literal("clozeassociation"),
+          v.literal("imageclozeassociationV2"),
+          v.literal("plaintext"),
+          v.literal("formulaessayV2"),
+          v.literal("chemistryessayV2"),
+          // Legacy (kept for DB backwards compatibility)
           v.literal("hotspot"),
           v.literal("rating_scale")
         ),
