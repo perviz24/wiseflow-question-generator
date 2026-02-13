@@ -136,52 +136,131 @@ function buildQuestionParagraphs(
     })
   )
 
-  // Options (for MCQ, true_false, multiple_response, matching, ordering)
-  if (q.options && q.options.length > 0) {
-    const optionLabel = isSv ? "Svarsalternativ:" : "Answer options:"
+  // Type-specific answer display
+  if (q.type === "choicematrix" && q.options && q.options.length > 0) {
+    // Choice matrix: rows are statements, value has column headers (e.g. "Sant, Falskt")
+    // correctAnswer[i] = correct column for row i
+    const columns = q.options[0]?.value?.split(",").map((c) => c.trim()) || []
+    const colHeader = isSv ? "Matrisval:" : "Choice Matrix:"
     paragraphs.push(
       new Paragraph({
         spacing: { before: 80, after: 40 },
-        children: [
-          new TextRun({ text: optionLabel, bold: true, size: 20 }),
-        ],
+        children: [new TextRun({ text: colHeader, bold: true, size: 20 })],
       })
     )
-
-    q.options.forEach((opt) => {
-      // correctAnswer stores labels (e.g. "A", "B"), not option text
-      const isCorrect = q.correctAnswer?.includes(opt.label)
+    q.options.forEach((opt, i) => {
+      const correctCol = q.correctAnswer?.[i] || ""
+      const children: TextRun[] = [
+        new TextRun({ text: `${stripHtml(opt.label)}: `, bold: true, size: 20 }),
+      ]
+      columns.forEach((col) => {
+        const isCorrect = col === correctCol
+        children.push(
+          new TextRun({
+            text: ` [${col}${isCorrect ? " ✓" : " ✗"}]`,
+            bold: isCorrect,
+            color: isCorrect ? "2E7D32" : "C62828",
+            size: 20,
+          })
+        )
+      })
+      paragraphs.push(
+        new Paragraph({ spacing: { after: 20 }, indent: { left: 400 }, children })
+      )
+    })
+  } else if (q.type === "clozedropdown" && q.options && q.options.length > 0) {
+    // Cloze dropdown: each option = one gap, value = comma-separated choices
+    // correctAnswer[i] = correct choice for gap i
+    const gapLabel = isSv ? "Luckor:" : "Gaps:"
+    paragraphs.push(
+      new Paragraph({
+        spacing: { before: 80, after: 40 },
+        children: [new TextRun({ text: gapLabel, bold: true, size: 20 })],
+      })
+    )
+    q.options.forEach((opt, i) => {
+      const choices = opt.value?.split(",").map((c) => c.trim()) || []
+      const correctChoice = q.correctAnswer?.[i] || ""
+      const children: TextRun[] = [
+        new TextRun({ text: `${opt.label}: `, bold: true, size: 20 }),
+      ]
+      choices.forEach((choice, ci) => {
+        const isCorrect = choice === correctChoice
+        children.push(
+          new TextRun({
+            text: `${ci > 0 ? " | " : ""}${choice}`,
+            bold: isCorrect,
+            color: isCorrect ? "2E7D32" : "C62828",
+            size: 20,
+          })
+        )
+      })
+      paragraphs.push(
+        new Paragraph({ spacing: { after: 20 }, indent: { left: 400 }, children })
+      )
+    })
+  } else if (q.type === "orderlist" && q.options && q.options.length > 0) {
+    // Orderlist: correctAnswer = labels in correct sequence
+    const seqLabel = isSv ? "Korrekt ordning:" : "Correct order:"
+    paragraphs.push(
+      new Paragraph({
+        spacing: { before: 80, after: 40 },
+        children: [new TextRun({ text: seqLabel, bold: true, size: 20 })],
+      })
+    )
+    const correctSeq = q.correctAnswer || []
+    correctSeq.forEach((label, i) => {
+      const opt = q.options?.find((o) => o.label === label)
       paragraphs.push(
         new Paragraph({
           spacing: { after: 20 },
           indent: { left: 400 },
           children: [
             new TextRun({
-              text: `${opt.label}: `,
-              bold: true,
+              text: `${i + 1}. ${opt?.value || label}`,
               size: 20,
+              color: "2E7D32",
             }),
+          ],
+        })
+      )
+    })
+  } else if (q.options && q.options.length > 0) {
+    // Standard option-based types: MCQ, true_false, multiple_response, matching, etc.
+    // correctAnswer stores labels (e.g. "A", "B")
+    const optionLabel = isSv ? "Svarsalternativ:" : "Answer options:"
+    paragraphs.push(
+      new Paragraph({
+        spacing: { before: 80, after: 40 },
+        children: [new TextRun({ text: optionLabel, bold: true, size: 20 })],
+      })
+    )
+    q.options.forEach((opt) => {
+      const isCorrect = q.correctAnswer?.includes(opt.label)
+      paragraphs.push(
+        new Paragraph({
+          spacing: { after: 20 },
+          indent: { left: 400 },
+          children: [
+            new TextRun({ text: `${opt.label}: `, bold: true, size: 20 }),
             new TextRun({
               text: opt.value,
               size: 20,
+              color: isCorrect ? "2E7D32" : undefined,
             }),
-            ...(isCorrect
-              ? [
-                  new TextRun({
-                    text: ` ✓`,
-                    bold: true,
-                    color: "2E7D32",
-                    size: 20,
-                  }),
-                ]
-              : []),
+            new TextRun({
+              text: isCorrect ? " ✓" : " ✗",
+              bold: true,
+              color: isCorrect ? "2E7D32" : "C62828",
+              size: 20,
+            }),
           ],
         })
       )
     })
   }
 
-  // Correct answer (for types without options, or fill_blank)
+  // Correct answer text (for types without options: fill_blank, clozetext, tokenhighlight, short_answer)
   if (q.correctAnswer && q.correctAnswer.length > 0 && !q.options?.length) {
     const ansLabel = isSv ? "Korrekt svar:" : "Correct answer:"
     paragraphs.push(
@@ -192,6 +271,7 @@ function buildQuestionParagraphs(
           new TextRun({
             text: ` ${q.correctAnswer.join(", ")}`,
             size: 20,
+            color: "2E7D32",
           }),
         ],
       })
