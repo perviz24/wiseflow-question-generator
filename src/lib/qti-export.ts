@@ -43,11 +43,12 @@ function escapeXml(text: string): string {
 }
 
 // Determine QTI cardinality based on question type and answers
+// Per QTI 2.2 spec: ordered for ordering, multiple for multi-select/matching/gap types
 function getQtiCardinality(question: Question): string {
-  const multiTypes = ["multiple_response", "tokenhighlight"]
-  if (multiTypes.includes(question.type)) return "multiple"
-  if (question.correctAnswer && question.correctAnswer.length > 1 &&
-      (question.type === "mcq" || question.type === "ordering" || question.type === "orderlist")) return "ordered"
+  const orderedTypes = ["ordering", "orderlist"]
+  if (orderedTypes.includes(question.type)) return "ordered"
+  const multipleTypes = ["multiple_response", "tokenhighlight", "matching", "choicematrix", "clozeassociation", "imageclozeassociationV2"]
+  if (multipleTypes.includes(question.type)) return "multiple"
   return "single"
 }
 
@@ -72,22 +73,45 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
     title="${escapeXml(metadata.subject)} - ${escapeXml(metadata.topic)} - Question ${index + 1}"
     adaptive="false"
     timeDependent="false">
-
-    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">
 `
 
-  // Add correct response for types with correctAnswer
+  // Per QTI spec: textEntryInteraction needs separate responseDeclaration per blank
+  const isTextEntry = (question.type === "fill_blank" || question.type === "clozetext") && question.correctAnswer
   const essayTypes = ["longtextV2", "short_answer", "plaintext", "formulaessayV2", "chemistryessayV2"]
-  if (!essayTypes.includes(question.type) && question.correctAnswer) {
-    qtiXml += `      <correctResponse>\n`
-    question.correctAnswer.forEach((val) => {
-      qtiXml += `        <value>${escapeXml(val)}</value>\n`
+
+  if (isTextEntry && question.correctAnswer) {
+    question.correctAnswer.forEach((answer, i) => {
+      const blankId = `${responseId}_blank_${i}`
+      qtiXml += `    <responseDeclaration identifier="${blankId}" cardinality="single" baseType="string">
+      <correctResponse>
+        <value>${escapeXml(answer)}</value>
+      </correctResponse>
+    </responseDeclaration>
+`
     })
-    qtiXml += `      </correctResponse>\n`
+  } else {
+    qtiXml += `    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">\n`
+    if (!essayTypes.includes(question.type) && question.correctAnswer) {
+      qtiXml += `      <correctResponse>\n`
+      const pairTypes = ["matching", "choicematrix"]
+      const gapTypes = ["clozeassociation", "imageclozeassociationV2"]
+      question.correctAnswer.forEach((val, i) => {
+        if (pairTypes.includes(question.type)) {
+          // directedPair format: "source_id target_id" per QTI spec
+          qtiXml += `        <value>${escapeXml(val)} val_${escapeXml(val)}</value>\n`
+        } else if (gapTypes.includes(question.type)) {
+          // directedPair format: "gapText_id gap_id" per QTI spec
+          qtiXml += `        <value>${escapeXml(val)} gap_${i}</value>\n`
+        } else {
+          qtiXml += `        <value>${escapeXml(val)}</value>\n`
+        }
+      })
+      qtiXml += `      </correctResponse>\n`
+    }
+    qtiXml += `    </responseDeclaration>\n`
   }
 
-  qtiXml += `    </responseDeclaration>
-
+  qtiXml += `
     <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
       <defaultValue>
         <value>0</value>
@@ -134,7 +158,7 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
     words.forEach((word, i) => {
       const isToken = question.correctAnswer?.includes(word)
       if (isToken) {
-        qtiXml += `        <hottext identifier="token_${i}">${escapeXml(word)}</hottext> `
+        qtiXml += `        <hottext identifier="token_${i}" matchMax="1">${escapeXml(word)}</hottext> `
       } else {
         qtiXml += `${escapeXml(word)} `
       }
@@ -170,14 +194,16 @@ function questionToQtiItem(question: Question, index: number, metadata: ExportMe
     })
     qtiXml += `\n      </gapMatchInteraction>\n`
   } else if (question.type === "imageclozeassociationV2" && question.options) {
-    // GraphicGapMatchInteraction — drag onto image zones
+    // GraphicGapMatchInteraction — drag onto image zones (QTI spec requires object element for background)
     qtiXml += `      <graphicGapMatchInteraction responseIdentifier="${responseId}">\n`
+    // Background image placeholder — replace with actual image path when importing to LMS
+    qtiXml += `        <object data="background_image.png" type="image/png" width="600" height="400">Background image</object>\n`
     question.options.forEach((option) => {
-      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+      qtiXml += `        <gapImg identifier="${option.label}" matchMax="1"><object data="label_${option.label}.png" type="image/png" width="100" height="30">${escapeXml(option.value)}</object></gapImg>\n`
     })
-    // Add placeholder associable hotspots
-    question.options.forEach((option, i) => {
-      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 100},50,${150 + i * 100},150"/>\n`
+    // Associable hotspots define drop zones on the background image
+    question.options.forEach((_, i) => {
+      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 120},50,${170 + i * 120},150"/>\n`
     })
     qtiXml += `      </graphicGapMatchInteraction>\n`
   } else {
@@ -342,22 +368,43 @@ function questionToQti22Item(question: Question, index: number, metadata: Export
     title="${escapeXml(metadata.subject)} - ${escapeXml(metadata.topic)} - Question ${index + 1}"
     adaptive="false"
     timeDependent="false">
-
-    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">
 `
 
-  // Add correct response for types with correctAnswer
+  // Per QTI spec: textEntryInteraction needs separate responseDeclaration per blank
+  const isTextEntry22 = (question.type === "fill_blank" || question.type === "clozetext") && question.correctAnswer
   const essayTypes22 = ["longtextV2", "short_answer", "plaintext", "formulaessayV2", "chemistryessayV2"]
-  if (!essayTypes22.includes(question.type) && question.correctAnswer) {
-    qtiXml += `      <correctResponse>\n`
-    question.correctAnswer.forEach((val) => {
-      qtiXml += `        <value>${escapeXml(val)}</value>\n`
+
+  if (isTextEntry22 && question.correctAnswer) {
+    question.correctAnswer.forEach((answer, i) => {
+      const blankId = `${responseId}_blank_${i}`
+      qtiXml += `    <responseDeclaration identifier="${blankId}" cardinality="single" baseType="string">
+      <correctResponse>
+        <value>${escapeXml(answer)}</value>
+      </correctResponse>
+    </responseDeclaration>
+`
     })
-    qtiXml += `      </correctResponse>\n`
+  } else {
+    qtiXml += `    <responseDeclaration identifier="${responseId}" cardinality="${getQtiCardinality(question)}" baseType="${getQtiBaseType(question)}">\n`
+    if (!essayTypes22.includes(question.type) && question.correctAnswer) {
+      qtiXml += `      <correctResponse>\n`
+      const pairTypes22 = ["matching", "choicematrix"]
+      const gapTypes22 = ["clozeassociation", "imageclozeassociationV2"]
+      question.correctAnswer.forEach((val, i) => {
+        if (pairTypes22.includes(question.type)) {
+          qtiXml += `        <value>${escapeXml(val)} val_${escapeXml(val)}</value>\n`
+        } else if (gapTypes22.includes(question.type)) {
+          qtiXml += `        <value>${escapeXml(val)} gap_${i}</value>\n`
+        } else {
+          qtiXml += `        <value>${escapeXml(val)}</value>\n`
+        }
+      })
+      qtiXml += `      </correctResponse>\n`
+    }
+    qtiXml += `    </responseDeclaration>\n`
   }
 
-  qtiXml += `    </responseDeclaration>
-
+  qtiXml += `
     <outcomeDeclaration identifier="SCORE" cardinality="single" baseType="float">
       <defaultValue>
         <value>0</value>
@@ -401,7 +448,7 @@ function questionToQti22Item(question: Question, index: number, metadata: Export
     words.forEach((word, i) => {
       const isToken = question.correctAnswer?.includes(word)
       if (isToken) {
-        qtiXml += `        <hottext identifier="token_${i}">${escapeXml(word)}</hottext> `
+        qtiXml += `        <hottext identifier="token_${i}" matchMax="1">${escapeXml(word)}</hottext> `
       } else {
         qtiXml += `${escapeXml(word)} `
       }
@@ -434,12 +481,14 @@ function questionToQti22Item(question: Question, index: number, metadata: Export
     })
     qtiXml += `\n      </gapMatchInteraction>\n`
   } else if (question.type === "imageclozeassociationV2" && question.options) {
+    // GraphicGapMatchInteraction — QTI spec requires object for background + gapImg for draggable items
     qtiXml += `      <graphicGapMatchInteraction responseIdentifier="${responseId}">\n`
+    qtiXml += `        <object data="background_image.png" type="image/png" width="600" height="400">Background image</object>\n`
     question.options.forEach((option) => {
-      qtiXml += `        <gapText identifier="${option.label}" matchMax="1">${escapeXml(option.value)}</gapText>\n`
+      qtiXml += `        <gapImg identifier="${option.label}" matchMax="1"><object data="label_${option.label}.png" type="image/png" width="100" height="30">${escapeXml(option.value)}</object></gapImg>\n`
     })
-    question.options.forEach((option, i) => {
-      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 100},50,${150 + i * 100},150"/>\n`
+    question.options.forEach((_, i) => {
+      qtiXml += `        <associableHotspot identifier="zone_${i}" matchMax="1" shape="rect" coords="${50 + i * 120},50,${170 + i * 120},150"/>\n`
     })
     qtiXml += `      </graphicGapMatchInteraction>\n`
   } else {
