@@ -686,6 +686,8 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMcqQuestionData(question, score)
       } else if (question.type === "multiple_response") {
         questionData = buildMultipleResponseData(question, score)
+      } else if (question.type === "longtextV2") {
+        questionData = buildEssayQuestionData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
       } else if (question.type === "matching") {
@@ -711,7 +713,7 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       } else if (question.type === "chemistryessayV2") {
         questionData = buildChemistryEssayData(question, score)
       } else {
-        // Fallback: essay format for unknown types
+        // Fallback for hotspot, rating_scale, and any unknown types: essay format
         questionData = buildEssayQuestionData(question, score)
       }
 
@@ -779,6 +781,8 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMcqQuestionData(question, score)
       } else if (question.type === "multiple_response") {
         questionData = buildMultipleResponseData(question, score)
+      } else if (question.type === "longtextV2") {
+        questionData = buildEssayQuestionData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
       } else if (question.type === "matching") {
@@ -804,7 +808,7 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
       } else if (question.type === "chemistryessayV2") {
         questionData = buildChemistryEssayData(question, score)
       } else {
-        // Fallback: essay format for unknown types
+        // Fallback for hotspot, rating_scale, and any unknown types: essay format
         questionData = buildEssayQuestionData(question, score)
       }
 
