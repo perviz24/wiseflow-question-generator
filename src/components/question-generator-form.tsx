@@ -191,7 +191,7 @@ interface Question {
 }
 
 // Core type IDs shown before "show more" toggle
-const PRIMARY_TYPE_IDS = ["mcq", "true_false", "longtextV2"]
+const PRIMARY_TYPE_IDS = ["mcq", "multiple_response", "true_false", "longtextV2", "short_answer", "fill_blank", "matching"]
 
 /** Renders type toggle buttons from the QUESTION_TYPES registry, filtered by user profile */
 function QuestionTypeSelector({
