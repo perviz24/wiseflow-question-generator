@@ -550,19 +550,29 @@ function buildClozeDropdownData(question: Question, score: number) {
 }
 
 // Build question data for orderlist — drag to reorder
+// Learnosity valid_response.value = indices into `list` that produce the correct order
+// e.g. list=["C","A","B"], correct=["A","B","C"] → value=[1,2,0]
 function buildOrderListData(question: Question, score: number) {
+  const listItems = question.options?.map(opt => opt.value) || []
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     stimulus: question.stimulus,
     type: "orderlist",
-    list: question.options?.map(opt => opt.value) || [],
+    list: listItems,
     score,
     minScore: 0,
   }
-  if (question.correctAnswer) {
+  if (question.correctAnswer && question.correctAnswer.length > 0) {
+    // Map each correct-order item to its index in the scrambled list
+    const correctIndices = question.correctAnswer.map((answer) => {
+      const idx = listItems.findIndex(
+        (item) => item.toLowerCase().trim() === answer.toLowerCase().trim()
+      )
+      return idx >= 0 ? idx : 0
+    })
     data.validation = {
       scoring_type: "exactMatch",
-      valid_response: { score, value: question.correctAnswer.map((_, i) => i) },
+      valid_response: { score, value: correctIndices },
     }
   }
   return data

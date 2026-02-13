@@ -453,7 +453,7 @@ export const translations: Record<Language, Translations> = {
     // Specialized tier types
     questionType_choicematrix: "Valmatris",
     questionType_clozetext: "Lucktext (fritext)",
-    questionType_clozedropdown: "Lucktext (rullmeny)",
+    questionType_clozedropdown: "Rullgardinslucka",
     questionType_orderlist: "Ordningslista",
     questionType_tokenhighlight: "Markera text",
     questionType_clozeassociation: "Dra-och-släpp (text)",
