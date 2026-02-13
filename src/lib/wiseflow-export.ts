@@ -921,7 +921,8 @@ export function downloadWiseflowJSON(questions: Question[], metadata: ExportMeta
   const url = URL.createObjectURL(blob)
 
   const timestamp = new Date().toISOString().split("T")[0]
-  const format = metadata.exportFormat === "legacy" ? "new" : "legacy"
+  // Internal "legacy" = NEW Learnosity format, "utgaende" = OLD format
+  const format = metadata.exportFormat === "legacy" ? "ny_json" : "utgaende_json"
   const filename = `wiseflow_${metadata.subject.toLowerCase().replace(/\s+/g, "_")}_${format}_${timestamp}.json`
 
   const link = document.createElement("a")
