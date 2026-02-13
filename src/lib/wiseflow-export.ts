@@ -287,26 +287,23 @@ function getShortTitle(question: Question): string {
   return shortWords.length > 60 ? shortWords.substring(0, 57) + "..." : shortWords
 }
 
-// Build question data object for longtextV2 (essay) — matches real WISEflow format
-// max_length = WORD count (Learnosity default 10000). 10000 lets students write freely.
+// Build question data object for longtextV2 (essay) — matches real WISEflow BEL.json
+// BEL.json: 143/183 essays use formatting_options: ["bold","unorderedList","orderedList"]
+// BEL.json: max_length varies (10-1000), 166/183 have spellcheck, validation is {max_score}
 function buildEssayQuestionData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     submit_over_limit: true,
-    show_word_count: true,
+    spellcheck: true,
     stimulus: question.stimulus,
     type: "longtextV2",
-    max_length: 10000,
     validation: {
       max_score: score,
-      automarkable: false,
     },
     formatting_options: [
-      "bold", "italic", "underline", "|",
-      "unorderedList", "orderedList", "|",
-      "charactermap"
+      "bold", "unorderedList", "orderedList"
     ],
-    character_map: true,
+    max_length: 1000,
     score: score,
     minScore: 0,
   }
@@ -378,17 +375,17 @@ function buildMultipleResponseData(question: Question, score: number) {
   return data
 }
 
-// Build question data for short_answer — uses longtextV2 WITHOUT formatting_options
-// No formatting toolbar = simple text box, vs essay which has bold/italic/list toolbar
-// Matches real WISEflow BEL.json pattern: longtextV2 + no formatting_options = kortsvarstext
+// Build question data for short_answer — longtextV2 WITHOUT formatting_options
+// BEL.json: 5/188 longtextV2 have NO formatting_options = kortsvarstext (plain text box)
+// BEL.json short answers: max_length 10-75, have character_map, submit_over_limit
 function buildShortAnswerData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     submit_over_limit: true,
+    character_map: true,
     stimulus: question.stimulus,
     type: "longtextV2",
     max_length: 50,
-    spellcheck: false,
     score,
     minScore: 0,
     validation: {
