@@ -415,18 +415,32 @@ function buildChoiceMatrixData(question: Question, score: number) {
     },
   }
   if (question.options && question.options.length > 0) {
-    // Extract column headers (e.g., "Sant,Falskt") from first option's value
-    const columnHeaders = question.options[0]?.value.split(",").map(v => v.trim()) || ["Sant", "Falskt"]
-    data.options = columnHeaders // Plain string array, NOT objects
-    // Stems are the row statements
-    data.stems = question.options.map(opt => opt.label)
+    // Extract column headers from first option's value (e.g., "Sant, Falskt")
+    let columnHeaders = question.options[0]?.value.split(",").map(v => v.trim()) || []
+    // Fallback: if AI only gave one column or none, force two-column "Sant/Falskt"
+    if (columnHeaders.length < 2) {
+      columnHeaders = ["Sant", "Falskt"]
+    }
+    data.options = columnHeaders
+    // Stems = row statements (deduplicate in case AI repeats them)
+    const seenStems = new Set<string>()
+    const stems: string[] = []
+    for (const opt of question.options) {
+      if (!seenStems.has(opt.label)) {
+        seenStems.add(opt.label)
+        stems.push(opt.label)
+      }
+    }
+    data.stems = stems
     if (question.correctAnswer) {
-      // BEL format: partialMatch with score 0.5 per item, value as nested arrays [[colIdx]]
+      // BEL format: partialMatch, score 0.5, value as nested arrays [[colIdx]]
+      // Only map answers for unique stems (match stems count)
+      const answers = question.correctAnswer.slice(0, stems.length)
       data.validation = {
         scoring_type: "partialMatch",
         valid_response: {
           score: 0.5,
-          value: question.correctAnswer.map(ans => {
+          value: answers.map(ans => {
             const idx = columnHeaders.indexOf(ans.trim())
             return [idx >= 0 ? idx : 0]
           }),

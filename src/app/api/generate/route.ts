@@ -157,7 +157,7 @@ export async function POST(req: NextRequest) {
       ordering: "ordering/sequencing questions where items must be arranged in correct order",
       hotspot: "image-based hotspot questions requiring selection of correct area on diagram/image",
       rating_scale: "rating scale questions using Likert-style 1-5 scale for evaluation",
-      choicematrix: "choice matrix questions with a grid of rows (statements) and columns (options like Agree/Disagree). Provide rows in options (label=row, value=column header). correctAnswer lists the correct column for each row",
+      choicematrix: "choice matrix (true/false grid). CRITICAL format: options array = row statements where label=statement text, value=ALWAYS 'Sant, Falskt' (two comma-separated column headers). correctAnswer = array listing 'Sant' or 'Falskt' for each row. Example: options=[{label:'The sun is a star', value:'Sant, Falskt'}, {label:'The moon is a planet', value:'Sant, Falskt'}], correctAnswer=['Sant', 'Falskt']",
       clozetext: "cloze text questions with sentences containing typed blanks. Write the sentence with [___] for each blank. Provide correct fill-in answers in correctAnswer array",
       clozedropdown: "cloze dropdown questions with inline dropdown menus in sentences. Write the sentence with [___] for each blank. IMPORTANT: Each option object = one dropdown gap. label=Gap1/Gap2/etc, value=comma-separated choices for that gap (e.g. value:'choice1, choice2, choice3'). correctAnswer lists the correct selection per gap in order",
       orderlist: "ordered list questions where items must be dragged into correct sequence. Provide items in options array. correctAnswer lists item labels in the correct order",
@@ -231,7 +231,7 @@ Requirements:
 - For Matching: Provide pairs in options array (left side labels, right side values).
 - For Ordering: List items that need sequencing with correct order in correctAnswer.
 - For Fill-in-blank: Use [___] to indicate blanks, provide answers in correctAnswer array.
-- For Choice Matrix: Create a grid with row statements and column options. Options array has labels as row statements and values as column headers. correctAnswer lists the correct column per row.
+- For Choice Matrix: CRITICAL: Each option = one row. label=statement text, value=ALWAYS 'Sant, Falskt' (both columns, comma-separated). correctAnswer=['Sant' or 'Falskt' per row]. Do NOT use single column like just 'Korrekt'. Always use exactly two columns.
 - For Cloze Text: Write sentences with [___] blanks to type into. correctAnswer has the expected typed answers.
 - For Cloze Dropdown: Write sentences with [___] blanks. CRITICAL: Each option = ONE gap's dropdown. label='Gap1', value='choice1, choice2, choice3' (comma-separated). correctAnswer lists the correct choice per gap in order. Example: options=[{label:'Gap1', value:'ran, walked, jumped'}, {label:'Gap2', value:'quickly, slowly'}], correctAnswer=['walked', 'quickly'].
 - For Order List: Provide items to be reordered. Options array has the items. correctAnswer lists labels in correct order.
