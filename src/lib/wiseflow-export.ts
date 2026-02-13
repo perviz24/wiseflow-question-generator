@@ -378,20 +378,21 @@ function buildMultipleResponseData(question: Question, score: number) {
   return data
 }
 
-// Build question data for short_answer — uses plaintext for simple text input
-// Plaintext renders as a simple text box (no rich editor), distinct from longtextV2 essay
+// Build question data for short_answer — uses longtextV2 WITHOUT formatting_options
+// No formatting toolbar = simple text box, vs essay which has bold/italic/list toolbar
+// Matches real WISEflow BEL.json pattern: longtextV2 + no formatting_options = kortsvarstext
 function buildShortAnswerData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
+    submit_over_limit: true,
     stimulus: question.stimulus,
-    type: "plaintext",
-    max_length: 10000,
-    show_word_count: true,
+    type: "longtextV2",
+    max_length: 50,
+    spellcheck: false,
     score,
     minScore: 0,
     validation: {
       max_score: score,
-      automarkable: false,
     },
   }
   if (question.instructorStimulus) {
