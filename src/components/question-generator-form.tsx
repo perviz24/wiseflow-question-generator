@@ -112,7 +112,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw } from "lucide-react"
+import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw, Shuffle } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -195,6 +195,7 @@ const PRIMARY_TYPE_IDS = ["mcq", "true_false", "longtextV2"]
 function QuestionTypeSelector({
   selectedTypes,
   onToggleType,
+  onSelectMixed,
   enabledTypes,
   showMore,
   onToggleShowMore,
@@ -202,6 +203,7 @@ function QuestionTypeSelector({
 }: {
   selectedTypes: string[]
   onToggleType: (type: string) => void
+  onSelectMixed: () => void
   enabledTypes: string[]
   showMore: boolean
   onToggleShowMore: () => void
@@ -210,6 +212,8 @@ function QuestionTypeSelector({
   // Split enabled types into primary (always visible) and secondary (under "show more")
   const primaryTypes = enabledTypes.filter((id) => PRIMARY_TYPE_IDS.includes(id))
   const secondaryTypes = enabledTypes.filter((id) => !PRIMARY_TYPE_IDS.includes(id))
+  // Mixed is active when ALL enabled types are selected
+  const isMixedActive = enabledTypes.length > 0 && enabledTypes.every((id) => selectedTypes.includes(id))
 
   const tierBorderClass = (typeId: string) => {
     const def = QUESTION_TYPES[typeId]
@@ -259,8 +263,28 @@ function QuestionTypeSelector({
         </Tooltip>
       </div>
       <div className="space-y-3">
-        {/* Primary types — always visible */}
+        {/* Primary types — always visible, with Mixed as first option */}
         <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={onSelectMixed}
+                className={`inline-flex items-center justify-center gap-1 rounded-full px-3 sm:px-2.5 py-1.5 sm:py-0.5 text-xs font-semibold transition-colors touch-action-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-1 ring-purple-400/50 ${
+                  isMixedActive
+                    ? "border-transparent bg-primary text-primary-foreground hover:bg-primary/80"
+                    : "border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+                }`}
+                aria-pressed={isMixedActive}
+              >
+                <Shuffle className="h-3 w-3" />
+                {t("mixedQuestionTypes")}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <p className="text-sm">{t("mixedQuestionTypesHelp")}</p>
+            </TooltipContent>
+          </Tooltip>
           {primaryTypes.map(renderTypeButton)}
         </div>
 
@@ -400,6 +424,16 @@ export function QuestionGeneratorForm() {
       questionTypes: prev.questionTypes.includes(type)
         ? prev.questionTypes.filter((t) => t !== type)
         : [...prev.questionTypes, type],
+    }))
+  }
+
+  // Select all enabled types (Mixed mode) — toggles between all-selected and MCQ-only
+  const selectMixedTypes = () => {
+    const allEnabled = normalizeEnabledTypes(userProfile?.enabledQuestionTypes as string[] | undefined)
+    const allSelected = allEnabled.every((id) => formData.questionTypes.includes(id))
+    setFormData((prev) => ({
+      ...prev,
+      questionTypes: allSelected ? ["mcq"] : [...allEnabled],
     }))
   }
 
@@ -757,6 +791,7 @@ export function QuestionGeneratorForm() {
           <QuestionTypeSelector
             selectedTypes={formData.questionTypes}
             onToggleType={toggleQuestionType}
+            onSelectMixed={selectMixedTypes}
             enabledTypes={normalizeEnabledTypes(userProfile?.enabledQuestionTypes as string[] | undefined)}
             showMore={showMoreQuestionTypes}
             onToggleShowMore={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}

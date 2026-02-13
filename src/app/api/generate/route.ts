@@ -217,6 +217,7 @@ ${context ? `Additional context: ${context}` : ""}`
 Requirements:
 - IMPORTANT: Distribute questions EVENLY across all selected question types. DO NOT favor MCQ or older formats.
 - If multiple types selected, ensure balanced representation (e.g., 10 questions with 3 types = 3-4 of each type).
+- EXCEPTION: If the additional context explicitly requests more of specific question types (e.g., "more essays" or "mostly MCQ"), respect those instructions and adjust the distribution accordingly. Only the user's explicit request overrides even distribution.
 - For MCQ: Provide exactly 4 options (A, B, C, D). Mark the correct answer(s) in correctAnswer array.
 - For True/False: Provide exactly 2 options (A: True, B: False). Mark the correct answer.
 - For Essays: Provide clear question prompts and grading rubric in instructorStimulus.

@@ -137,6 +137,8 @@ export interface Translations {
   questionType_plaintext: string
   questionType_formulaessayV2: string
   questionType_chemistryessayV2: string
+  mixedQuestionTypes: string
+  mixedQuestionTypesHelp: string
   showMoreTypes: string
   showLessTypes: string
   questionNumber: string
@@ -437,6 +439,8 @@ export const translations: Record<Language, Translations> = {
     questionType_plaintext: "Fritext (enkel)",
     questionType_formulaessayV2: "Essä (matematik)",
     questionType_chemistryessayV2: "Essä (kemi)",
+    mixedQuestionTypes: "Blandat",
+    mixedQuestionTypesHelp: "Väljer alla aktiverade frågetyper och fördelar frågorna jämnt",
     showMoreTypes: "Fler frågetyper",
     showLessTypes: "Färre frågetyper",
     questionNumber: "Fråga {n}",
@@ -735,6 +739,8 @@ export const translations: Record<Language, Translations> = {
     questionType_plaintext: "Plain Text",
     questionType_formulaessayV2: "Essay (Math)",
     questionType_chemistryessayV2: "Essay (Chemistry)",
+    mixedQuestionTypes: "Mixed",
+    mixedQuestionTypesHelp: "Selects all enabled question types and distributes questions evenly",
     showMoreTypes: "More Question Types",
     showLessTypes: "Less Question Types",
     questionNumber: "Question {n}",
