@@ -409,6 +409,10 @@ function buildChoiceMatrixData(question: Question, score: number) {
     multiple_responses: true,
     score,
     minScore: 0,
+    ui_style: {
+      type: "inline",
+      horizontal_lines: false,
+    },
   }
   if (question.options && question.options.length > 0) {
     // Extract column headers (e.g., "Sant,Falskt") from first option's value
@@ -417,14 +421,11 @@ function buildChoiceMatrixData(question: Question, score: number) {
     // Stems are the row statements
     data.stems = question.options.map(opt => opt.label)
     if (question.correctAnswer) {
-      // Convert correctAnswer to BEL format: array of arrays with column indices
-      // Each answer maps to an index in the columns array
-      const perItemScore = question.correctAnswer.length > 0
-        ? score / question.correctAnswer.length : 0
+      // BEL format: partialMatch with score 0.5 per item, value as nested arrays [[colIdx]]
       data.validation = {
         scoring_type: "partialMatch",
         valid_response: {
-          score: Math.round(perItemScore * 100) / 100,
+          score: 0.5,
           value: question.correctAnswer.map(ans => {
             const idx = columnHeaders.indexOf(ans.trim())
             return [idx >= 0 ? idx : 0]
@@ -517,7 +518,7 @@ function buildClozeDropdownData(question: Question, score: number) {
     minScore: 0,
   }
   if (question.options) {
-    data.possible_responses = question.options.map(opt => opt.value.split(",").map(v => ({ label: v.trim(), value: v.trim() })))
+    data.possible_responses = question.options.map(opt => opt.value.split(",").map(v => v.trim()))
   }
   if (question.correctAnswer) {
     data.validation = {
