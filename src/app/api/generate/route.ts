@@ -247,6 +247,16 @@ Requirements:
 - Avoid ambiguous wording.
 - Ensure questions are pedagogically sound and aligned with learning outcomes.
 
+⚠️ CRITICAL — ANSWER CORRECTNESS SAFETY:
+- NEVER guess or assume which answer is correct. Only mark answers as correct when you are absolutely certain based on established scientific/academic consensus.
+- For MCQ and Multiple Response: Double-check that correctAnswer labels (A, B, C, D) match the ACTUAL correct option values. Verify the mapping: if option A has value "Mitosis" and that IS the correct answer, then correctAnswer should include "A".
+- For True/False and Choice Matrix: Verify each statement is factually unambiguous before assigning Sant/Falskt. If a statement could be debated, rephrase it to be clearly true or clearly false.
+- For Ordering and Order List: Verify the sequence in correctAnswer reflects the objectively correct chronological, logical, or procedural order. Do not invent orderings — only create ordering questions when there IS a definitive correct sequence.
+- For Matching: Verify each term-definition pair is an exact match. Do not create plausible-but-wrong pairings as correct answers.
+- For Cloze Dropdown: Verify the correctAnswer for each gap is genuinely correct and that distractor options are clearly wrong but plausible.
+- For Cloze Text and Fill-in-blank: Ensure the expected answers in correctAnswer are the ONLY reasonable correct answers (accept synonyms if applicable).
+- If you are uncertain about the correctness of any answer, make the question about a concept you ARE certain about instead.
+
 Generate the questions now.`
 
     // API key check removed - using hardcoded value temporarily
