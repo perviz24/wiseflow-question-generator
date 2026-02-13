@@ -87,6 +87,10 @@ const QuestionSchema = z.object({
     .string()
     .optional()
     .describe("Grading rubric/guidance for the instructor on what to look for in essay and short answer responses"),
+  difficulty: z
+    .enum(["easy", "medium", "hard"])
+    .optional()
+    .describe("The difficulty level of THIS specific question. REQUIRED when generating mixed difficulty — assign easy, medium, or hard to each question individually with roughly equal distribution."),
 })
 
 // Define the output schema for multiple questions
@@ -139,7 +143,7 @@ export async function POST(req: NextRequest) {
       easy: "easy (suitable for beginners)",
       medium: "medium (suitable for intermediate learners)",
       hard: "hard (suitable for advanced learners)",
-      mixed: "mixed difficulty — generate a balanced mix of easy, medium, and hard questions (roughly equal distribution)",
+      mixed: `mixed difficulty — you MUST generate a balanced mix of easy, medium, and hard questions with roughly EQUAL distribution (approximately 1/3 each). For EACH question, you MUST set the "difficulty" field to "easy", "medium", or "hard" based on that specific question's actual difficulty level. Do NOT default to medium.`,
     }
 
     const questionTypeInstructions: Record<string, string> = {
@@ -155,7 +159,7 @@ export async function POST(req: NextRequest) {
       rating_scale: "rating scale questions using Likert-style 1-5 scale for evaluation",
       choicematrix: "choice matrix questions with a grid of rows (statements) and columns (options like Agree/Disagree). Provide rows in options (label=row, value=column header). correctAnswer lists the correct column for each row",
       clozetext: "cloze text questions with sentences containing typed blanks. Write the sentence with [___] for each blank. Provide correct fill-in answers in correctAnswer array",
-      clozedropdown: "cloze dropdown questions with inline dropdown menus in sentences. Write the sentence with [___] for blanks. Provide dropdown options in the options array and correct selections in correctAnswer",
+      clozedropdown: "cloze dropdown questions with inline dropdown menus in sentences. Write the sentence with [___] for each blank. IMPORTANT: Each option object = one dropdown gap. label=Gap1/Gap2/etc, value=comma-separated choices for that gap (e.g. value:'choice1, choice2, choice3'). correctAnswer lists the correct selection per gap in order",
       orderlist: "ordered list questions where items must be dragged into correct sequence. Provide items in options array. correctAnswer lists item labels in the correct order",
       tokenhighlight: "token highlight questions where students select correct words/phrases from a passage. Provide the passage in stimulus. List the tokens that should be highlighted in correctAnswer",
       clozeassociation: "cloze association questions with drag-and-drop gaps in text. Write sentence with [___] for gaps. Provide draggable answer options in options. correctAnswer maps each gap to its answer",
@@ -215,6 +219,7 @@ ${context ? `Additional context: ${context}` : ""}`
     prompt += `
 
 Requirements:
+- IMPORTANT: For MIXED DIFFICULTY — assign the "difficulty" field ("easy", "medium", or "hard") to EACH question individually with roughly equal distribution (1/3 each). Do NOT make all questions medium.
 - IMPORTANT: Distribute questions EVENLY across all selected question types. DO NOT favor MCQ or older formats.
 - If multiple types selected, ensure balanced representation (e.g., 10 questions with 3 types = 3-4 of each type).
 - EXCEPTION: If the additional context explicitly requests more of specific question types (e.g., "more essays" or "mostly MCQ"), respect those instructions and adjust the distribution accordingly. Only the user's explicit request overrides even distribution.
@@ -228,7 +233,7 @@ Requirements:
 - For Fill-in-blank: Use [___] to indicate blanks, provide answers in correctAnswer array.
 - For Choice Matrix: Create a grid with row statements and column options. Options array has labels as row statements and values as column headers. correctAnswer lists the correct column per row.
 - For Cloze Text: Write sentences with [___] blanks to type into. correctAnswer has the expected typed answers.
-- For Cloze Dropdown: Write sentences with [___] blanks. Options array provides dropdown choices per gap. correctAnswer has the correct selections.
+- For Cloze Dropdown: Write sentences with [___] blanks. CRITICAL: Each option = ONE gap's dropdown. label='Gap1', value='choice1, choice2, choice3' (comma-separated). correctAnswer lists the correct choice per gap in order. Example: options=[{label:'Gap1', value:'ran, walked, jumped'}, {label:'Gap2', value:'quickly, slowly'}], correctAnswer=['walked', 'quickly'].
 - For Order List: Provide items to be reordered. Options array has the items. correctAnswer lists labels in correct order.
 - For Token Highlight: Write a passage in stimulus. correctAnswer lists words/phrases students must highlight.
 - For Cloze Association: Write text with [___] gaps. Options array has draggable answers. correctAnswer maps gaps to correct answers.

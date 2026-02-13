@@ -518,7 +518,10 @@ function buildClozeDropdownData(question: Question, score: number) {
     minScore: 0,
   }
   if (question.options) {
-    data.possible_responses = question.options.map(opt => opt.value.split(",").map(v => v.trim()))
+    // AI may separate choices with commas or pipes — split on either
+    data.possible_responses = question.options.map(opt =>
+      opt.value.split(/[,|]/).map(v => v.trim()).filter(v => v.length > 0)
+    )
   }
   if (question.correctAnswer) {
     data.validation = {
