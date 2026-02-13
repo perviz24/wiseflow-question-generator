@@ -393,16 +393,39 @@ export async function exportToWord(
               }),
             ],
           }),
-          // Subtitle with date
+          // Subtitle with TentaGen branding + date
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 100 },
+            children: [
+              new TextRun({
+                text: `${isSv ? "Genererad med" : "Generated with"} `,
+                size: 20,
+                color: "666666",
+                italics: true,
+              }),
+              new TextRun({
+                text: "TentaGen",
+                size: 22,
+                color: "1E3A5F",
+                bold: true,
+              }),
+              new TextRun({
+                text: ` — ${new Date().toLocaleDateString(isSv ? "sv-SE" : "en-US")}`,
+                size: 20,
+                color: "666666",
+                italics: true,
+              }),
+            ],
+          }),
           new Paragraph({
             alignment: AlignmentType.CENTER,
             spacing: { after: 300 },
             children: [
               new TextRun({
-                text: `${isSv ? "Genererad" : "Generated"}: ${new Date().toLocaleDateString(isSv ? "sv-SE" : "en-US")} | TentaGen`,
-                size: 20,
-                color: "888888",
-                italics: true,
+                text: "tentagen.vercel.app",
+                size: 18,
+                color: "4A6FA5",
               }),
             ],
           }),
@@ -412,10 +435,10 @@ export async function exportToWord(
           new Paragraph({ spacing: { before: 300 }, children: [] }),
           // Questions
           ...questionParagraphs,
-          // Footer
+          // Footer separator
           new Paragraph({
             alignment: AlignmentType.CENTER,
-            spacing: { before: 400 },
+            spacing: { before: 400, after: 200 },
             children: [
               new TextRun({
                 text: `— ${isSv ? "Slut på tentafrågor" : "End of exam questions"} —`,
@@ -425,16 +448,76 @@ export async function exportToWord(
               }),
             ],
           }),
-          // TentaGen branding
-          new Paragraph({
-            alignment: AlignmentType.CENTER,
-            spacing: { before: 200 },
-            children: [
-              new TextRun({
-                text: `${isSv ? "Exporterad från" : "Exported from"} TentaGen — tentagen.vercel.app`,
-                italics: true,
-                color: "AAAAAA",
-                size: 16,
+          // TentaGen branding block — prominent
+          new Table({
+            width: { size: 100, type: WidthType.PERCENTAGE },
+            rows: [
+              new TableRow({
+                children: [
+                  new TableCell({
+                    shading: { type: ShadingType.SOLID, color: "F0F4FF" },
+                    children: [
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 150, after: 60 },
+                        children: [
+                          new TextRun({
+                            text: "✦ TentaGen",
+                            bold: true,
+                            size: 28,
+                            color: "1E3A5F",
+                          }),
+                        ],
+                      }),
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 60 },
+                        children: [
+                          new TextRun({
+                            text: isSv
+                              ? "AI-driven tentafråge-generator för högre utbildning"
+                              : "AI-powered exam question generator for higher education",
+                            size: 18,
+                            color: "4A6FA5",
+                          }),
+                        ],
+                      }),
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 80 },
+                        children: [
+                          new TextRun({
+                            text: "tentagen.vercel.app",
+                            bold: true,
+                            size: 20,
+                            color: "1E3A5F",
+                          }),
+                          new TextRun({
+                            text: isSv
+                              ? "  •  Utvecklad av Parviz Mammadzada, MD, PhD"
+                              : "  •  Developed by Parviz Mammadzada, MD, PhD",
+                            size: 18,
+                            color: "6B7280",
+                          }),
+                        ],
+                      }),
+                      new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { after: 150 },
+                        children: [
+                          new TextRun({
+                            text: isSv
+                              ? `Exporterad ${new Date().toLocaleDateString("sv-SE")}  •  ${questions.length} ${questions.length === 1 ? "fråga" : "frågor"}`
+                              : `Exported ${new Date().toLocaleDateString("en-US")}  •  ${questions.length} ${questions.length === 1 ? "question" : "questions"}`,
+                            size: 16,
+                            color: "9CA3AF",
+                            italics: true,
+                          }),
+                        ],
+                      }),
+                    ],
+                  }),
+                ],
               }),
             ],
           }),
