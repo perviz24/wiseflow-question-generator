@@ -5,6 +5,7 @@ import {
   Document,
   Paragraph,
   TextRun,
+  ImageRun,
   HeadingLevel,
   Table,
   TableRow,
@@ -325,6 +326,17 @@ export async function exportToWord(
 ): Promise<Blob> {
   const isSv = metadata.language === "sv"
 
+  // Fetch logo PNG for branding block
+  let logoData: ArrayBuffer | null = null
+  try {
+    const logoRes = await fetch("/logo-word.png")
+    if (logoRes.ok) {
+      logoData = await logoRes.arrayBuffer()
+    }
+  } catch {
+    // Fallback to text-only branding if logo fetch fails
+  }
+
   // Header info table
   const headerTable = new Table({
     width: { size: 100, type: WidthType.PERCENTAGE },
@@ -541,8 +553,18 @@ export async function exportToWord(
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 150, after: 60 },
                         children: [
+                          ...(logoData
+                            ? [
+                                new ImageRun({
+                                  data: logoData,
+                                  transformation: { width: 28, height: 28 },
+                                  type: "png",
+                                }),
+                                new TextRun({ text: " " }),
+                              ]
+                            : []),
                           new TextRun({
-                            text: "✦ TentaGen",
+                            text: "TentaGen",
                             bold: true,
                             size: 28,
                             color: "1E3A5F",
