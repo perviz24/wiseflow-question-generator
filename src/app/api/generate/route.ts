@@ -86,7 +86,7 @@ const QuestionSchema = z.object({
   instructorStimulus: z
     .string()
     .optional()
-    .describe("Guidance for the instructor on what to look for in essay answers"),
+    .describe("Grading rubric/guidance for the instructor on what to look for in essay and short answer responses"),
 })
 
 // Define the output schema for multiple questions
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       mcq: "multiple choice questions with 4 options each (A, B, C, D)",
       true_false: "true/false questions with 2 options (A: True, B: False)",
       longtextV2: "essay questions that require detailed written responses",
-      short_answer: "short answer questions requiring 1-3 sentence responses",
+      short_answer: "short answer questions requiring 1-3 sentence responses. Always include instructorStimulus with grading rubric/expected answer",
       fill_blank: "fill-in-the-blank questions with gaps in sentences to complete",
       multiple_response: "multiple response questions with several options where multiple can be correct",
       matching: "matching questions pairing terms with definitions or concepts",
@@ -219,7 +219,8 @@ Requirements:
 - If multiple types selected, ensure balanced representation (e.g., 10 questions with 3 types = 3-4 of each type).
 - For MCQ: Provide exactly 4 options (A, B, C, D). Mark the correct answer(s) in correctAnswer array.
 - For True/False: Provide exactly 2 options (A: True, B: False). Mark the correct answer.
-- For Essays: Provide clear question prompts and guidance for instructors in instructorStimulus.
+- For Essays: Provide clear question prompts and grading rubric in instructorStimulus.
+- For Short Answer: Provide grading rubric/expected answer guidance in instructorStimulus.
 - For Hotspot: Describe the image/diagram and indicate which area(s) should be selected.
 - For Matching: Provide pairs in options array (left side labels, right side values).
 - For Ordering: List items that need sequencing with correct order in correctAnswer.

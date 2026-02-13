@@ -1081,6 +1081,22 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         )}
                       </Card>
                     )}
+                    {displayQuestion.instructorStimulus && (
+                      <Card className="p-3 bg-primary/5 border-primary/20 dark:bg-primary/10 dark:border-primary/30">
+                        <p className="text-sm font-medium text-foreground mb-1">{t("instructorGuidance")}</p>
+                        {isEditing ? (
+                          <Textarea
+                            value={editedQuestion?.instructorStimulus || ""}
+                            onChange={(e) => setEditedQuestion(editedQuestion ? { ...editedQuestion, instructorStimulus: e.target.value } : null)}
+                            className="text-sm bg-white dark:bg-card"
+                          />
+                        ) : (
+                          <p className="text-sm text-foreground/80">
+                            {displayQuestion.instructorStimulus}
+                          </p>
+                        )}
+                      </Card>
+                    )}
                   </div>
                 </>
               )}
