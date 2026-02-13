@@ -103,7 +103,7 @@ export const QUESTION_TYPES: Record<string, QuestionTypeDefinition> = {
   matching: {
     id: "matching",
     tier: "extended",
-    learnosityType: "choicematrix",
+    learnosityType: "association",
     qtiInteraction: "MatchInteraction",
     defaultEnabled: true,
     canDisable: true,

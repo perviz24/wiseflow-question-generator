@@ -399,22 +399,71 @@ function buildShortAnswerData(question: Question, score: number) {
   return data
 }
 
-// Build question data for choicematrix — grid of rows x columns
+// Build question data for choicematrix — grid of rows x columns (True/False matrix)
+// BEL format: options = string[], stems = string[], value = number[][]
 function buildChoiceMatrixData(question: Question, score: number) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     stimulus: question.stimulus,
     type: "choicematrix",
+    shuffle_options: true,
+    multiple_responses: true,
     score,
     minScore: 0,
   }
-  if (question.options) {
+  if (question.options && question.options.length > 0) {
+    // Extract column headers (e.g., "Sant,Falskt") from first option's value
+    const columnHeaders = question.options[0]?.value.split(",").map(v => v.trim()) || ["Sant", "Falskt"]
+    data.options = columnHeaders // Plain string array, NOT objects
+    // Stems are the row statements
     data.stems = question.options.map(opt => opt.label)
-    data.options = question.options[0]?.value.split(",").map(v => ({ label: v.trim(), value: v.trim() })) || []
     if (question.correctAnswer) {
+      // Convert correctAnswer to BEL format: array of arrays with column indices
+      // Each answer maps to an index in the columns array
+      const perItemScore = question.correctAnswer.length > 0
+        ? score / question.correctAnswer.length : 0
       data.validation = {
-        scoring_type: "exactMatch",
-        valid_response: { score, value: question.correctAnswer },
+        scoring_type: "partialMatch",
+        valid_response: {
+          score: Math.round(perItemScore * 100) / 100,
+          value: question.correctAnswer.map(ans => {
+            const idx = columnHeaders.indexOf(ans.trim())
+            return [idx >= 0 ? idx : 0]
+          }),
+        },
+      }
+    }
+  }
+  return data
+}
+
+// Build question data for association — matching pairs (drag-and-drop)
+// BEL format: possible_responses = string[], stimulus_list = string[], value = string[]
+function buildAssociationData(question: Question, score: number) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: Record<string, any> = {
+    stimulus: question.stimulus,
+    type: "association",
+    shuffle_options: true,
+    score,
+    minScore: 0,
+  }
+  if (question.options && question.options.length > 0) {
+    // options[].label = prompt/statement (stimulus_list)
+    // options[].value = matching answer (possible_responses)
+    data.stimulus_list = question.options.map(opt => opt.label)
+    // Collect all response values + add distractors if available from correctAnswer
+    const responses = question.options.map(opt => opt.value)
+    data.possible_responses = responses
+    if (question.correctAnswer) {
+      const perItemScore = question.correctAnswer.length > 0
+        ? score / question.correctAnswer.length : 0
+      data.validation = {
+        scoring_type: "partialMatch",
+        valid_response: {
+          score: Math.round(perItemScore * 100) / 100,
+          value: question.correctAnswer, // Ordered array matching stimulus_list
+        },
       }
     }
   }
@@ -422,11 +471,16 @@ function buildChoiceMatrixData(question: Question, score: number) {
 }
 
 // Build question data for clozetext — typed blanks
+// BEL/Learnosity expects {{response}} markers in template, NOT [___]
 function buildClozeTextData(question: Question, score: number) {
+  // Convert [___] or [____] markers to Learnosity {{response}} markers
+  const template = question.stimulus
+    .replace(/\[_+\]/g, "{{response}}")
+    .replace(/_{3,}/g, "{{response}}")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     stimulus: "",
-    template: question.stimulus,
+    template,
     type: "clozetext",
     score,
     minScore: 0,
@@ -445,10 +499,14 @@ function buildClozeTextData(question: Question, score: number) {
 
 // Build question data for clozedropdown — inline dropdowns
 function buildClozeDropdownData(question: Question, score: number) {
+  // Convert [___] markers to Learnosity {{response}} markers
+  const template = question.stimulus
+    .replace(/\[_+\]/g, "{{response}}")
+    .replace(/_{3,}/g, "{{response}}")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     stimulus: "",
-    template: question.stimulus,
+    template,
     type: "clozedropdown",
     score,
     minScore: 0,
@@ -506,10 +564,14 @@ function buildTokenHighlightData(question: Question, score: number) {
 
 // Build question data for clozeassociation — drag-and-drop gaps
 function buildClozeAssociationData(question: Question, score: number) {
+  // Convert [___] markers to Learnosity {{response}} markers
+  const template = question.stimulus
+    .replace(/\[_+\]/g, "{{response}}")
+    .replace(/_{3,}/g, "{{response}}")
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data: Record<string, any> = {
     stimulus: "",
-    template: question.stimulus,
+    template,
     type: "clozeassociation",
     possible_responses: question.options?.map(opt => opt.value) || [],
     score,
@@ -622,7 +684,9 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
-      } else if (question.type === "choicematrix" || question.type === "matching") {
+      } else if (question.type === "matching") {
+        questionData = buildAssociationData(question, score)
+      } else if (question.type === "choicematrix") {
         questionData = buildChoiceMatrixData(question, score)
       } else if (question.type === "clozetext" || question.type === "fill_blank") {
         questionData = buildClozeTextData(question, score)
@@ -713,7 +777,9 @@ export function exportToWiseflowJSON(questions: Question[], metadata: ExportMeta
         questionData = buildMultipleResponseData(question, score)
       } else if (question.type === "short_answer") {
         questionData = buildShortAnswerData(question, score)
-      } else if (question.type === "choicematrix" || question.type === "matching") {
+      } else if (question.type === "matching") {
+        questionData = buildAssociationData(question, score)
+      } else if (question.type === "choicematrix") {
         questionData = buildChoiceMatrixData(question, score)
       } else if (question.type === "clozetext" || question.type === "fill_blank") {
         questionData = buildClozeTextData(question, score)
