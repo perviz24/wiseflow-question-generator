@@ -5,11 +5,12 @@ import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
-import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info } from "lucide-react"
+import { ArrowLeft, BookOpen, Zap, Settings, Library, Upload, Tag, FileJson, CheckCircle2, AlertCircle, Info, FileUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 
 export default function DocsPage() {
   const { t, language } = useTranslation()
@@ -570,6 +571,369 @@ export default function DocsPage() {
                     </div>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* How to Import */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileUp className="h-5 w-5" />
+                  {isSv ? "Så importerar du frågor" : "How to Import Questions"}
+                </CardTitle>
+                <CardDescription>
+                  {isSv
+                    ? "Steg-för-steg-guider för att importera dina exporterade frågor till olika plattformar"
+                    : "Step-by-step guides for importing your exported questions into various platforms"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Accordion type="single" collapsible className="w-full">
+                  {/* Wiseflow Legacy JSON Import */}
+                  <AccordionItem value="wiseflow-legacy">
+                    <AccordionTrigger className="text-base font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">Legacy JSON</Badge>
+                        {isSv ? "Importera till Wiseflow (Legacy/Utgående)" : "Import to Wiseflow (Legacy)"}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        {isSv
+                          ? "Följ dessa steg för att importera legacy JSON-frågor till Wiseflow:"
+                          : "Follow these steps to import legacy JSON questions into Wiseflow:"}
+                      </p>
+                      <ol className="space-y-4 text-sm">
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            1
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Öppna huvudsidan och navigera till \"Uppgifter (utgående)\""
+                                : "Open the main page and navigate to \"Uppgifter (utgående)\""}
+                            </p>
+                            <p className="text-muted-foreground mt-1">
+                              {isSv
+                                ? "Detta är den äldre uppgiftshanteringen i Wiseflow."
+                                : "This is the legacy task management section in Wiseflow."}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            2
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Navigera till \"Innehållsbank\""
+                                : "Navigate to \"Innehållsbank\" (Content Bank)"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            3
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Klicka på importknappen"
+                                : "Click the import button"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            4
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Välj \"Wiseflow\" i rullgardinsmenyn och klicka \"Välj fil\""
+                                : "Choose \"Wiseflow\" in the dropdown and click \"Välj fil\" (Choose file)"}
+                            </p>
+                            <p className="text-muted-foreground mt-1">
+                              {isSv
+                                ? "Välj din exporterade .json-fil från TentaGen."
+                                : "Select your exported .json file from TentaGen."}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            5
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Förhandsgranska frågorna, lägg till taggar om du vill, och klicka importera"
+                                : "Preview the questions, add tags if needed, and click import"}
+                            </p>
+                          </div>
+                        </li>
+                      </ol>
+                      <div className="rounded-lg bg-muted p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                          <p className="text-xs text-muted-foreground">
+                            {isSv
+                              ? "Använd exportformatet \"Wiseflow Legacy JSON\" i TentaGen för denna importmetod."
+                              : "Use the \"Wiseflow Legacy JSON\" export format in TentaGen for this import method."}
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Wiseflow New JSON Import */}
+                  <AccordionItem value="wiseflow-new">
+                    <AccordionTrigger className="text-base font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">{isSv ? "Ny JSON" : "New JSON"}</Badge>
+                        {isSv ? "Importera till Wiseflow (Ny JSON)" : "Import to Wiseflow (New JSON)"}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        {isSv
+                          ? "Följ dessa steg för att importera det nya JSON-formatet till Wiseflow:"
+                          : "Follow these steps to import the new JSON format into Wiseflow:"}
+                      </p>
+                      <ol className="space-y-4 text-sm">
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            1
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Öppna huvudsidan och navigera till \"Uppgifter\""
+                                : "Open the main page and navigate to \"Uppgifter\" (Tasks)"}
+                            </p>
+                            <p className="text-muted-foreground mt-1">
+                              {isSv
+                                ? "Använd den nya uppgiftshanteringen (inte utgående)."
+                                : "Use the new task management (not the legacy/utgående)."}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            2
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Navigera till \"Innehållsbank\""
+                                : "Navigate to \"Innehållsbank\" (Content Bank)"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            3
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Klicka på importknappen och välj \"Wiseflow\" som format"
+                                : "Click the import button and choose \"Wiseflow\" as format"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            4
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Välj din exporterade .json-fil och klicka importera"
+                                : "Select your exported .json file and click import"}
+                            </p>
+                          </div>
+                        </li>
+                      </ol>
+                      <div className="rounded-lg bg-muted p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                          <p className="text-xs text-muted-foreground">
+                            {isSv
+                              ? "Använd exportformatet \"Ny Wiseflow JSON\" i TentaGen. Det nya formatet inkluderar labels med ID-fält."
+                              : "Use the \"New Wiseflow JSON\" export format in TentaGen. The new format includes labels with ID fields."}
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* QTI / Inspera Import */}
+                  <AccordionItem value="inspera-qti">
+                    <AccordionTrigger className="text-base font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">QTI 2.2</Badge>
+                        {isSv ? "Importera till Inspera" : "Import to Inspera"}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        {isSv
+                          ? "Följ dessa steg för att importera QTI 2.2-frågor till Inspera:"
+                          : "Follow these steps to import QTI 2.2 questions into Inspera:"}
+                      </p>
+                      <ol className="space-y-4 text-sm">
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            1
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Exportera frågorna med formatet \"QTI 2.2 Inspera\" i TentaGen"
+                                : "Export questions using the \"QTI 2.2 Inspera\" format in TentaGen"}
+                            </p>
+                            <p className="text-muted-foreground mt-1">
+                              {isSv
+                                ? "Detta laddar ner en .zip-fil med QTI 2.2-kompatibla XML-filer."
+                                : "This downloads a .zip file with QTI 2.2 compatible XML files."}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            2
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Logga in på Inspera och gå till \"Frågebank\" eller \"Item Bank\""
+                                : "Log into Inspera and go to \"Item Bank\""}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            3
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Klicka \"Importera\" och välj den nedladdade .zip-filen"
+                                : "Click \"Import\" and select the downloaded .zip file"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            4
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Granska importerade frågor och verifiera formatering"
+                                : "Review imported questions and verify formatting"}
+                            </p>
+                          </div>
+                        </li>
+                      </ol>
+                      <div className="rounded-lg bg-muted p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                          <p className="text-xs text-muted-foreground">
+                            {isSv
+                              ? "QTI 2.2 Inspera-formatet stöder flerval, sant/falskt och essäfrågor. Inspera-specifik metadata inkluderas automatiskt."
+                              : "QTI 2.2 Inspera format supports multiple choice, true/false, and essay questions. Inspera-specific metadata is included automatically."}
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+
+                  {/* Other LMS (QTI 2.1) Import */}
+                  <AccordionItem value="other-lms">
+                    <AccordionTrigger className="text-base font-semibold">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline">QTI 2.1</Badge>
+                        {isSv ? "Importera till andra LMS (Canvas, Moodle, m.m.)" : "Import to Other LMS (Canvas, Moodle, etc.)"}
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      <p className="text-sm text-muted-foreground">
+                        {isSv
+                          ? "QTI 2.1 är ett universellt format som stöds av de flesta lärplattformar:"
+                          : "QTI 2.1 is a universal format supported by most learning management systems:"}
+                      </p>
+                      <ol className="space-y-4 text-sm">
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            1
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Exportera frågorna med formatet \"QTI 2.1\" i TentaGen"
+                                : "Export questions using the \"QTI 2.1\" format in TentaGen"}
+                            </p>
+                            <p className="text-muted-foreground mt-1">
+                              {isSv
+                                ? "Detta laddar ner en .zip-fil med QTI 2.1-kompatibla XML-filer."
+                                : "This downloads a .zip file with QTI 2.1 compatible XML files."}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            2
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Logga in på din LMS-plattform (Canvas, Moodle, Blackboard, etc.)"
+                                : "Log into your LMS platform (Canvas, Moodle, Blackboard, etc.)"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            3
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Hitta importfunktionen för frågebanken (vanligtvis under \"Frågor\" eller \"Question Bank\")"
+                                : "Find the question bank import function (usually under \"Questions\" or \"Question Bank\")"}
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start gap-3">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold shrink-0 mt-0.5">
+                            4
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              {isSv
+                                ? "Välj \"QTI\" eller \"IMS QTI\" som importformat och ladda upp .zip-filen"
+                                : "Select \"QTI\" or \"IMS QTI\" as import format and upload the .zip file"}
+                            </p>
+                          </div>
+                        </li>
+                      </ol>
+                      <div className="rounded-lg bg-muted p-3 mt-2">
+                        <div className="flex items-start gap-2">
+                          <Info className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                          <p className="text-xs text-muted-foreground">
+                            {isSv
+                              ? "QTI 2.1-formatet fungerar med Canvas, Moodle, Blackboard, D2L Brightspace och de flesta andra LMS-plattformar. Kontrollera din plattforms dokumentation för specifika QTI-importsteg."
+                              : "QTI 2.1 format works with Canvas, Moodle, Blackboard, D2L Brightspace, and most other LMS platforms. Check your platform's documentation for specific QTI import steps."}
+                          </p>
+                        </div>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
 
