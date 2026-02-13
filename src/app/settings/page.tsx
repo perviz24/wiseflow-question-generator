@@ -29,14 +29,17 @@ export default function SettingsPage() {
   const [tutorInitials, setTutorInitials] = useState("")
   const [uiLanguage, setUiLanguage] = useState<"sv" | "en">("sv")
   const [isSaving, setIsSaving] = useState(false)
+  const [initialLoaded, setInitialLoaded] = useState(false)
 
-  // Load profile data when available
+  // Load profile data ONCE when first available — not on every Convex re-fire
+  // (Convex subscriptions re-fire frequently, which would reset unsaved form changes)
   useEffect(() => {
-    if (profile) {
+    if (profile && !initialLoaded) {
       setTutorInitials(profile.tutorInitials)
       setUiLanguage(profile.uiLanguage)
+      setInitialLoaded(true)
     }
-  }, [profile])
+  }, [profile, initialLoaded])
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,11 +47,20 @@ export default function SettingsPage() {
 
     try {
       // Preserve enabledQuestionTypes when saving other settings
-      const result = await upsertProfile({
+      // Build args explicitly — Convex needs optional fields omitted, not undefined
+      const saveArgs: {
+        tutorInitials: string
+        uiLanguage: "sv" | "en"
+        enabledQuestionTypes?: string[]
+      } = {
         tutorInitials: tutorInitials.trim(),
         uiLanguage,
-        enabledQuestionTypes: profile?.enabledQuestionTypes ?? undefined,
-      })
+      }
+      // Only include enabledQuestionTypes if profile actually has them set
+      if (profile?.enabledQuestionTypes && profile.enabledQuestionTypes.length > 0) {
+        saveArgs.enabledQuestionTypes = profile.enabledQuestionTypes as string[]
+      }
+      const result = await upsertProfile(saveArgs)
 
       toast.success(t("settingsSaved"), {
         description: result?.action === "created"
@@ -59,11 +71,11 @@ export default function SettingsPage() {
       console.error("Failed to save settings:", error)
       const errorMsg = error instanceof Error ? error.message : String(error)
       // Show specific message for auth errors
-      const isAuthError = errorMsg.includes("Not authenticated") || errorMsg.includes("auth")
+      const isAuthError = errorMsg.includes("Not authenticated") || errorMsg.includes("auth") || errorMsg.includes("Unauthorized")
       toast.error(t("settingsSaveFailed"), {
         description: isAuthError
           ? (language === "sv" ? "Logga ut och logga in igen för att lösa detta." : "Sign out and sign in again to fix this.")
-          : t("settingsSaveFailedDesc"),
+          : (language === "sv" ? `Fel: ${errorMsg}` : `Error: ${errorMsg}`),
       })
     } finally {
       setIsSaving(false)
