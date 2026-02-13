@@ -297,6 +297,7 @@ function buildEssayQuestionData(question: Question, score: number) {
     max_length: 10000,
     validation: {
       max_score: score,
+      automarkable: false,
     },
     formatting_options: [
       "bold", "italic", "underline", "|",
@@ -387,6 +388,7 @@ function buildShortAnswerData(question: Question, score: number) {
     max_length: 200,
     validation: {
       max_score: score,
+      automarkable: false,
     },
     formatting_options: ["bold", "unorderedList", "orderedList"],
     character_map: true,
@@ -456,12 +458,12 @@ function buildAssociationData(question: Question, score: number) {
     const responses = question.options.map(opt => opt.value)
     data.possible_responses = responses
     if (question.correctAnswer) {
-      const perItemScore = question.correctAnswer.length > 0
-        ? score / question.correctAnswer.length : 0
+      // For partialMatch scoring, Learnosity expects the TOTAL score —
+      // it automatically divides by the number of responses internally
       data.validation = {
         scoring_type: "partialMatch",
         valid_response: {
-          score: Math.round(perItemScore * 100) / 100,
+          score: score,
           value: question.correctAnswer, // Ordered array matching stimulus_list
         },
       }
@@ -617,7 +619,7 @@ function buildPlainTextData(question: Question, score: number) {
     show_word_count: true,
     score,
     minScore: 0,
-    validation: { max_score: score },
+    validation: { max_score: score, automarkable: false },
   }
   if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
   return data
@@ -634,7 +636,7 @@ function buildFormulaEssayData(question: Question, score: number) {
     is_math: true,
     score,
     minScore: 0,
-    validation: { max_score: score },
+    validation: { max_score: score, automarkable: false },
   }
   if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
   return data
@@ -651,7 +653,7 @@ function buildChemistryEssayData(question: Question, score: number) {
     is_chemistry: true,
     score,
     minScore: 0,
-    validation: { max_score: score },
+    validation: { max_score: score, automarkable: false },
   }
   if (question.instructorStimulus) data.instructor_stimulus = question.instructorStimulus
   return data
