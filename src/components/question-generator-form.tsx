@@ -748,9 +748,9 @@ export function QuestionGeneratorForm() {
           </div>
 
           {/* Difficulty, Number of Questions, Language — horizontal row */}
-          <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+          <div className="flex flex-col sm:grid sm:grid-cols-3 gap-4 sm:gap-6">
             {/* Difficulty */}
-            <div className="space-y-2 flex-1">
+            <div className="space-y-2">
               <Label htmlFor="difficulty">{t("difficulty")}</Label>
               <Select
                 value={formData.difficulty}
@@ -791,7 +791,7 @@ export function QuestionGeneratorForm() {
             </div>
 
             {/* Number of Questions */}
-            <div className="space-y-2 w-24 sm:w-20">
+            <div className="space-y-2">
               <Label htmlFor="numQuestions">{t("numQuestions")}</Label>
               <Input
                 id="numQuestions"
@@ -810,7 +810,7 @@ export function QuestionGeneratorForm() {
             </div>
 
             {/* Language */}
-            <div className="space-y-2 flex-1 sm:ml-4">
+            <div className="space-y-2">
               <Label htmlFor="language">{t("language")}</Label>
               <Select
                 value={formData.language}
