@@ -747,65 +747,87 @@ export function QuestionGeneratorForm() {
             />
           </div>
 
-          {/* Difficulty */}
-          <div className="space-y-2">
-            <Label htmlFor="difficulty">{t("difficulty")}</Label>
-            <Select
-              value={formData.difficulty}
-              onValueChange={(value: Difficulty) =>
-                setFormData({ ...formData, difficulty: value })
-              }
-            >
-              <SelectTrigger id="difficulty">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="easy">
-                  <span className="flex items-center justify-between w-full gap-4">
-                    <span>{t("easy")}</span>
-                    <span className="text-xs text-muted-foreground">1 poäng</span>
-                  </span>
-                </SelectItem>
-                <SelectItem value="medium">
-                  <span className="flex items-center justify-between w-full gap-4">
-                    <span>{t("medium")}</span>
-                    <span className="text-xs text-muted-foreground">2 {t("points").toLowerCase()}</span>
-                  </span>
-                </SelectItem>
-                <SelectItem value="hard">
-                  <span className="flex items-center justify-between w-full gap-4">
-                    <span>{t("hard")}</span>
-                    <span className="text-xs text-muted-foreground">3 {t("points").toLowerCase()}</span>
-                  </span>
-                </SelectItem>
-                <SelectItem value="mixed">
-                  <span className="flex items-center justify-between w-full gap-4">
-                    <span>{t("mixed")}</span>
-                    <span className="text-xs text-muted-foreground">1-3 {t("points").toLowerCase()}</span>
-                  </span>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Difficulty, Number of Questions, Language — horizontal row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Difficulty */}
+            <div className="space-y-2">
+              <Label htmlFor="difficulty">{t("difficulty")}</Label>
+              <Select
+                value={formData.difficulty}
+                onValueChange={(value: Difficulty) =>
+                  setFormData({ ...formData, difficulty: value })
+                }
+              >
+                <SelectTrigger id="difficulty">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">
+                    <span className="flex items-center justify-between w-full gap-4">
+                      <span>{t("easy")}</span>
+                      <span className="text-xs text-muted-foreground">1 poäng</span>
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="medium">
+                    <span className="flex items-center justify-between w-full gap-4">
+                      <span>{t("medium")}</span>
+                      <span className="text-xs text-muted-foreground">2 {t("points").toLowerCase()}</span>
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="hard">
+                    <span className="flex items-center justify-between w-full gap-4">
+                      <span>{t("hard")}</span>
+                      <span className="text-xs text-muted-foreground">3 {t("points").toLowerCase()}</span>
+                    </span>
+                  </SelectItem>
+                  <SelectItem value="mixed">
+                    <span className="flex items-center justify-between w-full gap-4">
+                      <span>{t("mixed")}</span>
+                      <span className="text-xs text-muted-foreground">1-3 {t("points").toLowerCase()}</span>
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Number of Questions */}
-          <div className="space-y-2">
-            <Label htmlFor="numQuestions">{t("numQuestions")}</Label>
-            <Input
-              id="numQuestions"
-              name="numQuestions"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              max={20}
-              value={formData.numQuestions}
-              onChange={(e) =>
-                setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
-              }
-              autoComplete="off"
-            />
-            <p className="text-sm text-muted-foreground">{t("numQuestionsHelp")}</p>
+            {/* Number of Questions */}
+            <div className="space-y-2">
+              <Label htmlFor="numQuestions">{t("numQuestions")}</Label>
+              <Input
+                id="numQuestions"
+                name="numQuestions"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                max={20}
+                value={formData.numQuestions}
+                onChange={(e) =>
+                  setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
+                }
+                autoComplete="off"
+              />
+            </div>
+
+            {/* Language */}
+            <div className="space-y-2">
+              <Label htmlFor="language">{t("language")}</Label>
+              <Select
+                value={formData.language}
+                onValueChange={(value: Language) =>
+                  setFormData({ ...formData, language: value })
+                }
+              >
+                <SelectTrigger id="language">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="sv">{t("swedish")}</SelectItem>
+                  <SelectItem value="en">{t("english")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+          <p className="text-sm text-muted-foreground -mt-2">{t("numQuestionsHelp")}</p>
 
           {/* Question Types — dynamically rendered from registry, filtered by profile */}
           <QuestionTypeSelector
@@ -817,25 +839,6 @@ export function QuestionGeneratorForm() {
             onToggleShowMore={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}
             t={t}
           />
-
-          {/* Language */}
-          <div className="space-y-2">
-            <Label htmlFor="language">{t("language")}</Label>
-            <Select
-              value={formData.language}
-              onValueChange={(value: Language) =>
-                setFormData({ ...formData, language: value })
-              }
-            >
-              <SelectTrigger id="language">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="sv">{t("swedish")}</SelectItem>
-                <SelectItem value="en">{t("english")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           {/* Content Upload Section */}
           <div className="space-y-3">
