@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <!-- TentaGen Apple Touch Icon -->
+  <rect width="180" height="180" rx="36" fill="#0d9488" />
+  <!-- Main T? letterform -->
+  <g stroke="white" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" transform="translate(40, 10)">
+    <!-- Top horizontal bar of T -->
+    <line x1="18" y1="25" x2="82" y2="25" />
+    <!-- Vertical stem of T going into question mark curve -->
+    <line x1="50" y1="25" x2="50" y2="70" />
+    <!-- Question mark curve -->
+    <path d="M 50 70 Q 72 76 72 90 Q 72 106 50 110" fill="none" />
+    <!-- Question mark dot -->
+    <circle cx="50" cy="126" r="7" fill="white" stroke="none" />
+  </g>
+  <!-- AI sparkle -->
+  <g fill="white" opacity="0.85" transform="translate(20, 8) scale(1.6)">
+    <path d="M 78 8 L 80 14 L 86 16 L 80 18 L 78 24 L 76 18 L 70 16 L 76 14 Z" />
+  </g>
+</svg>
