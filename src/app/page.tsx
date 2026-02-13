@@ -7,7 +7,7 @@ import { FeedbackButton } from "@/components/feedback-button"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import Image from "next/image"
-import { BookOpen } from "lucide-react"
+import { BookOpen, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
@@ -35,30 +35,24 @@ export default function Home() {
                 />
                 <span className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">TentaGen</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent text-balance">
                 {t("createQuestionsTitle")}
-              </h2>
+              </h1>
               <p className="mt-3 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                 {t("createQuestionsSubtitle")}
               </p>
               {/* Hero Benefits */}
               <div className="mt-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="h-5 w-5 text-primary" />
                   <span>{t("heroSaveTime")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="h-5 w-5 text-primary" />
                   <span>{t("heroReviewEdit")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="h-5 w-5 text-primary" />
                   <span>{t("heroMultipleFormats")}</span>
                 </div>
               </div>
@@ -94,37 +88,31 @@ export default function Home() {
               />
               <span className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">TentaGen</span>
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-tight pb-2 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent text-balance">
               {t("welcomeTitle")}
-            </h2>
+            </h1>
             <p className="max-w-md text-lg sm:text-xl text-muted-foreground leading-relaxed">
               {t("welcomeSubtitle")}
             </p>
             {/* Hero Benefits */}
             <div className="mt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="h-5 w-5 text-primary" />
                 <span>{t("heroSaveTime")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="h-5 w-5 text-primary" />
                 <span>{t("heroReviewEdit")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="h-5 w-5 text-primary" />
                 <span>{t("heroMultipleFormats")}</span>
               </div>
             </div>
             <SignInButton mode="modal">
-              <button className="mt-4 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90">
+              <Button size="lg" className="mt-4 text-base px-6">
                 {t("signInToContinue")}
-              </button>
+              </Button>
             </SignInButton>
           </div>
         </SignedOut>
