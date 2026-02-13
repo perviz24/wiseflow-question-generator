@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation"
 import { useTranslation } from "@/lib/language-context"
 
 export default function SettingsPage() {
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   const router = useRouter()
   // Settings page for tutor profile configuration
   const profile = useQuery(api.profiles.getUserProfile)
@@ -43,20 +43,27 @@ export default function SettingsPage() {
     setIsSaving(true)
 
     try {
+      // Preserve enabledQuestionTypes when saving other settings
       const result = await upsertProfile({
         tutorInitials: tutorInitials.trim(),
         uiLanguage,
+        enabledQuestionTypes: profile?.enabledQuestionTypes ?? undefined,
       })
 
       toast.success(t("settingsSaved"), {
-        description: result.action === "created"
+        description: result?.action === "created"
           ? t("settingsSavedDescCreated")
           : t("settingsSavedDescUpdated"),
       })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to save settings:", error)
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      // Show specific message for auth errors
+      const isAuthError = errorMsg.includes("Not authenticated") || errorMsg.includes("auth")
       toast.error(t("settingsSaveFailed"), {
-        description: t("settingsSaveFailedDesc"),
+        description: isAuthError
+          ? (language === "sv" ? "Logga ut och logga in igen för att lösa detta." : "Sign out and sign in again to fix this.")
+          : t("settingsSaveFailedDesc"),
       })
     } finally {
       setIsSaving(false)
