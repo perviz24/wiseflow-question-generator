@@ -6,7 +6,7 @@ export default defineSchema({
     // Basic metadata
     title: v.string(),
     subject: v.string(),
-    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
+    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard"), v.literal("mixed")),
     language: v.union(v.literal("sv"), v.literal("en")),
     tags: v.array(v.string()),
 

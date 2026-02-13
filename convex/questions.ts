@@ -8,7 +8,7 @@ export const saveQuestions = mutation({
       v.object({
         title: v.string(),
         subject: v.string(),
-        difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
+        difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard"), v.literal("mixed")),
         language: v.union(v.literal("sv"), v.literal("en")),
         tags: v.array(v.string()),
         type: v.union(
@@ -160,7 +160,7 @@ export const updateQuestion = mutation({
 export const updateDifficulty = mutation({
   args: {
     questionId: v.id("questions"),
-    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard")),
+    difficulty: v.union(v.literal("easy"), v.literal("medium"), v.literal("hard"), v.literal("mixed")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity()

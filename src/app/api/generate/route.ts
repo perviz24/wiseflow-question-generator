@@ -139,6 +139,7 @@ export async function POST(req: NextRequest) {
       easy: "easy (suitable for beginners)",
       medium: "medium (suitable for intermediate learners)",
       hard: "hard (suitable for advanced learners)",
+      mixed: "mixed difficulty — generate a balanced mix of easy, medium, and hard questions (roughly equal distribution)",
     }
 
     const questionTypeInstructions: Record<string, string> = {

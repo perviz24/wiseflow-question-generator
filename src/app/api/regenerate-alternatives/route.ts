@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
       easy: "easy (suitable for beginners)",
       medium: "medium (suitable for intermediate learners)",
       hard: "hard (suitable for advanced learners)",
+      mixed: "mixed difficulty (vary between easy, medium, and hard)",
     }
 
     const optionCount = questionType === "true_false" ? 2 : 4

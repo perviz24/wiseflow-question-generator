@@ -37,6 +37,7 @@ export interface Translations {
   easy: string
   medium: string
   hard: string
+  mixed: string
   numQuestions: string
   numQuestionsHelp: string
   questionTypes: string
@@ -335,6 +336,7 @@ export const translations: Record<Language, Translations> = {
     easy: "Lätt",
     medium: "Medel",
     hard: "Svår",
+    mixed: "Blandat",
     numQuestions: "Antal frågor",
     numQuestionsHelp: "Välj mellan 1 och 20 frågor",
     questionTypes: "Frågetyper",
@@ -631,6 +633,7 @@ export const translations: Record<Language, Translations> = {
     easy: "Easy",
     medium: "Medium",
     hard: "Hard",
+    mixed: "Mixed",
     numQuestions: "Number of Questions",
     numQuestionsHelp: "Choose between 1 and 20 questions",
     questionTypes: "Question Types",

@@ -76,7 +76,7 @@ function generateQuestionTitle(stimulus: string, type: string): string {
 }
 
 // Calculate default score based on difficulty
-function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
+function getDefaultScore(difficulty: "easy" | "medium" | "hard" | "mixed"): number {
   switch (difficulty) {
     case "easy":
       return 1
@@ -84,6 +84,8 @@ function getDefaultScore(difficulty: "easy" | "medium" | "hard"): number {
       return 2
     case "hard":
       return 3
+    case "mixed":
+      return 2 // Default middle score for mixed
     default:
       return 1
   }
@@ -147,7 +149,7 @@ const TYPE_TRANSLATION_KEY: Record<string, string> = {
 }
 
 type QuestionType = string // Question type ID from question-types.ts registry
-type Difficulty = "easy" | "medium" | "hard"
+type Difficulty = "easy" | "medium" | "hard" | "mixed"
 type Language = "sv" | "en"
 type ExportFormat = "legacy" | "utgaende" | "qti21"
 
@@ -460,7 +462,7 @@ export function QuestionGeneratorForm() {
 
       // Translate difficulty to display name (single language, not raw "hard"/"easy")
       const difficultyMap: Record<string, [string, string]> = {
-        easy: ["Easy", "Lätt"], medium: ["Medium", "Medel"], hard: ["Hard", "Svår"],
+        easy: ["Easy", "Lätt"], medium: ["Medium", "Medel"], hard: ["Hard", "Svår"], mixed: ["Mixed", "Blandat"],
       }
       const diffEntry = difficultyMap[metadata.difficulty]
       const difficultyTag = diffEntry ? (isSv ? diffEntry[1] : diffEntry[0]) : metadata.difficulty
@@ -502,7 +504,7 @@ export function QuestionGeneratorForm() {
         return {
           title: generateQuestionTitle(q.stimulus, q.type),
           subject: metadata.subject,
-          difficulty: metadata.difficulty as "easy" | "medium" | "hard",
+          difficulty: metadata.difficulty as "easy" | "medium" | "hard" | "mixed",
           language: metadata.language as "sv" | "en",
           tags: allTags,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -515,9 +517,9 @@ export function QuestionGeneratorForm() {
           formattingOptions: q.type === "longtextV2" ? ["bold", "italic", "underline"] : undefined,
           instructorStimulus: q.instructorStimulus,
           submitOverLimit: false,
-          score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
+          score: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard" | "mixed"),
           minScore: 0,
-          maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard"),
+          maxScore: getDefaultScore(metadata.difficulty as "easy" | "medium" | "hard" | "mixed"),
           tutorInitials: userProfile?.tutorInitials || "N/A",
           generatedBy: "ai" as const,
         }
@@ -715,6 +717,12 @@ export function QuestionGeneratorForm() {
                   <span className="flex items-center justify-between w-full gap-4">
                     <span>{t("hard")}</span>
                     <span className="text-xs text-muted-foreground">3 {t("points").toLowerCase()}</span>
+                  </span>
+                </SelectItem>
+                <SelectItem value="mixed">
+                  <span className="flex items-center justify-between w-full gap-4">
+                    <span>{t("mixed")}</span>
+                    <span className="text-xs text-muted-foreground">1-3 {t("points").toLowerCase()}</span>
                   </span>
                 </SelectItem>
               </SelectContent>

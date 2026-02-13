@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     let prompt = `You are a pedagogical expert creating exam questions for ${subject}, specifically about ${topic}.
 
-Generate exactly ${count} ${difficulty} difficulty question(s) in ${languageText}.
+Generate exactly ${count} ${difficulty === "mixed" ? "mixed difficulty (balanced mix of easy, medium, and hard)" : difficulty + " difficulty"} question(s) in ${languageText}.
 
 CRITICAL: User specifically selected these question types: ${questionTypesText}
 - You MUST generate ONLY the question types listed above

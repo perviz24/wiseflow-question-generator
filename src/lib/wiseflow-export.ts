@@ -158,6 +158,7 @@ function getDifficultyTag(difficulty: string, isSv: boolean): string {
     easy: ["Easy", "Lätt"],
     medium: ["Medium", "Medel"],
     hard: ["Hard", "Svår"],
+    mixed: ["Mixed", "Blandat"],
   }
   const entry = diffMap[difficulty]
   return entry ? (isSv ? entry[1] : entry[0]) : difficulty
@@ -172,6 +173,7 @@ function getScore(question: Question, metadata: ExportMetadata): number {
     case "easy": return 1
     case "medium": return 2
     case "hard": return 3
+    case "mixed": return 2
     default: return 1
   }
 }
