@@ -336,7 +336,10 @@ export default function LibraryPage() {
           ...metadata,
           exportFormat: format === "legacy" ? "legacy" : "utgaende"
         })
-        const filename = `library-export-${format}-${Date.now()}.json`
+        // Map internal format codes to descriptive filename labels
+        // "legacy" = new Learnosity format, "utg" = old utgående format
+        const formatLabel = format === "legacy" ? "ny_json" : "utgaende_json"
+        const filename = `library-export-${formatLabel}-${Date.now()}.json`
         const blob = new Blob([jsonContent], { type: "application/json" })
         downloadBlob(blob, filename)
         toast.success("Export lyckades!", {
@@ -569,14 +572,17 @@ export default function LibraryPage() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                      {/* Search filter */}
+                    <div className="space-y-3">
+                      {/* Search filter — full width */}
                       <Input
                         placeholder="Search questions..."
                         value={filterSearch}
                         onChange={(e) => setFilterSearch(e.target.value)}
                         className="text-sm"
                       />
+
+                      {/* Filter dropdowns row */}
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
 
                       {/* Tag filter */}
                       <Select value={filterTag || "all"} onValueChange={(value) => setFilterTag(value === "all" ? "" : value)}>
@@ -631,6 +637,7 @@ export default function LibraryPage() {
                           <SelectItem value="oldest">{t("sortOldest")}</SelectItem>
                         </SelectContent>
                       </Select>
+                      </div>
                     </div>
 
                     {/* Results count */}
