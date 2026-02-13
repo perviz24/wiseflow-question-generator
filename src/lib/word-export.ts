@@ -149,7 +149,8 @@ function buildQuestionParagraphs(
     )
 
     q.options.forEach((opt) => {
-      const isCorrect = q.correctAnswer?.includes(opt.value)
+      // correctAnswer stores labels (e.g. "A", "B"), not option text
+      const isCorrect = q.correctAnswer?.includes(opt.label)
       paragraphs.push(
         new Paragraph({
           spacing: { after: 20 },
@@ -421,6 +422,19 @@ export async function exportToWord(
                 italics: true,
                 color: "999999",
                 size: 18,
+              }),
+            ],
+          }),
+          // TentaGen branding
+          new Paragraph({
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 200 },
+            children: [
+              new TextRun({
+                text: `${isSv ? "Exporterad från" : "Exported from"} TentaGen — tentagen.vercel.app`,
+                italics: true,
+                color: "AAAAAA",
+                size: 16,
               }),
             ],
           }),
