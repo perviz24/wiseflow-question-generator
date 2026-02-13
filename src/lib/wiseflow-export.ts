@@ -156,7 +156,7 @@ function getQuestionTypeTag(type: string, isSv: boolean): string {
 function getDifficultyTag(difficulty: string, isSv: boolean): string {
   const diffMap: Record<string, [string, string]> = {
     easy: ["Easy", "Lätt"],
-    medium: ["Medium", "Medium"],
+    medium: ["Medium", "Medel"],
     hard: ["Hard", "Svår"],
   }
   const entry = diffMap[difficulty]

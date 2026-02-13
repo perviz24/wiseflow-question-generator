@@ -266,7 +266,7 @@ export default function DocsPage() {
                         <span>
                           <strong>{isSv ? "Svårighetsgrad" : "Difficulty"}:</strong>{" "}
                           {isSv
-                            ? "Lätt (1 poäng), Medium (2 poäng), eller Svår (3 poäng)"
+                            ? "Lätt (1 poäng), Medel (2 poäng), eller Svår (3 poäng)"
                             : "Easy (1 point), Medium (2 points), or Hard (3 points)"}
                         </span>
                       </li>
@@ -407,7 +407,7 @@ export default function DocsPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge>Svårighetsgrad</Badge>
-                        <span className="text-muted-foreground">{isSv ? "T.ex. Medium" : "E.g., Medium"}</span>
+                        <span className="text-muted-foreground">{isSv ? "T.ex. Medel" : "E.g., Medium"}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge>Språk</Badge>

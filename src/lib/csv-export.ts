@@ -55,7 +55,7 @@ function getTypeDisplayName(type: string, lang: string): string {
 function getDifficultyDisplayName(diff: string, lang: string): string {
   const names: Record<string, [string, string]> = {
     easy: ["Lätt", "Easy"],
-    medium: ["Medium", "Medium"],
+    medium: ["Medel", "Medium"],
     hard: ["Svår", "Hard"],
   }
   const entry = names[diff]

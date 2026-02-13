@@ -460,7 +460,7 @@ export function QuestionGeneratorForm() {
 
       // Translate difficulty to display name (single language, not raw "hard"/"easy")
       const difficultyMap: Record<string, [string, string]> = {
-        easy: ["Easy", "Lätt"], medium: ["Medium", "Medium"], hard: ["Hard", "Svår"],
+        easy: ["Easy", "Lätt"], medium: ["Medium", "Medel"], hard: ["Hard", "Svår"],
       }
       const diffEntry = difficultyMap[metadata.difficulty]
       const difficultyTag = diffEntry ? (isSv ? diffEntry[1] : diffEntry[0]) : metadata.difficulty

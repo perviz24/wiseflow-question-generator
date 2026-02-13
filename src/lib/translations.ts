@@ -333,7 +333,7 @@ export const translations: Record<Language, Translations> = {
     topicPlaceholder: "t.ex. Celldelning, Algebra, Andra världskriget",
     difficulty: "Svårighetsgrad",
     easy: "Lätt",
-    medium: "Medium",
+    medium: "Medel",
     hard: "Svår",
     numQuestions: "Antal frågor",
     numQuestionsHelp: "Välj mellan 1 och 20 frågor",
