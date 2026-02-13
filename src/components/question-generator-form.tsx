@@ -704,7 +704,7 @@ export function QuestionGeneratorForm() {
       <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-border hover:shadow-xl transition-shadow duration-300">
         <CardHeader className="px-4 sm:px-6">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight">
-            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0 drop-shadow-sm" />
+            <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-warm flex-shrink-0 drop-shadow-sm" />
             <span className="truncate bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t("generateQuestions")}</span>
           </CardTitle>
           <div className="mt-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 p-3">

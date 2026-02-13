@@ -11,7 +11,7 @@ export function AppFooter() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col items-center gap-4 text-base">
           {/* Beta badge — centered */}
-          <Badge variant="secondary" className="text-sm px-3 py-1">
+          <Badge variant="secondary" className="text-sm px-3 py-1 bg-warm-muted/60 dark:bg-warm/15 text-warm-foreground dark:text-warm border border-warm/20">
             🚧 {t("footerBeta")}
           </Badge>
 

@@ -198,7 +198,7 @@ export default function QuestionTypeSettings() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-3">
-          <ListChecks className="h-6 w-6 text-primary" />
+          <ListChecks className="h-6 w-6 text-warm" />
           {t("questionTypesTitle")}
         </CardTitle>
         <CardDescription>

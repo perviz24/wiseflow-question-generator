@@ -48,7 +48,7 @@ export default function Home() {
                   <span>{t("heroSaveTime")}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="h-5 w-5 text-primary" />
+                  <Check className="h-5 w-5 text-warm" />
                   <span>{t("heroReviewEdit")}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-muted-foreground"
+                    className="text-warm-foreground dark:text-warm border-warm/30 hover:bg-warm-muted/40 dark:hover:bg-warm/10"
                   >
                     <BookOpen className="mr-1.5 h-3.5 w-3.5" />
                     {t("instructionManual")}
@@ -101,7 +101,7 @@ export default function Home() {
                 <span>{t("heroSaveTime")}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Check className="h-5 w-5 text-primary" />
+                <Check className="h-5 w-5 text-warm" />
                 <span>{t("heroReviewEdit")}</span>
               </div>
               <div className="flex items-center gap-2">

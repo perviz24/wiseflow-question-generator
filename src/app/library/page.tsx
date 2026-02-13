@@ -846,7 +846,7 @@ export default function LibraryPage() {
                                 ) : (
                                   <Badge
                                     variant="outline"
-                                    className="cursor-pointer hover:opacity-80 bg-primary/10 dark:bg-primary/20"
+                                    className="cursor-pointer hover:opacity-80 bg-warm-muted/50 dark:bg-warm/15 text-warm-foreground dark:text-warm border-warm/30"
                                     onClick={() => {
                                       setEditingPointsId(question._id)
                                       setPointsInput(String(question.score))
@@ -894,7 +894,7 @@ export default function LibraryPage() {
                                   question.tutorInitials && (
                                     <Badge
                                       variant="outline"
-                                      className="bg-primary/10 dark:bg-primary/20 cursor-pointer hover:bg-primary/20 dark:hover:bg-primary/30"
+                                      className="bg-warm-muted/50 dark:bg-warm/15 text-warm-foreground dark:text-warm border-warm/30 cursor-pointer hover:bg-warm-muted/70 dark:hover:bg-warm/25"
                                       onClick={() => {
                                         setEditingInitialsId(question._id)
                                         setInitialsInput(question.tutorInitials || "")
