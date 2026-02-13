@@ -112,7 +112,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw, Shuffle } from "lucide-react"
+import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw, Shuffle, Settings } from "lucide-react"
 import { QuestionPreview } from "./question-preview"
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
@@ -246,27 +246,13 @@ function QuestionTypeSelector({
     )
   }
 
+  // Calculate how many types exist but are NOT enabled (available in Settings)
+  const totalTypesInRegistry = Object.keys(QUESTION_TYPES).length
+  const inactiveCount = totalTypesInRegistry - enabledTypes.length
+
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-1.5">
-        <Label>{t("questionTypes")} *</Label>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button type="button" className="inline-flex text-muted-foreground hover:text-foreground transition-colors">
-              <Info className="h-3.5 w-3.5" />
-              <span className="sr-only">Question types information</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent className="max-w-xs">
-            <p className="text-sm">
-              {t("questionTypesHelp") || "Select one or more question types to generate. You can mix different types in the same set."}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              💡 {t("questionTypesSettingsHint")}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </div>
+      <Label>{t("questionTypes")} *</Label>
       <div className="space-y-3">
         {/* Primary types — always visible, with Mixed as first option */}
         <div className="flex flex-wrap gap-2" role="group" aria-label="Question type selection">
@@ -300,26 +286,37 @@ function QuestionTypeSelector({
           </div>
         )}
 
-        {/* Toggle button */}
-        {secondaryTypes.length > 0 && (
-          <button
-            type="button"
-            onClick={onToggleShowMore}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {showMore ? (
-              <>
-                <ChevronUp className="h-3.5 w-3.5" />
-                {t("showLessTypes")}
-              </>
-            ) : (
-              <>
-                <ChevronDown className="h-3.5 w-3.5" />
-                {t("showMoreTypes")} (+{secondaryTypes.length})
-              </>
-            )}
-          </button>
-        )}
+        {/* Toggle for secondary enabled types + info about inactive types */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          {secondaryTypes.length > 0 && (
+            <button
+              type="button"
+              onClick={onToggleShowMore}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {showMore ? (
+                <>
+                  <ChevronUp className="h-3.5 w-3.5" />
+                  {t("showLessTypes")}
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-3.5 w-3.5" />
+                  {t("showMoreTypes")} (+{secondaryTypes.length})
+                </>
+              )}
+            </button>
+          )}
+          {inactiveCount > 0 && (
+            <a
+              href="/settings"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Settings className="h-3.5 w-3.5" />
+              {t("moreTypesInSettings", { count: inactiveCount })}
+            </a>
+          )}
+        </div>
       </div>
       {selectedTypes.length === 0 && (
         <p className="text-sm text-muted-foreground">
@@ -801,9 +798,10 @@ export function QuestionGeneratorForm() {
                 min={1}
                 max={20}
                 value={formData.numQuestions}
-                onChange={(e) =>
-                  setFormData({ ...formData, numQuestions: parseInt(e.target.value) || 1 })
-                }
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1
+                  setFormData({ ...formData, numQuestions: Math.min(20, Math.max(1, val)) })
+                }}
                 autoComplete="off"
                 className="text-center"
               />
@@ -938,7 +936,7 @@ export function QuestionGeneratorForm() {
 
 
           {/* Tagging Section */}
-          <div className="space-y-4 rounded-lg border-2 border-border bg-muted/50 p-4 shadow-sm">
+          <div className="space-y-4 rounded-lg border border-purple-400/25 bg-purple-500/5 p-4 shadow-sm">
             <div>
               <div className="flex items-center gap-1.5">
                 <h3 className="text-sm font-semibold text-foreground">{t("tagsOrganization")}</h3>

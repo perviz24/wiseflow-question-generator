@@ -361,18 +361,16 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
     }
   }
 
-  // Check if URL is from a platform that doesn't support direct audio/video links
-  const isWebPageVideoUrl = (url: string): boolean => {
+  // Check if URL points to a direct audio/video file (not a web page)
+  const isDirectMediaUrl = (url: string): boolean => {
     try {
       const parsed = new URL(url)
-      return (
-        parsed.hostname.includes("vimeo.com") ||
-        parsed.hostname.includes("dailymotion.com") ||
-        parsed.hostname.includes("twitch.tv") ||
-        parsed.hostname.includes("facebook.com") ||
-        parsed.hostname.includes("instagram.com") ||
-        parsed.hostname.includes("tiktok.com")
-      )
+      const path = parsed.pathname.toLowerCase()
+      const mediaExtensions = [
+        ".mp3", ".mp4", ".wav", ".m4a", ".webm", ".ogg", ".flac", ".aac",
+        ".wma", ".avi", ".mov", ".mkv", ".opus", ".m4v", ".3gp",
+      ]
+      return mediaExtensions.some((ext) => path.endsWith(ext))
     } catch {
       return false
     }
@@ -423,10 +421,10 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
         })
       } else {
         // Non-YouTube video URLs → AssemblyAI (can fetch direct audio/video URLs)
-        // Block web-page-only platforms (Vimeo, TikTok, etc.) — AssemblyAI gets HTML, not audio
-        if (isWebPageVideoUrl(url)) {
-          toast.error("Denna plattform stöds inte för direktlänkar", {
-            description: "Vimeo, TikTok, Instagram m.fl. kräver att du laddar ner videon först. Ladda sedan upp filen direkt via filuppladdningen ovan.",
+        // Only allow direct media file URLs (e.g. .mp4, .mp3) — web pages return HTML, not audio
+        if (!isDirectMediaUrl(url)) {
+          toast.error("Ingen direktlänk till video/ljud", {
+            description: "URL:en måste peka direkt på en video- eller ljudfil (t.ex. .mp4, .mp3). Webbsidor som Vimeo, Streamfabriken m.fl. fungerar inte. Ladda istället ner videon och använd filuppladdningen ovan.",
             duration: 8000,
           })
           setIsProcessing(false)
@@ -479,7 +477,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
       <CardContent className="pt-6">
         <div className="space-y-4">
           {/* File Upload Section */}
-          <div className="space-y-3 rounded-lg border border-blue-500/20 bg-blue-500/5 p-4">
+          <div className="space-y-3 rounded-lg border border-blue-500/25 bg-blue-500/10 p-4">
             <div className="flex items-center gap-2">
               <Upload className="h-5 w-5 text-blue-500" />
               <Label className="text-base font-semibold">
@@ -545,7 +543,7 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           </div>
 
           {/* URL Inputs Section */}
-          <div className="space-y-3 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="space-y-3 rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-4">
             <div className="flex items-center gap-2">
               <Globe className="h-5 w-5 text-emerald-500" />
               <Label className="text-base font-semibold">
@@ -620,9 +618,9 @@ export function ContentUpload({ onContentExtracted, onFileUploaded, onContentRem
           </div>
 
           {/* Video Section */}
-          <div className="space-y-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <div className="space-y-4 rounded-lg border border-violet-500/25 bg-violet-500/10 p-4">
             <div className="flex items-center gap-2">
-              <Video className="h-5 w-5 text-primary" />
+              <Video className="h-5 w-5 text-violet-500" />
               <Label className="text-base font-semibold">
                 {t("videoSectionTitle")}
               </Label>

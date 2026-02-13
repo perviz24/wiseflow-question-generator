@@ -142,6 +142,7 @@ export interface Translations {
   mixedQuestionTypesHelp: string
   showMoreTypes: string
   showLessTypes: string
+  moreTypesInSettings: string
   questionNumber: string
   questionsAbout: string
   questionSingular: string
@@ -405,8 +406,8 @@ export const translations: Record<Language, Translations> = {
     contextGuidanceTip: '💡 <strong>Tips:</strong> Du kan vägleda AI här! Exempel: "Generera 5 frågor från filen och 5 från URL:en" eller "Fokusera främst på det uppladdade dokumentet"',
     videoSectionTitle: "🎬 Förvandla inspelad videoföreläsning till tentafrågor",
     uploadVideoFile: "Ladda upp videofil",
-    videoUrlLabel: "Eller klistra in en video-URL",
-    videoUrlPlaceholder: "https://example.com/video...",
+    videoUrlLabel: "Eller klistra in en YouTube- eller direktlänk",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=... eller .mp4-länk",
     videoSupportNote: "AI transkriberar och analyserar hela videon — vanligtvis klart inom 3–5 min för en 30 min föreläsning.",
 
     // Tagging Section
@@ -465,6 +466,7 @@ export const translations: Record<Language, Translations> = {
     mixedQuestionTypesHelp: "Väljer alla aktiverade frågetyper och fördelar frågorna jämnt",
     showMoreTypes: "Fler frågetyper",
     showLessTypes: "Färre frågetyper",
+    moreTypesInSettings: "Gå till Inställningar för att aktivera ytterligare {count} frågetyper",
     questionNumber: "Fråga {n}",
     questionsAbout: "{count} {unit} om",
     questionSingular: "fråga",
@@ -725,8 +727,8 @@ export const translations: Record<Language, Translations> = {
     contextGuidanceTip: '💡 <strong>Tip:</strong> You can guide AI here! Example: "Generate 5 questions from the file and 5 from the URL" or "Focus primarily on the uploaded document"',
     videoSectionTitle: "🎬 Turn recorded video lectures into exam questions",
     uploadVideoFile: "Upload video file",
-    videoUrlLabel: "Or paste a video URL",
-    videoUrlPlaceholder: "https://example.com/video...",
+    videoUrlLabel: "Or paste a YouTube or direct link",
+    videoUrlPlaceholder: "https://youtube.com/watch?v=... or .mp4 link",
     videoSupportNote: "AI transcribes and analyzes the full video — typically done in 3–5 min for a 30 min lecture.",
 
     // Tagging Section
@@ -785,6 +787,7 @@ export const translations: Record<Language, Translations> = {
     mixedQuestionTypesHelp: "Selects all enabled question types and distributes questions evenly",
     showMoreTypes: "More Question Types",
     showLessTypes: "Less Question Types",
+    moreTypesInSettings: "Go to Settings to activate {count} more question types",
     questionNumber: "Question {n}",
     questionsAbout: "{count} {unit} about",
     questionSingular: "question",

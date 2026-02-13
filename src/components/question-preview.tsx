@@ -1593,7 +1593,10 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                 min="1"
                 max="20"
                 value={additionalCount}
-                onChange={(e) => setAdditionalCount(parseInt(e.target.value) || 1)}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1
+                  setAdditionalCount(Math.min(20, Math.max(1, val)))
+                }}
                 className="w-full"
               />
               <p className="text-xs text-muted-foreground">{t("chooseBetween")}</p>
