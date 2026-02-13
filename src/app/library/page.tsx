@@ -354,16 +354,30 @@ export default function LibraryPage() {
 
   const getQuestionTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
+      // Core
       mcq: "Flerval",
       true_false: "Sant/Falskt",
       longtextV2: "Essä",
       short_answer: "Kort svar",
       fill_blank: "Ifyllnad",
+      // Extended
       multiple_response: "Flera rätt",
       matching: "Matchning",
       ordering: "Ordningsföljd",
+      // Specialized
+      choicematrix: "Valmatris",
+      clozetext: "Lucktext",
+      clozedropdown: "Rullgardinslucka",
+      orderlist: "Ordningslista",
+      tokenhighlight: "Tokenmarkering",
+      clozeassociation: "Dra-och-släpp lucka",
+      imageclozeassociationV2: "Bildlucka",
+      plaintext: "Fritext",
+      formulaessayV2: "Formeluppsats",
+      chemistryessayV2: "Kemiuppsats",
+      // Legacy (kept for DB compatibility)
       hotspot: "Bildmarkering",
-      rating_scale: "Betygsskala"
+      rating_scale: "Betygsskala",
     }
     return labels[type] || type
   }
@@ -406,6 +420,13 @@ export default function LibraryPage() {
       questions?.flatMap((q) => q.tags || []) || []
     )
   ).sort()
+
+  // Get unique question types that actually exist in the library
+  const allTypes = Array.from(
+    new Set(
+      questions?.map((q) => q.type).filter(Boolean) || []
+    )
+  ).sort((a, b) => getQuestionTypeLabel(a).localeCompare(getQuestionTypeLabel(b), "sv"))
 
   // Check if any filters are active
   const hasActiveFilters = Boolean(filterTag || filterType || filterDifficulty || filterSearch)
@@ -572,23 +593,18 @@ export default function LibraryPage() {
                         </SelectContent>
                       </Select>
 
-                      {/* Type filter */}
+                      {/* Type filter — dynamic, shows only types in library */}
                       <Select value={filterType || "all"} onValueChange={(value) => setFilterType(value === "all" ? "" : value)}>
                         <SelectTrigger className="text-sm">
                           <SelectValue placeholder={t("filterByType")} />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">{t("allTypes")}</SelectItem>
-                          <SelectItem value="mcq">Flerval</SelectItem>
-                          <SelectItem value="true_false">Sant/Falskt</SelectItem>
-                          <SelectItem value="longtextV2">Essä</SelectItem>
-                          <SelectItem value="short_answer">Kort svar</SelectItem>
-                          <SelectItem value="fill_blank">Ifyllnad</SelectItem>
-                          <SelectItem value="multiple_response">Flera rätt</SelectItem>
-                          <SelectItem value="matching">Matchning</SelectItem>
-                          <SelectItem value="ordering">Ordningsföljd</SelectItem>
-                          <SelectItem value="hotspot">Bildmarkering</SelectItem>
-                          <SelectItem value="rating_scale">Betygsskala</SelectItem>
+                          {allTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {getQuestionTypeLabel(type)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
 
