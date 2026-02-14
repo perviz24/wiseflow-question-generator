@@ -3,17 +3,17 @@
 import { useState } from "react"
 import { sanitizeHtml } from "@/lib/sanitize"
 
-// Calculate points based on difficulty
+// Calculate points based on difficulty — must match getDefaultScore in question-generator-form
 function getPointsForDifficulty(difficulty: string): number {
   switch (difficulty) {
     case "easy":
       return 1
     case "medium":
-      return 1.5
-    case "hard":
       return 2
+    case "hard":
+      return 3
     case "mixed":
-      return 1.5 // Average for mixed
+      return 2
     default:
       return 1
   }
