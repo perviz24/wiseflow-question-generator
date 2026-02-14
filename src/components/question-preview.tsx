@@ -37,10 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
-import { downloadQti21, downloadQti22 } from "@/lib/qti-export"
-import { downloadCSV } from "@/lib/csv-export"
-import { exportToWord } from "@/lib/word-export"
+// Export libs are dynamically imported when user clicks Export (saves ~120KB from initial bundle)
 
 interface Question {
   type: string // Question type ID from question-types.ts registry
@@ -420,6 +417,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
 
     try {
       if (format === "word") {
+        const { exportToWord } = await import("@/lib/word-export")
         const blob = await exportToWord(questions, metadata)
         const timestamp = new Date().toISOString().split("T")[0]
         const url = URL.createObjectURL(blob)
@@ -434,22 +432,26 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
           description: t("exportWordDesc")
         })
       } else if (format === "csv") {
+        const { downloadCSV } = await import("@/lib/csv-export")
         downloadCSV(questions, metadata)
         toast.success(t("exportCSVSuccess"), {
           description: t("exportCSVDesc")
         })
       } else if (format === "qti21") {
+        const { downloadQti21 } = await import("@/lib/qti-export")
         await downloadQti21(questions, metadata)
         toast.success(t("exportQti21Success"), {
           description: t("exportQti21Desc")
         })
       } else if (format === "qti22") {
+        const { downloadQti22 } = await import("@/lib/qti-export")
         await downloadQti22(questions, metadata)
         toast.success(t("exportQti22Success"), {
           description: t("exportQti22Desc")
         })
       } else {
         // Wiseflow JSON formats
+        const { downloadWiseflowJSON } = await import("@/lib/wiseflow-export")
         const exportFormat = format === "wiseflow-legacy" ? "legacy" : "utgaende"
         downloadWiseflowJSON(questions, {
           ...metadata,

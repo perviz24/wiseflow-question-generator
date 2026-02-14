@@ -2,7 +2,6 @@
 
 import { UserButton, SignInButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Library, BookOpen, Home, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -12,7 +11,6 @@ import Image from "next/image"
 
 export function AppHeader() {
   const { t, language, setGuestLanguage } = useTranslation()
-  const router = useRouter()
   const { isLoaded } = useAuth()
 
   const handleHomeNavigation = () => {
@@ -53,7 +51,7 @@ export function AppHeader() {
             <Home className="h-4 w-4" />
             <span className="hidden md:inline text-xs font-medium">{t("home")}</span>
           </Button>
-          <Link href="/docs">
+          <Link href="/docs" prefetch={false}>
             <Button
               variant="ghost"
               size="sm"
@@ -74,7 +72,7 @@ export function AppHeader() {
           ) : (
             <>
               <SignedIn>
-                <Link href="/library" data-tour="library-link">
+                <Link href="/library" prefetch={false} data-tour="library-link">
                   <Button
                     variant="ghost"
                     size="sm"

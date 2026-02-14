@@ -113,13 +113,15 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Loader2, Sparkles, Info, ChevronDown, ChevronUp, Upload, RotateCcw, Shuffle, Settings } from "lucide-react"
-import { QuestionPreview } from "./question-preview"
+import dynamic from "next/dynamic"
+const QuestionPreview = dynamic(() => import("./question-preview").then(mod => mod.QuestionPreview), {
+  loading: () => <div className="w-full max-w-4xl animate-pulse space-y-4"><div className="h-48 bg-muted rounded-lg" /><div className="h-32 bg-muted rounded-lg" /></div>,
+})
 import { ContentUpload } from "./content-upload"
 import { toast } from "sonner"
 import { useMutation, useQuery } from "convex/react"
 import { api } from "../../convex/_generated/api"
-import { downloadWiseflowJSON } from "@/lib/wiseflow-export"
-import { downloadQti21 } from "@/lib/qti-export"
+// Export libs are dynamically imported when user clicks Export (saves ~60KB from initial bundle)
 import { useTranslation } from "@/lib/language-context"
 import type { Translations } from "@/lib/translations"
 import { QUESTION_TYPES, normalizeEnabledTypes } from "@/lib/question-types"
@@ -629,10 +631,12 @@ export function QuestionGeneratorForm() {
         includeTopicTag: formData.includeTopicTag,
       }
 
-      // Choose export format based on user selection
+      // Choose export format based on user selection (dynamic imports for bundle size)
       if (formData.exportFormat === "qti21") {
+        const { downloadQti21 } = await import("@/lib/qti-export")
         await downloadQti21(generatedQuestions, exportMetadata)
       } else {
+        const { downloadWiseflowJSON } = await import("@/lib/wiseflow-export")
         downloadWiseflowJSON(generatedQuestions, exportMetadata)
       }
 

@@ -1,10 +1,19 @@
 "use client"
 
-import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
-import { OnboardingTour } from "@/components/onboarding-tour"
+import dynamic from "next/dynamic"
+
+// Lazy-load heavy components (loaded after initial paint)
+const QuestionGeneratorForm = dynamic(
+  () => import("@/components/question-generator-form").then(mod => mod.QuestionGeneratorForm),
+  { loading: () => <div className="w-full max-w-4xl mx-auto animate-pulse space-y-4"><div className="h-64 bg-muted rounded-lg" /><div className="h-48 bg-muted rounded-lg" /></div> }
+)
+const OnboardingTour = dynamic(
+  () => import("@/components/onboarding-tour").then(mod => mod.OnboardingTour),
+  { ssr: false }
+)
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import Image from "next/image"
@@ -60,7 +69,7 @@ export default function Home() {
               </div>
               {/* Instruction Manual — centered below benefits */}
               <div className="mt-4 flex justify-center">
-                <Link href="/docs">
+                <Link href="/docs" prefetch={false}>
                   <Button
                     variant="outline"
                     size="sm"
