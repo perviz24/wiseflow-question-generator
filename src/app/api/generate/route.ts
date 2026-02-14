@@ -34,11 +34,6 @@ function getAnthropicKey(): string {
 }
 
 const apiKey = getAnthropicKey()
-console.log("🔑 API Key loaded:", {
-  exists: !!apiKey,
-  length: apiKey.length,
-  prefix: apiKey.substring(0, 20),
-})
 
 const anthropic = createAnthropic({
   apiKey,
