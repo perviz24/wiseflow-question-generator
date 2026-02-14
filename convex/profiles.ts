@@ -7,7 +7,9 @@ export const getUserProfile = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity()
     if (!identity) {
-      throw new Error("Not authenticated")
+      // Return null instead of throwing — prevents client-side crash
+      // when auth token expires or during Clerk session race conditions
+      return null
     }
 
     const profile = await ctx.db

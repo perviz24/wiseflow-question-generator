@@ -83,10 +83,21 @@ export default function SettingsPage() {
     }
   }
 
+  // Loading state — Convex query hasn't resolved yet
   if (profile === undefined) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  // Unauthenticated — redirect home (token expired or race condition)
+  if (profile === null) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground">{language === "sv" ? "Du behöver logga in för att se inställningar." : "You need to sign in to view settings."}</p>
+        <Button onClick={() => router.push("/")}>{language === "sv" ? "Gå till startsidan" : "Go to homepage"}</Button>
       </div>
     )
   }
