@@ -98,11 +98,12 @@ export const getUserQuestions = query({
 
     const userId = identity.subject
 
+    // Cap at 500 to prevent unbounded growth — covers even power users
     return await ctx.db
       .query("questions")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
-      .collect()
+      .take(500)
   },
 })
 
@@ -122,7 +123,7 @@ export const getQuestionsBySubject = query({
       .withIndex("by_subject", (q) => q.eq("subject", args.subject))
       .filter((q) => q.eq(q.field("userId"), userId))
       .order("desc")
-      .collect()
+      .take(500)
   },
 })
 

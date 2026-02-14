@@ -120,11 +120,12 @@ export const listFeedback = query({
       return []
     }
 
+    // Cap at 100 — no user will submit more than 100 feedback entries
     const feedback = await ctx.db
       .query("feedback")
       .withIndex("by_user", (q) => q.eq("userId", identity.subject))
       .order("desc")
-      .collect()
+      .take(100)
 
     return feedback
   },

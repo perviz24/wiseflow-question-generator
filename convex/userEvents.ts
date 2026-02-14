@@ -120,10 +120,11 @@ export const listUserEvents = query({
     if (!identity) return []
     if (!isAdminEmail(identity.email)) return []
 
+    // Cap at 500 — sufficient for admin monitoring, prevents unbounded reads
     return await ctx.db
       .query("userEvents")
       .withIndex("by_created_at")
       .order("desc")
-      .collect()
+      .take(500)
   },
 })

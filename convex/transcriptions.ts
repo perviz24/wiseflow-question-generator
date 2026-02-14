@@ -77,11 +77,12 @@ export const getUserTranscriptions = query({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    // Cap at 100 — transcription history doesn't need to be unlimited
     const jobs = await ctx.db
       .query("transcriptionJobs")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .order("desc")
-      .collect()
+      .take(100)
 
     return jobs
   },
@@ -93,11 +94,12 @@ export const getPendingTranscriptions = query({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    // Cap at 20 — user won't have 20+ concurrent transcriptions
     const jobs = await ctx.db
       .query("transcriptionJobs")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .filter((q) => q.eq(q.field("status"), "processing"))
-      .collect()
+      .take(20)
 
     return jobs
   },
