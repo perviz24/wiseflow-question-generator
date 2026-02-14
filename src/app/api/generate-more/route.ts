@@ -3,34 +3,10 @@ import { auth } from "@clerk/nextjs/server"
 import { generateText, Output } from "ai"
 import { createAnthropic } from "@ai-sdk/anthropic"
 import { z } from "zod"
-import { readFileSync } from "fs"
-import { join } from "path"
+import { ANTHROPIC_API_KEY } from "@/lib/env"
 
 // Set function timeout to 60 seconds
 export const maxDuration = 60
-
-// Turbopack workaround: read API key from .env.local if env var is empty
-function getAnthropicKey(): string {
-  if (process.env.ANTHROPIC_API_KEY) {
-    return process.env.ANTHROPIC_API_KEY
-  }
-  try {
-    const envPath = join(process.cwd(), ".env.local")
-    const envContent = readFileSync(envPath, "utf-8")
-    const match = envContent.match(/ANTHROPIC_API_KEY=(.+)/)
-    if (match && match[1]) {
-      return match[1].trim()
-    }
-  } catch {
-    // .env.local not found (production) — env var should be set
-  }
-  return ""
-}
-
-const anthropic = createAnthropic({
-  apiKey: getAnthropicKey(),
-  baseURL: "https://api.anthropic.com/v1",
-})
 
 // Define the schema for a single question — matches main generate route
 const QuestionSchema = z.object({
@@ -175,6 +151,12 @@ CRITICAL: User specifically selected these question types: ${questionTypesText}
     if (additionalContext && additionalContext.trim()) {
       prompt += `\n\nAdditional context to guide question generation:\n${additionalContext.trim()}`
     }
+
+    // Create Anthropic client at request time using validated env var
+    const anthropic = createAnthropic({
+      apiKey: ANTHROPIC_API_KEY,
+      baseURL: "https://api.anthropic.com/v1",
+    })
 
     const { output } = await generateText({
       model: anthropic("claude-sonnet-4-5-20250929"),

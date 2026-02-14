@@ -5,9 +5,10 @@ import { api } from "../../../../convex/_generated/api"
 import { Id } from "../../../../convex/_generated/dataModel"
 import mammoth from "mammoth"
 import { parseOffice } from "officeparser"
+import { NEXT_PUBLIC_CONVEX_URL } from "@/lib/env"
 
-const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!)
-const FIRECRAWL_API_KEY = process.env.FIRECRAWL_API_KEY
+// Uses validated env var from env.ts instead of raw process.env
+const convex = new ConvexHttpClient(NEXT_PUBLIC_CONVEX_URL)
 
 export const runtime = "nodejs"
 export const maxDuration = 60
