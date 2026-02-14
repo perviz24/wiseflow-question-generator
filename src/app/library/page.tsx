@@ -23,6 +23,7 @@ import { Id } from "../../../convex/_generated/dataModel"
 import { exportToWiseflowJSON } from "@/lib/wiseflow-export"
 import { exportToQti21, exportToQti22 } from "@/lib/qti-export"
 import { exportToWord } from "@/lib/word-export"
+import { downloadCSV } from "@/lib/csv-export"
 
 interface EditState {
   questionId: string
@@ -276,7 +277,7 @@ export default function LibraryPage() {
     }
   }
 
-  const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22" | "word") => {
+  const exportSelected = async (format: "legacy" | "utg" | "qti21" | "qti22" | "word" | "csv") => {
     if (!questions || selectedQuestions.size === 0) {
       toast.error(uiLanguage === "sv" ? "Ingen fråga vald" : "No question selected", {
         description: uiLanguage === "sv" ? "Välj minst en fråga att exportera" : "Select at least one question to export"
@@ -309,7 +310,15 @@ export default function LibraryPage() {
         URL.revokeObjectURL(url)
       }
 
-      if (format === "word") {
+      if (format === "csv") {
+        // CSV export — downloadCSV handles blob creation and download
+        downloadCSV(selected, metadata)
+        toast.success(uiLanguage === "sv" ? "CSV-export lyckades!" : "CSV export succeeded!", {
+          description: uiLanguage === "sv"
+            ? `${selectedQuestions.size} frågor exporterade som .csv`
+            : `${selectedQuestions.size} questions exported as .csv`
+        })
+      } else if (format === "word") {
         // Word (.docx) export
         const blob = await exportToWord(selected, metadata)
         const timestamp = new Date().toISOString().split("T")[0]
@@ -528,6 +537,15 @@ export default function LibraryPage() {
                       >
                         <FileText className="mr-2 h-4 w-4" />
                         Word (.docx)
+                      </Button>
+                      <Button
+                        onClick={() => exportSelected("csv")}
+                        disabled={selectedQuestions.size === 0 || isExporting}
+                        variant="outline"
+                        size="sm"
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        CSV
                       </Button>
                       <Button
                         onClick={() => exportSelected("qti21")}
@@ -892,7 +910,7 @@ export default function LibraryPage() {
                                     </Button>
                                   </div>
                                 ) : (
-                                  question.tutorInitials && (
+                                  question.tutorInitials && question.tutorInitials !== "N/A" && question.tutorInitials.trim() !== "" && (
                                     <Badge
                                       variant="outline"
                                       className="bg-warm-muted/50 dark:bg-warm/15 text-warm-foreground dark:text-warm border-warm/30 cursor-pointer hover:bg-warm-muted/70 dark:hover:bg-warm/25"
