@@ -35,7 +35,10 @@ export const sendFeedbackNotification = internalAction({
       },
       body: JSON.stringify({
         from: "TentaGen <onboarding@resend.dev>",
-        to: ["parviz.mammadzada@oru.se"],
+        // NOTE: Resend free tier only allows sending to account owner email.
+        // To add parviz.mammadzada@oru.se, verify a domain at resend.com/domains
+        // and change "from" to use that domain (e.g. noreply@tentagen.se)
+        to: ["perviz20@yahoo.com"],
         subject: `[TentaGen] ${typeLabel} from ${fromUser}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
