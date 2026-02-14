@@ -5,6 +5,7 @@ import { ConvexProviderWithClerk } from "convex/react-clerk"
 import { ConvexReactClient } from "convex/react"
 import { ReactNode, useState, useEffect } from "react"
 import { LanguageProvider } from "@/lib/language-context"
+import { AuthTracker } from "@/components/auth-tracker"
 import { svSE } from "@clerk/localizations"
 
 if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
@@ -50,6 +51,7 @@ export function ConvexClientProvider({ children }: { children: ReactNode }) {
     <ClerkWithDynamicLocale>
       <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
         <LanguageProvider>
+          <AuthTracker />
           {children}
         </LanguageProvider>
       </ConvexProviderWithClerk>
