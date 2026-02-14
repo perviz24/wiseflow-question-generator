@@ -924,10 +924,20 @@ export default function LibraryPage() {
                                     </Badge>
                                   )
                                 )}
-                                {[...new Set(
-                                  (isEditing ? editState?.tags : question.tags)
-                                    ?.filter(tag => tag && tag.trim().length > 0) ?? []
-                                )].map((tag) => {
+                                {(() => {
+                                  // Tags already visible as metadata badges — exclude to avoid duplicates
+                                  const metadataValues = new Set([
+                                    question.subject?.toLowerCase(),
+                                    getQuestionTypeLabel(question.type)?.toLowerCase(),
+                                    question.difficulty === "easy" ? t("easy").toLowerCase() :
+                                    question.difficulty === "medium" ? t("medium").toLowerCase() :
+                                    question.difficulty === "hard" ? t("hard").toLowerCase() : "",
+                                  ].filter(Boolean))
+                                  return [...new Set(
+                                    (isEditing ? editState?.tags : question.tags)
+                                      ?.filter(tag => tag && tag.trim().length > 0 && !metadataValues.has(tag.toLowerCase())) ?? []
+                                  )]
+                                })().map((tag) => {
                                   const isAITag = tag === "TentaGen" || tag === "AI-genererad" || tag === "AI-generated"
                                   return (
                                     <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
