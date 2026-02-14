@@ -4,6 +4,7 @@ import { QuestionGeneratorForm } from "@/components/question-generator-form"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
 import { FeedbackButton } from "@/components/feedback-button"
+import { OnboardingTour } from "@/components/onboarding-tour"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import Link from "next/link"
 import Image from "next/image"
@@ -21,6 +22,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="container mx-auto px-3 sm:px-4 py-8 sm:py-12 max-w-full overflow-x-hidden">
         <SignedIn>
+          <OnboardingTour />
           <div className="flex flex-col items-center gap-6 sm:gap-8 w-full">
             <div className="text-center px-2">
               {/* TentaGen Logo + Brand Name */}

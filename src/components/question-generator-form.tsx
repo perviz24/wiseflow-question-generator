@@ -719,7 +719,7 @@ export function QuestionGeneratorForm() {
   return (
     <TooltipProvider>
       <Card className="w-full max-w-2xl mx-auto shadow-lg border-2 border-border hover:shadow-xl transition-shadow duration-300">
-        <CardHeader className="px-4 sm:px-6">
+        <CardHeader className="px-4 sm:px-6" data-tour="welcome">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl font-bold tracking-tight">
             <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-warm flex-shrink-0 drop-shadow-sm" />
             <span className="truncate bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">{t("generateQuestions")}</span>
@@ -733,7 +733,7 @@ export function QuestionGeneratorForm() {
         <CardContent className="px-4 sm:px-6 pb-6">
           <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
           {/* Subject */}
-          <div className="space-y-2">
+          <div className="space-y-2" data-tour="subject-topic">
             <Label htmlFor="subject">
               {t("subject")} {formData.contextPriority !== "context_only" || !formData.uploadedContext ? "*" : "(Optional)"}
             </Label>
@@ -849,6 +849,7 @@ export function QuestionGeneratorForm() {
           <p className="text-sm text-muted-foreground -mt-2">{t("numQuestionsHelp")}</p>
 
           {/* Question Types — dynamically rendered from registry, filtered by profile */}
+          <div data-tour="question-types">
           <QuestionTypeSelector
             selectedTypes={formData.questionTypes}
             onToggleType={toggleQuestionType}
@@ -858,9 +859,10 @@ export function QuestionGeneratorForm() {
             onToggleShowMore={() => setShowMoreQuestionTypes(!showMoreQuestionTypes)}
             t={t}
           />
+          </div>
 
           {/* Content Upload Section */}
-          <div className="space-y-3">
+          <div className="space-y-3" data-tour="upload-section">
             <div className="flex items-center gap-2">
               <Upload className="h-5 w-5 text-primary" />
               <Label className="text-base font-semibold">{t("uploadSectionTitle")}</Label>
@@ -1097,6 +1099,7 @@ export function QuestionGeneratorForm() {
           <div className="space-y-2">
             <Button
               type="submit"
+              data-tour="generate-button"
               className="w-full h-11 sm:h-10 touch-action-manipulation shadow-md hover:shadow-lg transition-all duration-200"
               disabled={
                 isGenerating ||

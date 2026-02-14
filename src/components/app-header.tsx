@@ -71,7 +71,7 @@ export function AppHeader() {
           ) : (
             <>
               <SignedIn>
-                <Link href="/library">
+                <Link href="/library" data-tour="library-link">
                   <Button
                     variant="ghost"
                     size="icon"

@@ -22,6 +22,24 @@ export interface Translations {
   startOverConfirmDescription: string
   startOverConfirmAction: string
 
+  // Onboarding Tour
+  tourWelcomeTitle: string
+  tourWelcomeDesc: string
+  tourSubjectTitle: string
+  tourSubjectDesc: string
+  tourTypesTitle: string
+  tourTypesDesc: string
+  tourUploadTitle: string
+  tourUploadDesc: string
+  tourGenerateTitle: string
+  tourGenerateDesc: string
+  tourLibraryTitle: string
+  tourLibraryDesc: string
+  tourNext: string
+  tourSkip: string
+  tourFinish: string
+  tourStepOf: string
+
   // Home Page
   welcomeTitle: string
   welcomeSubtitle: string
@@ -349,6 +367,24 @@ export const translations: Record<Language, Translations> = {
     startOverConfirmDescription: "Alla ogenerade frågor och formulärdata kommer att raderas. Sparade frågor i biblioteket påverkas inte.",
     startOverConfirmAction: "Ja, börja om",
 
+    // Onboarding Tour
+    tourWelcomeTitle: "Välkommen till TentaGen! 👋",
+    tourWelcomeDesc: "Låt oss visa dig runt snabbt. Det tar bara 30 sekunder.",
+    tourSubjectTitle: "Ämne & ämnesområde",
+    tourSubjectDesc: "Börja med att ange ämne och ämnesområde. AI:n använder dessa för att skapa relevanta frågor.",
+    tourTypesTitle: "Välj frågetyper",
+    tourTypesDesc: "Välj vilka frågetyper du vill generera — flerval, essä, sant/falskt, med mera.",
+    tourUploadTitle: "Ladda upp källmaterial",
+    tourUploadDesc: "Ladda upp dokument, klistra in URL:er eller YouTube-videor som AI:n baserar frågorna på.",
+    tourGenerateTitle: "Generera frågor",
+    tourGenerateDesc: "Klicka här för att generera frågor! Du kan sedan granska, redigera och spara dem till ditt bibliotek.",
+    tourLibraryTitle: "Ditt bibliotek",
+    tourLibraryDesc: "Sparade frågor hamnar i biblioteket. Där kan du redigera, exportera till Word/CSV/QTI och organisera.",
+    tourNext: "Nästa",
+    tourSkip: "Hoppa över",
+    tourFinish: "Klar!",
+    tourStepOf: "av",
+
     // Home Page
     welcomeTitle: "Välkommen till TentaGen",
     welcomeSubtitle: "Generera högkvalitativa tentafrågor med AI. Logga in för att komma igång.",
@@ -672,6 +708,24 @@ export const translations: Record<Language, Translations> = {
     startOverConfirmTitle: "Start over?",
     startOverConfirmDescription: "All unsaved questions and form data will be cleared. Saved questions in your library are not affected.",
     startOverConfirmAction: "Yes, start over",
+
+    // Onboarding Tour
+    tourWelcomeTitle: "Welcome to TentaGen! 👋",
+    tourWelcomeDesc: "Let us show you around. It only takes 30 seconds.",
+    tourSubjectTitle: "Subject & Topic",
+    tourSubjectDesc: "Start by entering a subject and topic. The AI uses these to create relevant questions.",
+    tourTypesTitle: "Choose question types",
+    tourTypesDesc: "Select which question types to generate — MCQ, essay, true/false, and more.",
+    tourUploadTitle: "Upload source material",
+    tourUploadDesc: "Upload documents, paste URLs, or YouTube videos for the AI to base questions on.",
+    tourGenerateTitle: "Generate questions",
+    tourGenerateDesc: "Click here to generate questions! You can then review, edit, and save them to your library.",
+    tourLibraryTitle: "Your Library",
+    tourLibraryDesc: "Saved questions go to your library. There you can edit, export to Word/CSV/QTI, and organize.",
+    tourNext: "Next",
+    tourSkip: "Skip",
+    tourFinish: "Done!",
+    tourStepOf: "of",
 
     // Home Page
     welcomeTitle: "Welcome to TentaGen",
