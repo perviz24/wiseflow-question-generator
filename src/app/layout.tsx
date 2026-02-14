@@ -42,6 +42,11 @@ export const metadata: Metadata = {
     locale: "sv_SE",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "TentaGen — Smartare tentafrågor för utbildningsorganisationer",
+    description: "Generera högkvalitativa tentafrågor med AI. Stöder WISEflow, QTI, Word och fler format.",
+  },
 };
 
 export default function RootLayout({
