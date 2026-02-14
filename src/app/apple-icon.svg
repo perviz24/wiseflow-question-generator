@@ -12,8 +12,4 @@
     <!-- Question mark dot -->
     <circle cx="50" cy="126" r="7" fill="white" stroke="none" />
   </g>
-  <!-- AI sparkle -->
-  <g fill="white" opacity="0.85" transform="translate(20, 8) scale(1.6)">
-    <path d="M 78 8 L 80 14 L 86 16 L 80 18 L 78 24 L 76 18 L 70 16 L 76 14 Z" />
-  </g>
 </svg>
