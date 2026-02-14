@@ -492,6 +492,9 @@ export function QuestionGeneratorForm() {
       toast.success(t("questionsGenerated"), {
         description: t("questionsGeneratedDesc", { count: data.questions.length }),
       })
+
+      // Scroll to top so user sees results from Question 1
+      window.scrollTo({ top: 0, behavior: "smooth" })
     } catch (error) {
       console.error("Generation failed:", error)
       const errorMessage = error instanceof Error ? error.message : t("generationFailedDesc")
