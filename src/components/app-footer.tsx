@@ -1,11 +1,15 @@
 "use client"
 
 import { useTranslation } from "@/lib/language-context"
+import { useQuery } from "convex/react"
+import { api } from "../../convex/_generated/api"
 import { Badge } from "@/components/ui/badge"
 import { Shield } from "lucide-react"
+import Link from "next/link"
 
 export function AppFooter() {
   const { t } = useTranslation()
+  const launchReady = useQuery(api.siteConfig.getLaunchStatus)
 
   return (
     <footer className="border-t border-border bg-muted/40 dark:bg-muted/20 mt-auto">
@@ -32,6 +36,25 @@ export function AppFooter() {
               {t("privacyNoticeText")}
             </p>
           </div>
+
+          {/* Legal links — only visible when launchReady is ON */}
+          {launchReady && (
+            <div className="flex items-center gap-4 text-sm">
+              <Link
+                href="/privacy"
+                className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                {t("footerPrivacyPolicy")}
+              </Link>
+              <span className="text-border">|</span>
+              <Link
+                href="/terms"
+                className="text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
+              >
+                {t("footerTerms")}
+              </Link>
+            </div>
+          )}
 
           {/* Developer info */}
           <div className="flex flex-col items-center gap-2 text-sm">
