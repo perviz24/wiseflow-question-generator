@@ -83,7 +83,7 @@ export function OnboardingTour() {
     }
   }, [])
 
-  // Position tooltip relative to target element
+  // Position tooltip relative to target element (viewport-relative for fixed positioning)
   const positionTooltip = useCallback(() => {
     if (!isActive) return
     const step = TOUR_STEPS[currentStep]
@@ -98,29 +98,36 @@ export function OnboardingTour() {
       return
     }
 
-    const rect = target.getBoundingClientRect()
-    const tooltipWidth = 340
-    const tooltipHeight = 180
-    const padding = 12
+    // Scroll target into view first, then position tooltip after scroll settles
+    target.scrollIntoView({ behavior: "smooth", block: "center" })
 
-    let top: number
-    let left: number
+    // Wait for scroll to settle, then calculate viewport-relative position
+    const updatePosition = () => {
+      const rect = target.getBoundingClientRect()
+      const tooltipWidth = 340
+      const tooltipHeight = 180
+      const padding = 12
 
-    if (step.position === "bottom") {
-      top = rect.bottom + padding + window.scrollY
-      left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
-    } else {
-      top = rect.top - tooltipHeight - padding + window.scrollY
-      left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
+      let top: number
+      let left: number
+
+      if (step.position === "bottom") {
+        top = rect.bottom + padding
+        left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
+      } else {
+        top = rect.top - tooltipHeight - padding
+        left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
+      }
+
+      // Clamp tooltip within viewport bounds
+      left = Math.min(left, window.innerWidth - tooltipWidth - 16)
+      top = Math.max(8, Math.min(top, window.innerHeight - tooltipHeight - 8))
+
+      setTooltipPos({ top, left })
     }
 
-    // Keep tooltip within viewport
-    left = Math.min(left, window.innerWidth - tooltipWidth - 16)
-
-    setTooltipPos({ top, left })
-
-    // Scroll target into view if needed
-    target.scrollIntoView({ behavior: "smooth", block: "center" })
+    // Delay to let scrollIntoView finish
+    setTimeout(updatePosition, 400)
   }, [currentStep, isActive])
 
   useEffect(() => {
@@ -223,15 +230,25 @@ export function OnboardingTour() {
   )
 }
 
-// Highlight ring around target element
+// Highlight ring around target element — updates after scroll settles
 function HighlightRing({ selector }: { selector: string }) {
   const [rect, setRect] = useState<DOMRect | null>(null)
 
   useEffect(() => {
-    const el = document.querySelector(selector)
-    if (el) {
-      const r = el.getBoundingClientRect()
-      setRect(r)
+    const update = () => {
+      const el = document.querySelector(selector)
+      if (el) setRect(el.getBoundingClientRect())
+    }
+
+    // Initial position after scroll settles
+    const timer = setTimeout(update, 450)
+    window.addEventListener("scroll", update, { passive: true })
+    window.addEventListener("resize", update)
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("scroll", update)
+      window.removeEventListener("resize", update)
     }
   }, [selector])
 
