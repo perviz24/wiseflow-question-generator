@@ -98,6 +98,15 @@ export default defineSchema({
     .index("by_video_guid", ["videoGuid"])
     .index("by_status", ["status"]),
 
+  // Site configuration — launch toggle, admin-controlled settings
+  siteConfig: defineTable({
+    key: v.string(), // Config key, e.g. "launchReady"
+    value: v.boolean(), // Config value
+    updatedBy: v.string(), // Admin email who last updated
+    updatedAt: v.number(),
+  })
+    .index("by_key", ["key"]),
+
   feedback: defineTable({
     userId: v.string(), // Clerk user ID
     type: v.union(
