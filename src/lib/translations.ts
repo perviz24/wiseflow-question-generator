@@ -330,6 +330,7 @@ export interface Translations {
   footerEmail: string
   footerBeta: string
   footerPermission: string
+  footerFeedback: string
 
   // Feedback
   feedbackTitle: string
@@ -676,6 +677,7 @@ export const translations: Record<Language, Translations> = {
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta-version",
     footerPermission: "Distribution för bredare bruk kräver tillstånd från utvecklaren.",
+    footerFeedback: "Glöm inte att lämna feedback — det hjälper oss att ständigt förbättra TentaGen!",
 
     // Feedback
     feedbackTitle: "Skicka feedback",
@@ -1020,6 +1022,7 @@ export const translations: Record<Language, Translations> = {
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta version",
     footerPermission: "Distribution for broader use requires permission from the developer.",
+    footerFeedback: "Don't forget to leave feedback — it helps us continuously improve TentaGen!",
 
     // Feedback
     feedbackTitle: "Send feedback",

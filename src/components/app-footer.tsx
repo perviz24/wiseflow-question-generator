@@ -18,6 +18,11 @@ export function AppFooter() {
             🚧 {t("footerBeta")}
           </Badge>
 
+          {/* Feedback nudge */}
+          <p className="text-center text-muted-foreground text-sm max-w-md leading-relaxed">
+            💬 {t("footerFeedback")}
+          </p>
+
           {/* Developer info */}
           <div className="flex flex-col items-center gap-2 text-sm">
             <p className="text-center text-muted-foreground">
