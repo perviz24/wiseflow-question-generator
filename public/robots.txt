@@ -1,0 +1,10 @@
+# TentaGen - robots.txt
+User-agent: *
+Allow: /
+Allow: /docs
+Disallow: /library
+Disallow: /settings
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://www.tentagen.se/sitemap.xml
