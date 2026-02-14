@@ -23,7 +23,8 @@ export function AppHeader() {
 
   return (
     <header className="border-b border-border bg-white/50 backdrop-blur-sm dark:bg-black/50 sticky top-0 z-10">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+        {/* Logo — icon only on mobile, icon+text on desktop */}
         <div
           onClick={handleHomeNavigation}
           className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
@@ -31,42 +32,44 @@ export function AppHeader() {
           <Image
             src="/logo.svg"
             alt="TentaGen"
-            width={32}
-            height={32}
+            width={28}
+            height={28}
             className="text-foreground"
           />
-          <h1 className="text-base sm:text-xl font-semibold tracking-tight truncate max-w-[180px] sm:max-w-none">
+          <h1 className="hidden sm:block text-lg font-semibold tracking-tight">
             {t("appTitle")}
           </h1>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+
+        {/* Navigation */}
+        <nav className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Button
             variant="ghost"
-            size="icon"
-            className="h-11 w-11"
+            size="sm"
+            className="h-9 gap-1.5 px-2 sm:px-3"
             aria-label={t("home")}
             onClick={handleHomeNavigation}
           >
-            <Home className="h-7 w-7" />
-            <span className="sr-only">{t("home")}</span>
+            <Home className="h-4 w-4" />
+            <span className="hidden md:inline text-xs font-medium">{t("home")}</span>
           </Button>
           <Link href="/docs">
             <Button
               variant="ghost"
-              size="icon"
-              className="h-11 w-11"
+              size="sm"
+              className="h-9 gap-1.5 px-2 sm:px-3"
               aria-label={t("documentation")}
             >
-              <BookOpen className="h-7 w-7" />
-              <span className="sr-only">{t("documentation")}</span>
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden md:inline text-xs font-medium">{t("docs")}</span>
             </Button>
           </Link>
           {/* Auth-dependent nav: show skeleton while Clerk loads to prevent CLS */}
           {!isLoaded ? (
             <>
-              <Skeleton className="h-11 w-11 rounded-md" />
-              <Skeleton className="h-11 w-11 rounded-md" />
-              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-9 w-9 rounded-md" />
+              <Skeleton className="h-9 w-9 rounded-md" />
+              <Skeleton className="h-7 w-7 rounded-full" />
             </>
           ) : (
             <>
@@ -74,12 +77,12 @@ export function AppHeader() {
                 <Link href="/library" data-tour="library-link">
                   <Button
                     variant="ghost"
-                    size="icon"
-                    className="h-11 w-11"
+                    size="sm"
+                    className="h-9 gap-1.5 px-2 sm:px-3"
                     aria-label={t("myLibrary")}
                   >
-                    <Library className="h-7 w-7" />
-                    <span className="sr-only">{t("myLibrary")}</span>
+                    <Library className="h-4 w-4" />
+                    <span className="hidden md:inline text-xs font-medium">{t("library")}</span>
                   </Button>
                 </Link>
                 <SettingsSheet />
@@ -97,7 +100,7 @@ export function AppHeader() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-9 gap-1.5 text-muted-foreground hover:text-foreground"
+                  className="h-9 gap-1.5 px-2 sm:px-3 text-muted-foreground hover:text-foreground"
                   onClick={() => setGuestLanguage(language === "sv" ? "en" : "sv")}
                   aria-label={language === "sv" ? "Switch to English" : "Byt till svenska"}
                 >
@@ -105,14 +108,14 @@ export function AppHeader() {
                   <span className="text-xs font-medium">{language === "sv" ? "EN" : "SV"}</span>
                 </Button>
                 <SignInButton mode="modal">
-                  <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                  <Button size="sm" className="h-9 px-3 sm:px-4 text-xs sm:text-sm font-medium">
                     {t("signIn")}
-                  </button>
+                  </Button>
                 </SignInButton>
               </SignedOut>
             </>
           )}
-        </div>
+        </nav>
       </div>
     </header>
   )
