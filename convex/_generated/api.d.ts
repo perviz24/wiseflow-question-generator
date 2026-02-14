@@ -12,6 +12,7 @@ import type * as feedback from "../feedback.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as profiles from "../profiles.js";
 import type * as questions from "../questions.js";
+import type * as siteConfig from "../siteConfig.js";
 import type * as transcriptions from "../transcriptions.js";
 
 import type {
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   fileStorage: typeof fileStorage;
   profiles: typeof profiles;
   questions: typeof questions;
+  siteConfig: typeof siteConfig;
   transcriptions: typeof transcriptions;
 }>;
 

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { ConvexClientProvider } from "@/providers/convex-client-provider"
 import { Toaster } from "@/components/ui/sonner"
+import { CookieConsent } from "@/components/cookie-consent"
 import "./globals.css";
 
 const geistSans = Geist({
@@ -61,6 +62,7 @@ export default function RootLayout({
       >
         <ConvexClientProvider>
           {children}
+          <CookieConsent />
           <Toaster />
         </ConvexClientProvider>
         <Analytics />
