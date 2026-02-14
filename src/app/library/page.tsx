@@ -926,9 +926,26 @@ export default function LibraryPage() {
                                 )}
                                 {(() => {
                                   // Tags already visible as metadata badges — exclude to avoid duplicates
+                                  // Map question.type to its full translated tag name (e.g., "mcq" → "Flervalsfråga")
+                                  const typeToTagKey: Record<string, string> = {
+                                    mcq: "questionType_mcq", true_false: "questionType_trueFalse",
+                                    longtextV2: "questionType_essay", short_answer: "questionType_shortAnswer",
+                                    fill_blank: "questionType_fillBlank", multiple_response: "questionType_multipleResponse",
+                                    matching: "questionType_matching", ordering: "questionType_ordering",
+                                    choicematrix: "questionType_choicematrix", clozetext: "questionType_clozetext",
+                                    clozedropdown: "questionType_clozedropdown", orderlist: "questionType_orderlist",
+                                    tokenhighlight: "questionType_tokenhighlight", clozeassociation: "questionType_clozeassociation",
+                                    imageclozeassociationV2: "questionType_imageclozeassociationV2",
+                                    plaintext: "questionType_plaintext", formulaessayV2: "questionType_formulaessayV2",
+                                    chemistryessayV2: "questionType_chemistryessayV2",
+                                  }
+                                  const fullTypeName = typeToTagKey[question.type]
+                                    ? t(typeToTagKey[question.type] as Parameters<typeof t>[0])
+                                    : ""
                                   const metadataValues = new Set([
                                     question.subject?.toLowerCase(),
                                     getQuestionTypeLabel(question.type)?.toLowerCase(),
+                                    fullTypeName?.toLowerCase(),
                                     question.difficulty === "easy" ? t("easy").toLowerCase() :
                                     question.difficulty === "medium" ? t("medium").toLowerCase() :
                                     question.difficulty === "hard" ? t("hard").toLowerCase() : "",
