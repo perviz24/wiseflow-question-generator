@@ -15,8 +15,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.tentagen.se"),
   title: "TentaGen — Smartare tentafrågor för utbildningsorganisationer",
   description: "AI-driven tentafråge-generator som skapar högkvalitativa examensfrågor för utbildningsorganisationer. Stöder WISEflow, QTI, Word och fler format.",
+  openGraph: {
+    title: "TentaGen — Smartare tentafrågor för utbildningsorganisationer",
+    description: "Generera högkvalitativa tentafrågor med AI. Stöder WISEflow, QTI, Word och fler format.",
+    url: "https://www.tentagen.se",
+    siteName: "TentaGen",
+    locale: "sv_SE",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -25,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="sv">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

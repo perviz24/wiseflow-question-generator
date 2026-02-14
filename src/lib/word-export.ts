@@ -515,7 +515,7 @@ export async function exportToWord(
             spacing: { after: 300 },
             children: [
               new TextRun({
-                text: "tentagen.vercel.app",
+                text: "tentagen.se",
                 size: 18,
                 color: "4A6FA5",
               }),
@@ -589,7 +589,7 @@ export async function exportToWord(
                         spacing: { after: 80 },
                         children: [
                           new TextRun({
-                            text: "tentagen.vercel.app",
+                            text: "tentagen.se",
                             bold: true,
                             size: 20,
                             color: "1E3A5F",
