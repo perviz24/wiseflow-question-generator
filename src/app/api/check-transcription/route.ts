@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
 import { AssemblyAI } from "assemblyai"
 
 // Poll transcription status by transcriptId
 // Returns status + transcript text when completed
 export async function GET(request: NextRequest) {
   try {
+    const { userId } = await auth()
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const transcriptId = request.nextUrl.searchParams.get("id")
 
     if (!transcriptId) {

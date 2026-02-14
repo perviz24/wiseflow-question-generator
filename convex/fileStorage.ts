@@ -22,20 +22,30 @@ export const generateUploadUrl = mutation({
 /**
  * Get the URL for a stored file by its storage ID
  * Used by API routes to fetch file content from Convex storage
+ * Requires authentication to prevent unauthorized file access
  */
 export const getFileUrl = query({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Not authenticated")
+    }
     return await ctx.storage.getUrl(args.storageId)
   },
 })
 
 /**
  * Get metadata about a stored file
+ * Requires authentication
  */
 export const getFileMetadata = query({
   args: { storageId: v.id("_storage") },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity) {
+      throw new Error("Not authenticated")
+    }
     return await ctx.storage.getMetadata(args.storageId)
   },
 })

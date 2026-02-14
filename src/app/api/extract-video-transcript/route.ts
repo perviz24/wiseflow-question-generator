@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
 import { AssemblyAI } from "assemblyai"
 
 // Submit a video/audio for transcription via AssemblyAI
 // Returns a transcriptId that the client polls via /api/check-transcription
 export async function POST(request: NextRequest) {
   try {
+    const { userId } = await auth()
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const { url, language } = await request.json()
 
     if (!url) {
