@@ -418,6 +418,11 @@ export interface Translations {
   adminLaunchOn: string
   adminLaunchOff: string
   adminNotAuthorized: string
+  adminNewUsersTitle: string
+  adminNewUsersEmpty: string
+  adminNewUsersName: string
+  adminNewUsersEmail: string
+  adminNewUsersDate: string
 
   // Footer legal links
   footerPrivacyPolicy: string
@@ -839,6 +844,11 @@ export const translations: Record<Language, Translations> = {
     adminLaunchOn: "Lansering PÅ — juridiska sidor synliga",
     adminLaunchOff: "Lansering AV — juridiska sidor dolda",
     adminNotAuthorized: "Du har inte behörighet att visa denna sida.",
+    adminNewUsersTitle: "Nya användare",
+    adminNewUsersEmpty: "Inga nya användare ännu.",
+    adminNewUsersName: "Namn",
+    adminNewUsersEmail: "E-post",
+    adminNewUsersDate: "Datum",
 
     // Footer legal links
     footerPrivacyPolicy: "Integritetspolicy",
@@ -1258,6 +1268,11 @@ export const translations: Record<Language, Translations> = {
     adminLaunchOn: "Launch ON — legal pages visible",
     adminLaunchOff: "Launch OFF — legal pages hidden",
     adminNotAuthorized: "You are not authorized to view this page.",
+    adminNewUsersTitle: "New Users",
+    adminNewUsersEmpty: "No new users yet.",
+    adminNewUsersName: "Name",
+    adminNewUsersEmail: "Email",
+    adminNewUsersDate: "Date",
 
     // Footer legal links
     footerPrivacyPolicy: "Privacy Policy",
