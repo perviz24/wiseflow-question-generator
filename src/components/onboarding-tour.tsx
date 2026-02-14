@@ -72,15 +72,35 @@ export function OnboardingTour() {
   const [currentStep, setCurrentStep] = useState(0)
   const [isActive, setIsActive] = useState(false)
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 })
+  const [targetReady, setTargetReady] = useState(false)
 
-  // Check if tour should show on mount
+  // Wait for the first tour target to exist in the DOM before starting
+  // (dynamic imports mean elements may not be ready at a fixed delay)
   useEffect(() => {
     const completed = localStorage.getItem(TOUR_STORAGE_KEY)
-    if (!completed) {
-      // Delay tour start to let page render fully
-      const timer = setTimeout(() => setIsActive(true), 1500)
-      return () => clearTimeout(timer)
+    if (completed) return
+
+    let cancelled = false
+    let attempts = 0
+    const maxAttempts = 30 // ~15 seconds max wait
+
+    const poll = () => {
+      if (cancelled) return
+      attempts++
+      const firstTarget = document.querySelector(TOUR_STEPS[0].targetSelector)
+      if (firstTarget) {
+        setIsActive(true)
+        return
+      }
+      if (attempts < maxAttempts) {
+        setTimeout(poll, 500)
+      }
+      // After 15s give up silently — user can trigger tour later if needed
     }
+
+    // Start polling after a short initial delay
+    const timer = setTimeout(poll, 1000)
+    return () => { cancelled = true; clearTimeout(timer) }
   }, [])
 
   // Position tooltip relative to target element (viewport-relative for fixed positioning)
@@ -89,14 +109,31 @@ export function OnboardingTour() {
     const step = TOUR_STEPS[currentStep]
     const target = document.querySelector(step.targetSelector)
     if (!target) {
-      // If target not found, skip to next step or finish
-      if (currentStep < TOUR_STEPS.length - 1) {
-        setCurrentStep(prev => prev + 1)
-      } else {
-        completeTour()
+      setTargetReady(false)
+      // Poll for dynamically loaded targets instead of immediately skipping
+      let pollCount = 0
+      const pollForTarget = () => {
+        pollCount++
+        const el = document.querySelector(step.targetSelector)
+        if (el) {
+          setTargetReady(true)
+          positionTooltip() // re-run now that target exists
+        } else if (pollCount < 10) {
+          setTimeout(pollForTarget, 300)
+        } else {
+          // Target genuinely missing after 3s — skip this step
+          if (currentStep < TOUR_STEPS.length - 1) {
+            setCurrentStep(prev => prev + 1)
+          } else {
+            completeTour()
+          }
+        }
       }
+      setTimeout(pollForTarget, 300)
       return
     }
+
+    setTargetReady(true)
 
     // Scroll target into view first, then position tooltip after scroll settles
     target.scrollIntoView({ behavior: "smooth", block: "center" })
@@ -105,7 +142,6 @@ export function OnboardingTour() {
     const updatePosition = () => {
       const rect = target.getBoundingClientRect()
       const tooltipWidth = 340
-      const tooltipHeight = 180
       const padding = 12
 
       let top: number
@@ -115,13 +151,19 @@ export function OnboardingTour() {
         top = rect.bottom + padding
         left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
       } else {
-        top = rect.top - tooltipHeight - padding
+        // Place above the element
+        top = rect.top - padding
         left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
       }
 
-      // Clamp tooltip within viewport bounds
+      // Clamp horizontal within viewport
       left = Math.min(left, window.innerWidth - tooltipWidth - 16)
-      top = Math.max(8, Math.min(top, window.innerHeight - tooltipHeight - 8))
+
+      // For "top" position: use CSS transform to move tooltip above via bottom anchor
+      // For "bottom" position: just clamp top so it doesn't go off screen
+      if (step.position === "bottom") {
+        top = Math.max(8, Math.min(top, window.innerHeight - 220))
+      }
 
       setTooltipPos({ top, left })
     }
@@ -149,7 +191,7 @@ export function OnboardingTour() {
     }
   }
 
-  if (!isActive) return null
+  if (!isActive || !targetReady) return null
 
   const step = TOUR_STEPS[currentStep]
   const isLast = currentStep === TOUR_STEPS.length - 1
@@ -168,7 +210,12 @@ export function OnboardingTour() {
       {/* Tooltip card */}
       <Card
         className="fixed z-[1000] w-[340px] shadow-2xl border-2 border-warm/30 animate-in fade-in slide-in-from-bottom-2 duration-300"
-        style={{ top: tooltipPos.top, left: tooltipPos.left }}
+        style={{
+          left: tooltipPos.left,
+          ...(step.position === "top"
+            ? { top: tooltipPos.top, transform: "translateY(-100%)" }
+            : { top: tooltipPos.top }),
+        }}
       >
         <CardContent className="p-4">
           {/* Header with step counter and close */}
@@ -240,13 +287,23 @@ function HighlightRing({ selector }: { selector: string }) {
       if (el) setRect(el.getBoundingClientRect())
     }
 
-    // Initial position after scroll settles
+    // Initial position after scroll settles — poll in case element is lazy-loaded
+    let pollCount = 0
+    const pollTimer = setInterval(() => {
+      pollCount++
+      update()
+      if (document.querySelector(selector) || pollCount > 10) {
+        clearInterval(pollTimer)
+      }
+    }, 300)
+
     const timer = setTimeout(update, 450)
     window.addEventListener("scroll", update, { passive: true })
     window.addEventListener("resize", update)
 
     return () => {
       clearTimeout(timer)
+      clearInterval(pollTimer)
       window.removeEventListener("scroll", update)
       window.removeEventListener("resize", update)
     }
