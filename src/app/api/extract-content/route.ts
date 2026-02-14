@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import mammoth from "mammoth"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -11,6 +12,10 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Rate limit: shares the 100/day pool with AI generation
+    const rateLimitResponse = await checkRateLimit(userId)
+    if (rateLimitResponse) return rateLimitResponse
 
     const formData = await req.formData()
     const file = formData.get("file") as File

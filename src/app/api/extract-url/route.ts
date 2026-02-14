@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -10,6 +11,10 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Rate limit: shares the 100/day pool with AI generation
+    const rateLimitResponse = await checkRateLimit(userId)
+    if (rateLimitResponse) return rateLimitResponse
 
     const { url } = await req.json()
 

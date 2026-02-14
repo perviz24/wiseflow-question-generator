@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { YoutubeTranscript } from "youtube-transcript"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 // Extract transcript from YouTube videos using youtube-transcript package
 // AssemblyAI cannot fetch YouTube URLs directly (gets HTML instead of audio)
@@ -10,6 +11,10 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Rate limit: shares the 100/day pool with AI generation
+    const rateLimitResponse = await checkRateLimit(userId)
+    if (rateLimitResponse) return rateLimitResponse
 
     const { url, language } = await request.json()
 

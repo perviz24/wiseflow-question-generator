@@ -6,6 +6,7 @@ import { Id } from "../../../../convex/_generated/dataModel"
 import mammoth from "mammoth"
 import { parseOffice } from "officeparser"
 import { NEXT_PUBLIC_CONVEX_URL } from "@/lib/env"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 // Uses validated env var from env.ts instead of raw process.env
 const convex = new ConvexHttpClient(NEXT_PUBLIC_CONVEX_URL)
@@ -20,6 +21,10 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Rate limit: shares the 100/day pool with AI generation
+    const rateLimitResponse = await checkRateLimit(userId)
+    if (rateLimitResponse) return rateLimitResponse
 
     const body = await request.json()
     const { storageId, fileName, fileType } = body
