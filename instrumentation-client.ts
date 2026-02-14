@@ -20,3 +20,6 @@ Sentry.init({
     Sentry.replayIntegration(),
   ],
 })
+
+// Track Next.js route transitions for performance monitoring
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart

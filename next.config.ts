@@ -37,6 +37,8 @@ export default withSentryConfig(nextConfig, {
     deleteSourcemapsAfterUpload: true,
   },
 
-  // Disable Sentry telemetry
-  disableLogger: true,
+  // Remove debug logging in production bundle
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+  },
 });
