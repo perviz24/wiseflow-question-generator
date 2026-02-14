@@ -1,10 +1,11 @@
 "use client"
 
-import { UserButton, SignInButton, SignedIn, SignedOut } from "@clerk/nextjs"
+import { UserButton, SignInButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Library, BookOpen, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useTranslation } from "@/lib/language-context"
 import { SettingsSheet } from "@/components/settings-sheet"
 import Image from "next/image"
@@ -12,6 +13,7 @@ import Image from "next/image"
 export function AppHeader() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { isLoaded } = useAuth()
 
   const handleHomeNavigation = () => {
     // Clear preview session and force full page reload to reset all state
@@ -59,36 +61,47 @@ export function AppHeader() {
               <span className="sr-only">{t("documentation")}</span>
             </Button>
           </Link>
-          <SignedIn>
-            <Link href="/library">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-11 w-11"
-                aria-label={t("myLibrary")}
-              >
-                <Library className="h-7 w-7" />
-                <span className="sr-only">{t("myLibrary")}</span>
-              </Button>
-            </Link>
-            <SettingsSheet />
-            <UserButton afterSignOutUrl="/">
-              <UserButton.MenuItems>
-                <UserButton.Link
-                  label={t("myLibrary")}
-                  labelIcon={<Library className="h-4 w-4" />}
-                  href="/library"
-                />
-              </UserButton.MenuItems>
-            </UserButton>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-                {t("signIn")}
-              </button>
-            </SignInButton>
-          </SignedOut>
+          {/* Auth-dependent nav: show skeleton while Clerk loads to prevent CLS */}
+          {!isLoaded ? (
+            <>
+              <Skeleton className="h-11 w-11 rounded-md" />
+              <Skeleton className="h-11 w-11 rounded-md" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </>
+          ) : (
+            <>
+              <SignedIn>
+                <Link href="/library">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-11 w-11"
+                    aria-label={t("myLibrary")}
+                  >
+                    <Library className="h-7 w-7" />
+                    <span className="sr-only">{t("myLibrary")}</span>
+                  </Button>
+                </Link>
+                <SettingsSheet />
+                <UserButton afterSignOutUrl="/">
+                  <UserButton.MenuItems>
+                    <UserButton.Link
+                      label={t("myLibrary")}
+                      labelIcon={<Library className="h-4 w-4" />}
+                      href="/library"
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+                    {t("signIn")}
+                  </button>
+                </SignInButton>
+              </SignedOut>
+            </>
+          )}
         </div>
       </div>
     </header>
