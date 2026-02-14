@@ -18,6 +18,9 @@ export interface Translations {
   cancel: string
 
   startOver: string
+  startOverConfirmTitle: string
+  startOverConfirmDescription: string
+  startOverConfirmAction: string
 
   // Home Page
   welcomeTitle: string
@@ -342,6 +345,9 @@ export const translations: Record<Language, Translations> = {
     documentation: "Dokumentation",
     cancel: "Avbryt",
     startOver: "Börja om",
+    startOverConfirmTitle: "Börja om?",
+    startOverConfirmDescription: "Alla ogenerade frågor och formulärdata kommer att raderas. Sparade frågor i biblioteket påverkas inte.",
+    startOverConfirmAction: "Ja, börja om",
 
     // Home Page
     welcomeTitle: "Välkommen till TentaGen",
@@ -663,6 +669,9 @@ export const translations: Record<Language, Translations> = {
     documentation: "Documentation",
     cancel: "Cancel",
     startOver: "Start Over",
+    startOverConfirmTitle: "Start over?",
+    startOverConfirmDescription: "All unsaved questions and form data will be cleared. Saved questions in your library are not affected.",
+    startOverConfirmAction: "Yes, start over",
 
     // Home Page
     welcomeTitle: "Welcome to TentaGen",

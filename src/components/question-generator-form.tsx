@@ -124,6 +124,17 @@ import { useTranslation } from "@/lib/language-context"
 import type { Translations } from "@/lib/translations"
 import { QUESTION_TYPES, normalizeEnabledTypes } from "@/lib/question-types"
 import { sanitizeHtml } from "@/lib/sanitize"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 // Map question type IDs to their translation keys
 const TYPE_TRANSLATION_KEY: Record<string, string> = {
@@ -680,18 +691,26 @@ export function QuestionGeneratorForm() {
           isExporting={isExporting}
         />
         <div className="flex justify-center">
-          <Button
-            onClick={() => {
-              localStorage.removeItem("tentagen-preview-session")
-              window.location.href = "/"
-            }}
-            variant="ghost"
-            size="sm"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            {t("startOver")}
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                {t("startOver")}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("startOverConfirmTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>{t("startOverConfirmDescription")}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction onClick={() => { localStorage.removeItem("tentagen-preview-session"); window.location.href = "/" }}>
+                  {t("startOverConfirmAction")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     )
@@ -1108,19 +1127,26 @@ export function QuestionGeneratorForm() {
               </div>
             )}
             {/* Start Over — reset form and preview */}
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                localStorage.removeItem("tentagen-preview-session")
-                window.location.href = "/"
-              }}
-              className="w-full text-muted-foreground hover:text-foreground"
-            >
-              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-              {t("startOver")}
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button type="button" variant="ghost" size="sm" className="w-full text-muted-foreground hover:text-foreground">
+                  <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+                  {t("startOver")}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("startOverConfirmTitle")}</AlertDialogTitle>
+                  <AlertDialogDescription>{t("startOverConfirmDescription")}</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => { localStorage.removeItem("tentagen-preview-session"); window.location.href = "/" }}>
+                    {t("startOverConfirmAction")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </form>
       </CardContent>
