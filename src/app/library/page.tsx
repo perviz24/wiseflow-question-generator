@@ -15,6 +15,7 @@ import { useTranslation } from "@/lib/language-context"
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
 import { AppHeader } from "@/components/app-header"
 import { AppFooter } from "@/components/app-footer"
+import { sanitizeHtml } from "@/lib/sanitize"
 import { FeedbackButton } from "@/components/feedback-button"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -719,7 +720,7 @@ export default function LibraryPage() {
                                 ) : (
                                   <div
                                     className="prose prose-sm max-w-none mb-2"
-                                    dangerouslySetInnerHTML={{ __html: question.stimulus }}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(question.stimulus) }}
                                   />
                                 )}
                               </div>

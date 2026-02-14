@@ -123,6 +123,7 @@ import { downloadQti21 } from "@/lib/qti-export"
 import { useTranslation } from "@/lib/language-context"
 import type { Translations } from "@/lib/translations"
 import { QUESTION_TYPES, normalizeEnabledTypes } from "@/lib/question-types"
+import { sanitizeHtml } from "@/lib/sanitize"
 
 // Map question type IDs to their translation keys
 const TYPE_TRANSLATION_KEY: Record<string, string> = {
@@ -926,7 +927,7 @@ export function QuestionGeneratorForm() {
             {formData.uploadedContext && (
               <p
                 className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 p-2 rounded border border-amber-200 dark:border-amber-900"
-                dangerouslySetInnerHTML={{ __html: t("contextGuidanceTip") }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(t("contextGuidanceTip")) }}
               />
             )}
             <div className="text-xs text-muted-foreground whitespace-pre-line bg-muted/50 p-3 rounded-md border border-border">

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { sanitizeHtml } from "@/lib/sanitize"
 
 // Calculate points based on difficulty
 function getPointsForDifficulty(difficulty: string): number {
@@ -1274,7 +1275,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       <p className="text-sm leading-relaxed">
                         {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
                           <span key={i}>
-                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(part) }} />
                             {i < arr.length - 1 && (
                               <span className="inline-flex items-center mx-1">
                                 <Input readOnly placeholder={`(${i + 1})`} className="h-7 w-24 inline-flex text-center text-xs" />
@@ -1309,7 +1310,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       <p className="text-sm leading-relaxed">
                         {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
                           <span key={i}>
-                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(part) }} />
                             {i < arr.length - 1 && (
                               <span className="inline-flex items-center mx-1">
                                 <span className="inline-flex items-center h-7 px-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 text-xs text-muted-foreground">
@@ -1386,7 +1387,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                   <Separator className="my-4" />
                   <div className="space-y-2">
                     <Card className="p-4 bg-muted/50">
-                      <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: displayQuestion.stimulus }} />
+                      <p className="text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: sanitizeHtml(displayQuestion.stimulus) }} />
                     </Card>
                     {displayQuestion.correctAnswer && displayQuestion.correctAnswer.length > 0 && (
                       <Card className="p-3 bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800">
@@ -1413,7 +1414,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                       <p className="text-sm leading-relaxed">
                         {displayQuestion.stimulus.split(/\[___\]/g).map((part, i, arr) => (
                           <span key={i}>
-                            <span dangerouslySetInnerHTML={{ __html: part }} />
+                            <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(part) }} />
                             {i < arr.length - 1 && (
                               <span className="inline-flex items-center mx-1 px-3 py-0.5 rounded border-2 border-dashed border-amber-400 dark:border-amber-600 bg-amber-50 dark:bg-amber-950/30 text-xs text-muted-foreground">
                                 ↕ ({i + 1})
@@ -1461,7 +1462,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                         <div className="w-full h-40 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
                           <span className="text-sm text-muted-foreground">🖼️ Image / Diagram</span>
                         </div>
-                        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: displayQuestion.stimulus }} />
+                        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: sanitizeHtml(displayQuestion.stimulus) }} />
                       </div>
                     </Card>
                     {displayQuestion.options && displayQuestion.options.length > 0 && (
@@ -1507,7 +1508,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.instructorStimulus && (
                       <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
                         <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
-                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: sanitizeHtml(displayQuestion.instructorStimulus) }} />
                       </Card>
                     )}
                   </div>
@@ -1534,7 +1535,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.instructorStimulus && (
                       <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
                         <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
-                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: sanitizeHtml(displayQuestion.instructorStimulus) }} />
                       </Card>
                     )}
                   </div>
@@ -1561,7 +1562,7 @@ export function QuestionPreview({ questions, metadata, onSave, onExport, onUpdat
                     {displayQuestion.instructorStimulus && (
                       <Card className="p-3 bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800">
                         <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">{t("instructorGuidance")}</p>
-                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: displayQuestion.instructorStimulus }} />
+                        <p className="text-sm text-amber-800 dark:text-amber-200" dangerouslySetInnerHTML={{ __html: sanitizeHtml(displayQuestion.instructorStimulus) }} />
                       </Card>
                     )}
                   </div>

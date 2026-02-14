@@ -19,6 +19,7 @@
     "convex": "^1.31.7",
     "convex-helpers": "^0.1.111",
     "docx": "^9.5.1",
+    "dompurify": "^3.3.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "lucide-react": "^0.563.0",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/dompurify": "^3.0.5",
     "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
