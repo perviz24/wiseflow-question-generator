@@ -107,6 +107,17 @@ export default defineSchema({
   })
     .index("by_key", ["key"]),
 
+  // User events — tracks first-time logins for admin notification
+  userEvents: defineTable({
+    userId: v.string(), // Clerk user ID
+    email: v.optional(v.string()), // User's email from Clerk
+    name: v.optional(v.string()), // User's name from Clerk
+    event: v.literal("first_login"), // Event type
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_created_at", ["createdAt"]),
+
   feedback: defineTable({
     userId: v.string(), // Clerk user ID
     type: v.union(
