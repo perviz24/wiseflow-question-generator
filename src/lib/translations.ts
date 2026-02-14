@@ -362,6 +362,66 @@ export interface Translations {
   feedbackSuccessDesc: string
   feedbackError: string
   feedbackErrorDesc: string
+
+  // Privacy Policy Page
+  privacyPolicyTitle: string
+  privacyPolicyLastUpdated: string
+  privacyPolicyIntro: string
+  privacyDataCollectionTitle: string
+  privacyDataCollectionText: string
+  privacyAIProcessingTitle: string
+  privacyAIProcessingText: string
+  privacyAuthTitle: string
+  privacyAuthText: string
+  privacyStorageTitle: string
+  privacyStorageText: string
+  privacyCookiesTitle: string
+  privacyCookiesText: string
+  privacyRightsTitle: string
+  privacyRightsText: string
+  privacyContactTitle: string
+  privacyContactText: string
+
+  // Terms of Service Page
+  termsTitle: string
+  termsLastUpdated: string
+  termsIntro: string
+  termsAcceptanceTitle: string
+  termsAcceptanceText: string
+  termsDescriptionTitle: string
+  termsDescriptionText: string
+  termsUserAccountTitle: string
+  termsUserAccountText: string
+  termsAcceptableUseTitle: string
+  termsAcceptableUseText: string
+  termsIPTitle: string
+  termsIPText: string
+  termsAIContentTitle: string
+  termsAIContentText: string
+  termsLiabilityTitle: string
+  termsLiabilityText: string
+  termsChangesTitle: string
+  termsChangesText: string
+  termsContactTitle: string
+  termsContactText: string
+
+  // Cookie Consent Banner
+  cookieMessage: string
+  cookieAccept: string
+  cookieDecline: string
+
+  // Admin Page
+  adminTitle: string
+  adminDescription: string
+  adminLaunchToggleLabel: string
+  adminLaunchToggleDesc: string
+  adminLaunchOn: string
+  adminLaunchOff: string
+  adminNotAuthorized: string
+
+  // Footer legal links
+  footerPrivacyPolicy: string
+  footerTerms: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -723,6 +783,66 @@ export const translations: Record<Language, Translations> = {
     feedbackSuccessDesc: "Tack för din feedback. Vi uppskattar ditt bidrag.",
     feedbackError: "Misslyckades att skicka",
     feedbackErrorDesc: "Kunde inte skicka feedback. Försök igen.",
+
+    // Privacy Policy Page
+    privacyPolicyTitle: "Integritetspolicy",
+    privacyPolicyLastUpdated: "Senast uppdaterad: februari 2026",
+    privacyPolicyIntro: "TentaGen värnar om din integritet. Denna policy beskriver hur vi samlar in, använder och skyddar dina uppgifter.",
+    privacyDataCollectionTitle: "Data vi samlar in",
+    privacyDataCollectionText: "Vi samlar in: e-postadress och namn via Clerk-autentisering, ämne och frågor du genererar, samt uppladdade dokument och URL:er för frågegenering.",
+    privacyAIProcessingTitle: "AI-bearbetning",
+    privacyAIProcessingText: "Uppladdade dokument, URL:er och videor bearbetas av Anthropic Claude AI för att generera tentafrågor. Dessa källmaterial lagras inte efter att frågorna har genererats — de bearbetas enbart under genereringen.",
+    privacyAuthTitle: "Autentisering",
+    privacyAuthText: "Vi använder Clerk för autentisering. Clerk hanterar inloggning, sessionshantering och lagrar dina inloggningsuppgifter. Se Clerks integritetspolicy för detaljer.",
+    privacyStorageTitle: "Datalagring",
+    privacyStorageText: "Dina genererade frågor lagras i Convex-databas. Varje användare har tillgång till enbart sina egna frågor. Data lagras säkert med kryptering under överföring.",
+    privacyCookiesTitle: "Cookies",
+    privacyCookiesText: "Vi använder nödvändiga cookies för autentisering (Clerk) och valfria cookies för analys (Vercel Analytics och Speed Insights). Analyser samlar in anonym användningsdata för att förbättra tjänsten.",
+    privacyRightsTitle: "Dina rättigheter (GDPR)",
+    privacyRightsText: "Du har rätt att: begära tillgång till dina personuppgifter, begära radering av ditt konto och data, exportera dina frågor, och invända mot databehandling. Kontakta oss för att utöva dessa rättigheter.",
+    privacyContactTitle: "Kontakt",
+    privacyContactText: "Vid frågor om integritet, kontakta Parviz Mammadzada på parviz.mammadzada@oru.se.",
+
+    // Terms of Service Page
+    termsTitle: "Användarvillkor",
+    termsLastUpdated: "Senast uppdaterad: februari 2026",
+    termsIntro: "Dessa villkor gäller för din användning av TentaGen, en AI-driven tentafråge-generator för utbildningsorganisationer.",
+    termsAcceptanceTitle: "Godkännande av villkor",
+    termsAcceptanceText: "Genom att använda TentaGen godkänner du dessa villkor. Om du inte godkänner villkoren, vänligen sluta använda tjänsten.",
+    termsDescriptionTitle: "Tjänstebeskrivning",
+    termsDescriptionText: "TentaGen är ett AI-verktyg som hjälper lärare att generera tentafrågor. Tjänsten stöder export till WISEflow, QTI, Word och andra format.",
+    termsUserAccountTitle: "Användarkonto",
+    termsUserAccountText: "Du ansvarar för att hålla dina inloggningsuppgifter säkra. Varje konto är personligt och får inte delas med andra.",
+    termsAcceptableUseTitle: "Acceptabel användning",
+    termsAcceptableUseText: "Du får använda TentaGen för att skapa tentafrågor i utbildningssyfte. Du får inte: använda tjänsten för olagliga ändamål, försöka att kringgå säkerhetsåtgärder, eller överbelasta systemet med automatiserade förfrågningar.",
+    termsIPTitle: "Immateriella rättigheter",
+    termsIPText: "Frågor som genereras av AI med ditt innehåll tillhör dig. TentaGen-plattformen, dess design och kod tillhör utvecklaren.",
+    termsAIContentTitle: "AI-genererat innehåll",
+    termsAIContentText: "AI-genererade frågor är förslag och bör granskas av en lärare innan användning i examination. Vi garanterar inte att frågorna är felfria eller pedagogiskt optimala.",
+    termsLiabilityTitle: "Ansvarsbegränsning",
+    termsLiabilityText: "TentaGen tillhandahålls i befintligt skick. Vi ansvarar inte för eventuella fel i AI-genererade frågor eller för konsekvenser av att använda dem i examination.",
+    termsChangesTitle: "Ändringar av villkor",
+    termsChangesText: "Vi kan uppdatera dessa villkor. Väsentliga ändringar meddelas via e-post eller i tjänsten.",
+    termsContactTitle: "Kontakt",
+    termsContactText: "Vid frågor om villkoren, kontakta Parviz Mammadzada på parviz.mammadzada@oru.se.",
+
+    // Cookie Consent Banner
+    cookieMessage: "Vi använder cookies för autentisering och anonym analys för att förbättra tjänsten.",
+    cookieAccept: "Acceptera",
+    cookieDecline: "Avvisa",
+
+    // Admin Page
+    adminTitle: "Administratörspanel",
+    adminDescription: "Hantera plattformsinställningar och lanseringsläge.",
+    adminLaunchToggleLabel: "Lanseringsläge",
+    adminLaunchToggleDesc: "Aktivera för att visa integritetspolicy, användarvillkor och cookiebanner för alla användare.",
+    adminLaunchOn: "Lansering PÅ — juridiska sidor synliga",
+    adminLaunchOff: "Lansering AV — juridiska sidor dolda",
+    adminNotAuthorized: "Du har inte behörighet att visa denna sida.",
+
+    // Footer legal links
+    footerPrivacyPolicy: "Integritetspolicy",
+    footerTerms: "Användarvillkor",
   },
   en: {
     // Header & Navigation
@@ -1082,6 +1202,66 @@ export const translations: Record<Language, Translations> = {
     feedbackSuccessDesc: "Thank you for your feedback. We appreciate your input.",
     feedbackError: "Failed to send",
     feedbackErrorDesc: "Could not send feedback. Please try again.",
+
+    // Privacy Policy Page
+    privacyPolicyTitle: "Privacy Policy",
+    privacyPolicyLastUpdated: "Last updated: February 2026",
+    privacyPolicyIntro: "TentaGen cares about your privacy. This policy describes how we collect, use, and protect your data.",
+    privacyDataCollectionTitle: "Data We Collect",
+    privacyDataCollectionText: "We collect: email address and name via Clerk authentication, subjects and questions you generate, and uploaded documents and URLs for question generation.",
+    privacyAIProcessingTitle: "AI Processing",
+    privacyAIProcessingText: "Uploaded documents, URLs, and videos are processed by Anthropic Claude AI to generate exam questions. These source materials are not stored after questions are generated — they are only processed during generation.",
+    privacyAuthTitle: "Authentication",
+    privacyAuthText: "We use Clerk for authentication. Clerk handles login, session management, and stores your credentials. See Clerk's privacy policy for details.",
+    privacyStorageTitle: "Data Storage",
+    privacyStorageText: "Your generated questions are stored in a Convex database. Each user only has access to their own questions. Data is stored securely with encryption in transit.",
+    privacyCookiesTitle: "Cookies",
+    privacyCookiesText: "We use essential cookies for authentication (Clerk) and optional cookies for analytics (Vercel Analytics and Speed Insights). Analytics collect anonymous usage data to improve the service.",
+    privacyRightsTitle: "Your Rights (GDPR)",
+    privacyRightsText: "You have the right to: request access to your personal data, request deletion of your account and data, export your questions, and object to data processing. Contact us to exercise these rights.",
+    privacyContactTitle: "Contact",
+    privacyContactText: "For privacy questions, contact Parviz Mammadzada at parviz.mammadzada@oru.se.",
+
+    // Terms of Service Page
+    termsTitle: "Terms of Service",
+    termsLastUpdated: "Last updated: February 2026",
+    termsIntro: "These terms apply to your use of TentaGen, an AI-driven exam question generator for educational organizations.",
+    termsAcceptanceTitle: "Acceptance of Terms",
+    termsAcceptanceText: "By using TentaGen, you agree to these terms. If you do not agree, please stop using the service.",
+    termsDescriptionTitle: "Service Description",
+    termsDescriptionText: "TentaGen is an AI tool that helps educators generate exam questions. The service supports export to WISEflow, QTI, Word, and other formats.",
+    termsUserAccountTitle: "User Account",
+    termsUserAccountText: "You are responsible for keeping your login credentials secure. Each account is personal and must not be shared with others.",
+    termsAcceptableUseTitle: "Acceptable Use",
+    termsAcceptableUseText: "You may use TentaGen to create exam questions for educational purposes. You may not: use the service for illegal purposes, attempt to circumvent security measures, or overload the system with automated requests.",
+    termsIPTitle: "Intellectual Property",
+    termsIPText: "Questions generated by AI using your content belong to you. The TentaGen platform, its design, and code belong to the developer.",
+    termsAIContentTitle: "AI-Generated Content",
+    termsAIContentText: "AI-generated questions are suggestions and should be reviewed by an educator before use in examinations. We do not guarantee that questions are error-free or pedagogically optimal.",
+    termsLiabilityTitle: "Limitation of Liability",
+    termsLiabilityText: "TentaGen is provided as-is. We are not liable for any errors in AI-generated questions or for consequences of using them in examinations.",
+    termsChangesTitle: "Changes to Terms",
+    termsChangesText: "We may update these terms. Material changes will be communicated via email or within the service.",
+    termsContactTitle: "Contact",
+    termsContactText: "For questions about the terms, contact Parviz Mammadzada at parviz.mammadzada@oru.se.",
+
+    // Cookie Consent Banner
+    cookieMessage: "We use cookies for authentication and anonymous analytics to improve the service.",
+    cookieAccept: "Accept",
+    cookieDecline: "Decline",
+
+    // Admin Page
+    adminTitle: "Admin Panel",
+    adminDescription: "Manage platform settings and launch mode.",
+    adminLaunchToggleLabel: "Launch Mode",
+    adminLaunchToggleDesc: "Enable to show privacy policy, terms of service, and cookie banner to all users.",
+    adminLaunchOn: "Launch ON — legal pages visible",
+    adminLaunchOff: "Launch OFF — legal pages hidden",
+    adminNotAuthorized: "You are not authorized to view this page.",
+
+    // Footer legal links
+    footerPrivacyPolicy: "Privacy Policy",
+    footerTerms: "Terms of Service",
   },
 }
 
