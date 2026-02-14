@@ -3,7 +3,7 @@
 import { UserButton, SignInButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Library, BookOpen, Home } from "lucide-react"
+import { Library, BookOpen, Home, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTranslation } from "@/lib/language-context"
@@ -11,7 +11,7 @@ import { SettingsSheet } from "@/components/settings-sheet"
 import Image from "next/image"
 
 export function AppHeader() {
-  const { t } = useTranslation()
+  const { t, language, setGuestLanguage } = useTranslation()
   const router = useRouter()
   const { isLoaded } = useAuth()
 
@@ -94,6 +94,16 @@ export function AppHeader() {
                 </UserButton>
               </SignedIn>
               <SignedOut>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 gap-1.5 text-muted-foreground hover:text-foreground"
+                  onClick={() => setGuestLanguage(language === "sv" ? "en" : "sv")}
+                  aria-label={language === "sv" ? "Switch to English" : "Byt till svenska"}
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium">{language === "sv" ? "EN" : "SV"}</span>
+                </Button>
                 <SignInButton mode="modal">
                   <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90">
                     {t("signIn")}
