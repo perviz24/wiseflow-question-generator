@@ -74,11 +74,15 @@ export function OnboardingTour() {
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 })
   const [targetReady, setTargetReady] = useState(false)
 
-  // Wait for the first tour target to exist in the DOM before starting
-  // (dynamic imports mean elements may not be ready at a fixed delay)
+  // Wait for the first tour target to exist in the DOM before starting.
+  // Tour only runs for fresh users — no completed tour AND no existing preview session
+  // (preview session means form shows results view where data-tour targets don't exist)
   useEffect(() => {
     const completed = localStorage.getItem(TOUR_STORAGE_KEY)
     if (completed) return
+
+    const hasPreviewSession = localStorage.getItem("tentagen-preview-session")
+    if (hasPreviewSession) return // Form shows results view — tour targets won't exist
 
     let cancelled = false
     let attempts = 0
@@ -135,41 +139,48 @@ export function OnboardingTour() {
 
     setTargetReady(true)
 
-    // Scroll target into view first, then position tooltip after scroll settles
-    target.scrollIntoView({ behavior: "smooth", block: "center" })
+    // Only scroll if element is not already mostly visible
+    const rect = target.getBoundingClientRect()
+    const headerHeight = 64 // sticky header ~56px + padding
+    const isVisible = rect.top >= headerHeight && rect.bottom <= window.innerHeight - 100
+    if (!isVisible) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
 
-    // Wait for scroll to settle, then calculate viewport-relative position
+    // Calculate viewport-relative position for fixed tooltip
     const updatePosition = () => {
-      const rect = target.getBoundingClientRect()
+      const r = target.getBoundingClientRect()
       const tooltipWidth = 340
       const padding = 12
 
       let top: number
-      let left: number
+      let left = Math.max(16, r.left + r.width / 2 - tooltipWidth / 2)
 
       if (step.position === "bottom") {
-        top = rect.bottom + padding
-        left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
+        top = r.bottom + padding
       } else {
-        // Place above the element
-        top = rect.top - padding
-        left = Math.max(16, rect.left + rect.width / 2 - tooltipWidth / 2)
+        // "top" — anchor point is element's top edge, CSS transform moves tooltip up
+        top = r.top - padding
       }
 
       // Clamp horizontal within viewport
       left = Math.min(left, window.innerWidth - tooltipWidth - 16)
 
-      // For "top" position: use CSS transform to move tooltip above via bottom anchor
-      // For "bottom" position: just clamp top so it doesn't go off screen
+      // Clamp vertical so tooltip stays on screen
       if (step.position === "bottom") {
-        top = Math.max(8, Math.min(top, window.innerHeight - 220))
+        top = Math.max(headerHeight + 8, Math.min(top, window.innerHeight - 220))
+      }
+      // For "top": translateY(-100%) in CSS handles upward offset, but clamp minimum
+      if (step.position === "top") {
+        top = Math.max(220, top) // Ensure enough room above for tooltip card
       }
 
       setTooltipPos({ top, left })
     }
 
-    // Delay to let scrollIntoView finish
-    setTimeout(updatePosition, 400)
+    // Position after scroll settles, then refine again shortly after
+    setTimeout(updatePosition, 350)
+    setTimeout(updatePosition, 700)
   }, [currentStep, isActive])
 
   useEffect(() => {
