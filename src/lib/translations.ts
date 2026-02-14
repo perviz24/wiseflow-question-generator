@@ -325,10 +325,24 @@ export interface Translations {
   // Library Page
   librarySubtitle: string
 
+  // Privacy Notice
+  privacyNoticeTitle: string
+  privacyNoticeText: string
+
+  // Quick Start (homepage)
+  quickStartTitle: string
+  quickStartStep1Title: string
+  quickStartStep1Desc: string
+  quickStartStep2Title: string
+  quickStartStep2Desc: string
+  quickStartStep3Title: string
+  quickStartStep3Desc: string
+
   // Footer
   footerDeveloper: string
   footerEmail: string
   footerBeta: string
+  footerBetaPilot: string
   footerPermission: string
   footerFeedback: string
 
@@ -392,10 +406,10 @@ export const translations: Record<Language, Translations> = {
 
     // Home Page
     welcomeTitle: "Välkommen till TentaGen",
-    welcomeSubtitle: "Generera högkvalitativa tentafrågor med AI. Logga in för att komma igång.",
+    welcomeSubtitle: "Sluta lägga timmar på att formulera tentafrågor. AI skapar ett förslag — du granskar, redigerar och godkänner.",
     signInToContinue: "Logga in för att fortsätta",
     createQuestionsTitle: "Smartare tentafrågor för utbildningsorganisationer",
-    createQuestionsSubtitle: "Låt AI generera frågor från sin kunskapsbas, ladda upp eget underlag för kontroll över innehållet, eller kombinera båda",
+    createQuestionsSubtitle: "Sluta lägga timmar på att formulera tentafrågor. AI skapar ett förslag — du granskar, redigerar och godkänner",
 
     // Question Generator Form
     generateQuestions: "Generera frågor",
@@ -669,6 +683,19 @@ export const translations: Record<Language, Translations> = {
     heroMultipleFormats: "Flera exportformat",
     instructionManual: "Användarmanual",
 
+    // Privacy Notice
+    privacyNoticeTitle: "Dataintegritet",
+    privacyNoticeText: "Dina frågor sparas i din personliga databas. Uppladdade dokument och URL:er bearbetas av AI för att generera frågor och lagras inte efter generering.",
+
+    // Quick Start (homepage)
+    quickStartTitle: "Så fungerar det",
+    quickStartStep1Title: "Fyll i grundinfo",
+    quickStartStep1Desc: "Ämne, ämnesområde, svårighetsgrad och antal frågor",
+    quickStartStep2Title: "Ladda upp underlag",
+    quickStartStep2Desc: "Dokument, video eller URL — valfritt men ger mer träffsäkra frågor",
+    quickStartStep3Title: "Granska och exportera",
+    quickStartStep3Desc: "Du granskar, redigerar och godkänner innan export till Wiseflow, Inspera eller Word",
+
     // Library Page
     librarySubtitle: "Hantera och organisera alla dina sparade tentafrågor. Redigera, tagga och exportera frågor för användning i WISEflow, Inspera eller andra LMS-plattformar.",
 
@@ -676,8 +703,9 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Utvecklad av",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta-version",
+    footerBetaPilot: "Pilotversion — vi testar med utvalda kollegor vid Örebro universitet",
     footerPermission: "Distribution för bredare bruk kräver tillstånd från utvecklaren.",
-    footerFeedback: "Glöm inte att lämna feedback — det hjälper oss att ständigt förbättra TentaGen!",
+    footerFeedback: "Din feedback formar verktyget — berätta vad som fungerar och vad som kan förbättras!",
 
     // Feedback
     feedbackTitle: "Skicka feedback",
@@ -737,10 +765,10 @@ export const translations: Record<Language, Translations> = {
 
     // Home Page
     welcomeTitle: "Welcome to TentaGen",
-    welcomeSubtitle: "Generate high-quality exam questions using AI. Sign in to get started.",
+    welcomeSubtitle: "Stop spending hours writing exam questions. AI creates a draft — you review, edit, and approve.",
     signInToContinue: "Sign In to Continue",
     createQuestionsTitle: "Smarter exam questions for educational organizations",
-    createQuestionsSubtitle: "Let AI generate questions from its knowledge base, upload your own material for content control, or combine both",
+    createQuestionsSubtitle: "Stop spending hours writing exam questions. AI creates a draft — you review, edit, and approve",
 
     // Question Generator Form
     generateQuestions: "Generate Questions",
@@ -1014,6 +1042,19 @@ export const translations: Record<Language, Translations> = {
     heroMultipleFormats: "Multiple export formats",
     instructionManual: "Instruction Manual",
 
+    // Privacy Notice
+    privacyNoticeTitle: "Data privacy",
+    privacyNoticeText: "Your questions are stored in your personal database. Uploaded documents and URLs are processed by AI to generate questions and are not stored after generation.",
+
+    // Quick Start (homepage)
+    quickStartTitle: "How it works",
+    quickStartStep1Title: "Fill in basics",
+    quickStartStep1Desc: "Subject, topic, difficulty level, and number of questions",
+    quickStartStep2Title: "Upload material",
+    quickStartStep2Desc: "Documents, video, or URLs — optional but gives more targeted questions",
+    quickStartStep3Title: "Review and export",
+    quickStartStep3Desc: "You review, edit, and approve before exporting to Wiseflow, Inspera, or Word",
+
     // Library Page
     librarySubtitle: "Manage and organize all your saved exam questions. Edit, tag, and export questions for use in WISEflow, Inspera, or other LMS platforms.",
 
@@ -1021,8 +1062,9 @@ export const translations: Record<Language, Translations> = {
     footerDeveloper: "Developed by",
     footerEmail: "parviz.mammadzada@oru.se",
     footerBeta: "Beta version",
+    footerBetaPilot: "Pilot version — testing with selected colleagues at Örebro University",
     footerPermission: "Distribution for broader use requires permission from the developer.",
-    footerFeedback: "Don't forget to leave feedback — it helps us continuously improve TentaGen!",
+    footerFeedback: "Your feedback shapes this tool — tell us what works and what can be improved!",
 
     // Feedback
     feedbackTitle: "Send feedback",

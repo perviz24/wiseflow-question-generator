@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/lib/language-context"
 import { Badge } from "@/components/ui/badge"
+import { Shield } from "lucide-react"
 
 export function AppFooter() {
   const { t } = useTranslation()
@@ -10,18 +11,27 @@ export function AppFooter() {
     <footer className="border-t border-border bg-muted/40 dark:bg-muted/20 mt-auto">
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col items-center gap-6">
-          {/* Beta badge */}
+          {/* Pilot badge */}
           <Badge
             variant="secondary"
-            className="text-sm px-3 py-1 bg-warm-muted/60 dark:bg-warm/15 text-warm-foreground dark:text-warm border border-warm/20"
+            className="text-sm px-4 py-1.5 bg-primary/10 dark:bg-primary/15 text-primary dark:text-primary/90 border border-primary/20 text-center whitespace-normal"
           >
-            🚧 {t("footerBeta")}
+            🎓 {t("footerBetaPilot")}
           </Badge>
 
           {/* Feedback nudge */}
           <p className="text-center text-muted-foreground text-sm max-w-md leading-relaxed">
             💬 {t("footerFeedback")}
           </p>
+
+          {/* Privacy notice */}
+          <div className="flex items-start gap-2 text-xs text-muted-foreground max-w-md bg-muted/60 dark:bg-muted/30 rounded-lg px-4 py-3 border border-border/50">
+            <Shield className="h-4 w-4 mt-0.5 shrink-0 text-primary/70" />
+            <p className="leading-relaxed">
+              <span className="font-medium text-foreground/80">{t("privacyNoticeTitle")}:</span>{" "}
+              {t("privacyNoticeText")}
+            </p>
+          </div>
 
           {/* Developer info */}
           <div className="flex flex-col items-center gap-2 text-sm">

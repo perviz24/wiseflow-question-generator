@@ -21,6 +21,35 @@ import { BookOpen, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/lib/language-context"
 
+function QuickStartSteps() {
+  const { t } = useTranslation()
+
+  return (
+    <div className="w-full max-w-2xl mx-auto mt-6">
+      <p className="text-center text-sm font-medium text-muted-foreground mb-4">
+        {t("quickStartTitle")}
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="flex flex-col items-center text-center gap-2 rounded-lg border border-border/50 bg-card/50 px-4 py-4">
+          <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10 text-primary text-sm font-bold">1</div>
+          <p className="text-sm font-medium text-foreground">{t("quickStartStep1Title")}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t("quickStartStep1Desc")}</p>
+        </div>
+        <div className="flex flex-col items-center text-center gap-2 rounded-lg border border-border/50 bg-card/50 px-4 py-4">
+          <div className="flex items-center justify-center h-9 w-9 rounded-full bg-warm/10 text-warm-foreground text-sm font-bold">2</div>
+          <p className="text-sm font-medium text-foreground">{t("quickStartStep2Title")}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t("quickStartStep2Desc")}</p>
+        </div>
+        <div className="flex flex-col items-center text-center gap-2 rounded-lg border border-border/50 bg-card/50 px-4 py-4">
+          <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10 text-primary text-sm font-bold">3</div>
+          <p className="text-sm font-medium text-foreground">{t("quickStartStep3Title")}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t("quickStartStep3Desc")}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const { t } = useTranslation()
 
@@ -80,6 +109,8 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
+              {/* Quick Start Steps */}
+              <QuickStartSteps />
             </div>
             <QuestionGeneratorForm />
           </div>
@@ -120,8 +151,10 @@ export default function Home() {
                 <span>{t("heroMultipleFormats")}</span>
               </div>
             </div>
+            {/* Quick Start Steps (also visible to signed-out visitors) */}
+            <QuickStartSteps />
             <SignInButton mode="modal">
-              <Button size="lg" className="mt-4 text-base px-6">
+              <Button size="lg" className="mt-2 text-base px-6">
                 {t("signInToContinue")}
               </Button>
             </SignInButton>
