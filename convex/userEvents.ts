@@ -39,11 +39,13 @@ export const trackFirstLogin = mutation({
       createdAt: Date.now(),
     })
 
-    // Schedule email notification (runs immediately after mutation succeeds)
-    await ctx.scheduler.runAfter(0, internal.userEvents.sendNewUserNotification, {
-      email: identity.email ?? "No email",
-      name: identity.name ?? "Unknown user",
-    })
+    // Send email notification — skip if user is an admin (no point notifying yourself)
+    if (!isAdminEmail(identity.email)) {
+      await ctx.scheduler.runAfter(0, internal.userEvents.sendNewUserNotification, {
+        email: identity.email ?? "No email",
+        name: identity.name ?? "Unknown user",
+      })
+    }
 
     return { isNew: true }
   },
@@ -74,7 +76,7 @@ export const sendNewUserNotification = internalAction({
       body: JSON.stringify({
         from: "TentaGen <onboarding@resend.dev>",
         to: ["perviz20@yahoo.com"],
-        subject: `[TentaGen] 🆕 New user: ${args.name}`,
+        subject: `[TentaGen] 🆕 New user: ${args.name} (${args.email})`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #0d9488;">New User Signed In</h2>
