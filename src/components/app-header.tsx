@@ -1,8 +1,10 @@
 "use client"
 
 import { UserButton, SignInButton, SignedIn, SignedOut, useAuth } from "@clerk/nextjs"
+import { useQuery } from "convex/react"
+import { api } from "../../convex/_generated/api"
 import Link from "next/link"
-import { Library, BookOpen, Home, Globe } from "lucide-react"
+import { Library, BookOpen, Home, Globe, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useTranslation } from "@/lib/language-context"
@@ -12,6 +14,7 @@ import Image from "next/image"
 export function AppHeader() {
   const { t, language, setGuestLanguage } = useTranslation()
   const { isLoaded } = useAuth()
+  const isAdmin = useQuery(api.siteConfig.getIsAdmin)
 
   const handleHomeNavigation = () => {
     // Clear preview session and force full page reload to reset all state
@@ -91,6 +94,13 @@ export function AppHeader() {
                       labelIcon={<Library className="h-4 w-4" />}
                       href="/library"
                     />
+                    {isAdmin && (
+                      <UserButton.Link
+                        label={t("adminTitle")}
+                        labelIcon={<Settings className="h-4 w-4" />}
+                        href="/admin"
+                      />
+                    )}
                   </UserButton.MenuItems>
                 </UserButton>
               </SignedIn>
