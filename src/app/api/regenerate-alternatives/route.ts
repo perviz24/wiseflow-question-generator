@@ -4,6 +4,7 @@ import { createAnthropic } from "@ai-sdk/anthropic"
 import { auth } from "@clerk/nextjs/server"
 import { z } from "zod"
 import { ANTHROPIC_API_KEY } from "@/lib/env"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 // Set function timeout to 60 seconds
 export const maxDuration = 60
@@ -40,6 +41,10 @@ export async function POST(req: NextRequest) {
       difficulty,
       language,
     } = body
+
+    // Check rate limit (100 questions/day per user)
+    const rateLimitResponse = await checkRateLimit(userId, language || "sv")
+    if (rateLimitResponse) return rateLimitResponse
 
     // Validate required fields
     if (!questionType || !questionText || !subject || !topic) {

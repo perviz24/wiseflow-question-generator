@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { AssemblyAI } from "assemblyai"
+import { checkRateLimit } from "@/lib/ratelimit"
 
 // Submit a video/audio for transcription via AssemblyAI
 // Returns a transcriptId that the client polls via /api/check-transcription
@@ -12,6 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     const { url, language } = await request.json()
+
+    // Check rate limit (100 questions/day per user)
+    const rateLimitResponse = await checkRateLimit(userId, language || "sv")
+    if (rateLimitResponse) return rateLimitResponse
 
     if (!url) {
       return NextResponse.json(
