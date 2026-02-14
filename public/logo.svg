@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
-  <!-- TentaGen Logo: T with integrated question mark + AI sparkle -->
-  <!-- Main T? letterform -->
+  <!-- TentaGen Logo: T with integrated question mark -->
   <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
     <!-- Top horizontal bar of T -->
     <line x1="18" y1="18" x2="82" y2="18" />
@@ -10,10 +9,5 @@
     <path d="M 50 52 Q 68 56 68 68 Q 68 80 50 83" fill="none" />
     <!-- Question mark dot -->
     <circle cx="50" cy="93" r="4" fill="currentColor" stroke="none" />
-  </g>
-  <!-- AI sparkle (top-right corner) -->
-  <g fill="currentColor" opacity="0.7">
-    <path d="M 78 8 L 80 14 L 86 16 L 80 18 L 78 24 L 76 18 L 70 16 L 76 14 Z" />
-    <path d="M 88 22 L 89 25 L 92 26 L 89 27 L 88 30 L 87 27 L 84 26 L 87 25 Z" transform="scale(0.7) translate(40, 5)" />
   </g>
 </svg>
