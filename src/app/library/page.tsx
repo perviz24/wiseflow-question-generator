@@ -906,12 +906,13 @@ export default function LibraryPage() {
                                     </Badge>
                                   )
                                 )}
-                                {(isEditing ? editState?.tags : question.tags)
-                                  ?.filter(tag => tag && tag.trim().length > 0) // Hide empty tags
-                                  .map((tag, idx) => {
+                                {[...new Set(
+                                  (isEditing ? editState?.tags : question.tags)
+                                    ?.filter(tag => tag && tag.trim().length > 0) ?? []
+                                )].map((tag) => {
                                   const isAITag = tag === "TentaGen" || tag === "AI-genererad" || tag === "AI-generated"
                                   return (
-                                    <Badge key={idx} variant="secondary" className="text-xs flex items-center gap-1">
+                                    <Badge key={tag} variant="secondary" className="text-xs flex items-center gap-1">
                                       {tag}
                                       {isEditing && (
                                         <button
