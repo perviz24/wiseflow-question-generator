@@ -12,6 +12,7 @@
     "@ai-sdk/anthropic": "^3.0.36",
     "@clerk/localizations": "^3.35.3",
     "@clerk/nextjs": "^6.37.3",
+    "@sentry/nextjs": "^10.38.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.36.2",
     "@vercel/analytics": "^1.6.1",
