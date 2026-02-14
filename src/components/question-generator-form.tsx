@@ -385,7 +385,7 @@ export function QuestionGeneratorForm() {
 
   // Load persisted preview session on mount
   useEffect(() => {
-    const savedPreview = localStorage.getItem("wiseflow-preview-session")
+    const savedPreview = localStorage.getItem("tentagen-preview-session")
     if (savedPreview) {
       try {
         const { questions, metadata: savedMetadata } = JSON.parse(savedPreview)
@@ -395,7 +395,7 @@ export function QuestionGeneratorForm() {
         }
       } catch (error) {
         console.error("Failed to load preview session:", error)
-        localStorage.removeItem("wiseflow-preview-session")
+        localStorage.removeItem("tentagen-preview-session")
       }
     }
   }, [])
@@ -445,7 +445,7 @@ export function QuestionGeneratorForm() {
     setIsGenerating(true)
 
     // Clear previous preview session when generating new questions
-    localStorage.removeItem("wiseflow-preview-session")
+    localStorage.removeItem("tentagen-preview-session")
 
     try {
       // Combine manual context and uploaded context for API submission
@@ -472,7 +472,7 @@ export function QuestionGeneratorForm() {
       setMetadata(data.metadata)
 
       // Persist preview session to localStorage
-      localStorage.setItem("wiseflow-preview-session", JSON.stringify({
+      localStorage.setItem("tentagen-preview-session", JSON.stringify({
         questions: data.questions,
         metadata: data.metadata
       }))
@@ -648,7 +648,7 @@ export function QuestionGeneratorForm() {
     }))
     setUploadedContentSource("")
     // Clear persisted preview session
-    localStorage.removeItem("wiseflow-preview-session")
+    localStorage.removeItem("tentagen-preview-session")
   }
 
   const handleUpdateQuestions = (updatedQuestions: Question[]) => {
@@ -682,7 +682,7 @@ export function QuestionGeneratorForm() {
         <div className="flex justify-center">
           <Button
             onClick={() => {
-              localStorage.removeItem("wiseflow-preview-session")
+              localStorage.removeItem("tentagen-preview-session")
               window.location.href = "/"
             }}
             variant="ghost"
@@ -1113,7 +1113,7 @@ export function QuestionGeneratorForm() {
               variant="ghost"
               size="sm"
               onClick={() => {
-                localStorage.removeItem("wiseflow-preview-session")
+                localStorage.removeItem("tentagen-preview-session")
                 window.location.href = "/"
               }}
               className="w-full text-muted-foreground hover:text-foreground"

@@ -28,7 +28,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Save language to localStorage for Clerk localization
   useEffect(() => {
     if (typeof window !== "undefined") {
-      localStorage.setItem("wiseflow_ui_language", language)
+      localStorage.setItem("tentagen_ui_language", language)
       // Dispatch custom event for same-tab language changes
       window.dispatchEvent(new Event("languageChanged"))
     }

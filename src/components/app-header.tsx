@@ -15,7 +15,7 @@ export function AppHeader() {
 
   const handleHomeNavigation = () => {
     // Clear preview session and force full page reload to reset all state
-    localStorage.removeItem("wiseflow-preview-session")
+    localStorage.removeItem("tentagen-preview-session")
     window.location.href = "/"
   }
 

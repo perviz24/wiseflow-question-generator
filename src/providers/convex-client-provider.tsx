@@ -19,7 +19,7 @@ function ClerkWithDynamicLocale({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Read language preference from localStorage (set by LanguageProvider)
     const checkLanguage = () => {
-      const stored = localStorage.getItem("wiseflow_ui_language")
+      const stored = localStorage.getItem("tentagen_ui_language")
       setLocale(stored === "sv" ? svSE : undefined)
     }
 
