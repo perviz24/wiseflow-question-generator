@@ -11,23 +11,12 @@ import { useTranslation } from "@/lib/language-context"
 import { SettingsSheet } from "@/components/settings-sheet"
 import Image from "next/image"
 
-/** Admin menu item — only queries Convex when rendered (inside SignedIn) */
-function AdminMenuItem() {
-  const { t } = useTranslation()
-  const isAdmin = useQuery(api.siteConfig.getIsAdmin)
-  if (!isAdmin) return null
-  return (
-    <UserButton.Link
-      label={t("adminTitle")}
-      labelIcon={<Settings className="h-4 w-4" />}
-      href="/admin"
-    />
-  )
-}
-
 export function AppHeader() {
   const { t, language, setGuestLanguage } = useTranslation()
   const { isLoaded } = useAuth()
+  // Admin check must live here — Clerk UserButton.MenuItems only accepts
+  // UserButton.Link/Action, not custom components with hooks (they don't render as live React components)
+  const isAdmin = useQuery(api.siteConfig.getIsAdmin)
 
   const handleHomeNavigation = () => {
     // Clear preview session and force full page reload to reset all state
@@ -107,7 +96,13 @@ export function AppHeader() {
                       labelIcon={<Library className="h-4 w-4" />}
                       href="/library"
                     />
-                    <AdminMenuItem />
+                    {isAdmin && (
+                      <UserButton.Link
+                        label={t("adminTitle")}
+                        labelIcon={<Settings className="h-4 w-4" />}
+                        href="/admin"
+                      />
+                    )}
                   </UserButton.MenuItems>
                 </UserButton>
               </SignedIn>
