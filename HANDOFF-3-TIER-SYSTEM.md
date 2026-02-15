@@ -3,7 +3,7 @@
 > **For:** Next Claude Code session to continue implementing this feature
 > **Date:** 2026-02-12
 > **Project:** wiseflow-question-generator
-> **Path:** `C:\Users\pervi\OneDrive\Desktop\Claude code folder files\wiseflow-question-generator\`
+> **Path:** `C:\Dev\wiseflow-question-generator\`
 
 ---
 
